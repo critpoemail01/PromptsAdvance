@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "2026-07-29.4",
+  "gates": {
+    "G06": {
+      "status": "pending",
+      "approvedBy": { "name": "pending", "identity": "pending", "role": "pending" },
+      "approvedAt": "pending",
+      "artifacts": [],
+      "checks": {
+        "securityTestsPassed": false,
+        "authorizationNegativeTestsPassed": false,
+        "dependencyAndSecretScansPassed": false,
+        "accessibilityScopePassed": false,
+        "performanceBudgetsPassed": false,
+        "cacheAndOfflineBehaviorPassed": false,
+        "noUnresolvedCriticalHighFindings": false
+      }
+    },
+    "G07": {
+      "status": "pending",
+      "approvedBy": { "name": "pending", "identity": "pending", "role": "pending" },
+      "approvedAt": "pending",
+      "artifacts": [],
+      "checks": {
+        "ciRequiredChecksPassed": false,
+        "sameArtifactPromotionConfigured": false,
+        "sloAlertsValidated": false,
+        "backupRestoreAndDrTested": false,
+        "migrationAndRollbackTested": false,
+        "runbooksAndOwnersApproved": false
+      }
+    },
+    "G08": {
+      "status": "pending",
+      "approvedBy": { "name": "pending", "identity": "pending", "role": "pending" },
+      "approvedAt": "pending",
+      "artifacts": [],
+      "candidate": {
+        "baseSha": "pending",
+        "candidateSha": "pending",
+        "artifactDigest": "pending"
+      },
+      "acceptance": { "decision": "pending", "candidateSha": "pending", "artifactDigest": "pending" },
+      "independentReview": {
+        "decision": "pending",
+        "implementerIdentity": "pending",
+        "reviewerIdentity": "pending",
+        "taskId": "pending",
+        "readOnly": false,
+        "candidateSha": "pending",
+        "artifactDigest": "pending",
+        "criticalFindings": -1
+      }
+    },
+    "G09": {
+      "status": "pending",
+      "approvedBy": { "name": "pending", "identity": "pending", "role": "pending" },
+      "approvedAt": "pending",
+      "artifacts": [],
+      "authorization": {
+        "scope": "pending",
+        "environment": "pending",
+        "releaseWindow": "pending",
+        "candidateSha": "pending",
+        "artifactDigest": "pending",
+        "authorizedByIdentity": "pending",
+        "authorizedAt": "pending"
+      },
+      "deployment": {
+        "status": "pending",
+        "environment": "pending",
+        "candidateSha": "pending",
+        "artifactDigest": "pending",
+        "smokeTestsPassed": false,
+        "rollbackReady": false,
+        "abortCriteria": "pending"
+      }
+    },
+    "G10": {
+      "status": "pending",
+      "approvedBy": { "name": "pending", "identity": "pending", "role": "pending" },
+      "approvedAt": "pending",
+      "artifacts": [],
+      "checks": {
+        "postReleaseChecksScheduled": false,
+        "sloAndErrorBudgetOwned": false,
+        "bugsAndIncidentsTriaged": false,
+        "vulnerabilitiesMonitored": false,
+        "rumAndCostsReviewed": false,
+        "roiAndProductMetricsReviewed": false,
+        "doraAndImprovementCadenceOwned": false
+      }
+    }
+  }
+}

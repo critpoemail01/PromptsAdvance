@@ -1,0 +1,1102 @@
+[CmdletBinding()]
+param(
+    [string]$CatalogRoot,
+    [switch]$KeepFixture,
+    [switch]$BrownfieldOnly
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[Console]::InputEncoding = $utf8NoBom
+[Console]::OutputEncoding = $utf8NoBom
+$OutputEncoding = $utf8NoBom
+
+if ([string]::IsNullOrWhiteSpace($CatalogRoot)) {
+    $CatalogRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+}
+else {
+    $CatalogRoot = [System.IO.Path]::GetFullPath($CatalogRoot)
+}
+
+$entryPoint = Join-Path $CatalogRoot 'software-lifecycle.ps1'
+if (-not (Test-Path -LiteralPath $entryPoint -PathType Leaf)) {
+    throw "Lifecycle entry point is missing: $entryPoint"
+}
+
+$powerShellExe = Join-Path $PSHOME 'powershell.exe'
+if (-not (Test-Path -LiteralPath $powerShellExe -PathType Leaf)) {
+    $pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
+    $powerShellExe = $pwshCommand.Source
+}
+if ([string]::IsNullOrWhiteSpace([string]$powerShellExe)) {
+    throw 'PowerShell executable was not found.'
+}
+$fixtureRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("prompts-lifecycle-e2e-" + [Guid]::NewGuid().ToString('N'))
+$junctionRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("prompts-lifecycle-junction-" + [Guid]::NewGuid().ToString('N'))
+$brownfieldFixtureRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("prompts-brownfield-e2e-" + [Guid]::NewGuid().ToString('N'))
+$brownfieldProjectRoot = Join-Path $brownfieldFixtureRoot 'existing-application'
+$brownfieldProcessRoot = Join-Path $brownfieldFixtureRoot 'isolated-process'
+$brownfieldCollisionRoot = Join-Path $brownfieldFixtureRoot 'occupied-process'
+$boilerplate = [System.IO.Path]::GetFullPath((Join-Path $CatalogRoot '..\BoilerPlateAdvance'))
+$results = [System.Collections.Generic.List[string]]::new()
+
+function Invoke-Lifecycle {
+    param(
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [string]$ScriptPath = $entryPoint
+    )
+
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    $output = @(& $powerShellExe -NoProfile -ExecutionPolicy Bypass -File $ScriptPath @Arguments 2>&1)
+    $exitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    return [pscustomobject]@{
+        ExitCode = $exitCode
+        Output = ($output | Out-String).Trim()
+    }
+}
+
+function Require-ExitCode {
+    param(
+        [Parameter(Mandatory)]$Execution,
+        [Parameter(Mandatory)][int]$Expected,
+        [Parameter(Mandatory)][string]$Label
+    )
+
+    if ($Execution.ExitCode -ne $Expected) {
+        throw "$Label expected exit code $Expected, found $($Execution.ExitCode). Output: $($Execution.Output)"
+    }
+    $results.Add("$Label -> $Expected")
+}
+
+try {
+    New-Item -ItemType Directory -Path $brownfieldProjectRoot | Out-Null
+    $brownfieldSentinel = Join-Path $brownfieldProjectRoot 'existing-file.txt'
+    [System.IO.File]::WriteAllText(
+        $brownfieldSentinel,
+        "existing application content`r`n",
+        $utf8NoBom)
+    $gitCommand = Get-Command git -ErrorAction SilentlyContinue
+    $brownfieldGitHead = $null
+    $brownfieldGitRemote = $null
+    $brownfieldGitStatus = $null
+    $brownfieldGitMetadataHashes = @{}
+    if ($null -ne $gitCommand) {
+        & $gitCommand.Source -C $brownfieldProjectRoot init --quiet --initial-branch=main
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the disposable brownfield Git repository.'
+        }
+        & $gitCommand.Source -C $brownfieldProjectRoot config user.name 'Brownfield Fixture'
+        & $gitCommand.Source -C $brownfieldProjectRoot config user.email 'brownfield-fixture@example.invalid'
+        & $gitCommand.Source -C $brownfieldProjectRoot add -- 'existing-file.txt'
+        & $gitCommand.Source -C $brownfieldProjectRoot commit --quiet -m 'fixture baseline'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the disposable brownfield Git baseline.'
+        }
+        & $gitCommand.Source -C $brownfieldProjectRoot remote add origin 'https://example.invalid/existing-application.git'
+        [System.IO.File]::AppendAllText(
+            $brownfieldSentinel,
+            "preserve this local change`r`n",
+            $utf8NoBom)
+        $brownfieldGitHead = [string]@(& $gitCommand.Source --no-optional-locks -C $brownfieldProjectRoot rev-parse HEAD)[0]
+        $brownfieldGitRemote = [string]@(& $gitCommand.Source --no-optional-locks -C $brownfieldProjectRoot remote get-url origin)[0]
+        $brownfieldGitStatus = (@(& $gitCommand.Source --no-optional-locks -C $brownfieldProjectRoot status --porcelain=v1) -join "`n")
+        foreach ($relativeGitPath in @('config', 'HEAD', 'index')) {
+            $gitMetadataPath = Join-Path (Join-Path $brownfieldProjectRoot '.git') $relativeGitPath
+            $brownfieldGitMetadataHashes[$relativeGitPath] = (
+                Get-FileHash -Algorithm SHA256 -LiteralPath $gitMetadataPath).Hash
+        }
+    }
+    $brownfieldBeforeHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $brownfieldSentinel).Hash
+    $brownfieldContinue = Invoke-Lifecycle @(
+        'continue',
+        '-ProjectPath', $brownfieldProjectRoot,
+        '-ProcessRoot', $brownfieldProcessRoot,
+        '-Owner', 'Brownfield Fixture Owner',
+        '-BoilerplatePath', $boilerplate
+    )
+    Require-ExitCode -Execution $brownfieldContinue -Expected 0 -Label 'brownfield continue initializes adoption'
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $brownfieldSentinel).Hash -ne $brownfieldBeforeHash) {
+        throw 'Brownfield continue changed an existing application file.'
+    }
+    if (Test-Path -LiteralPath (Join-Path $brownfieldProjectRoot 'LIFECYCLE_STATE.json')) {
+        throw 'Brownfield continue wrote lifecycle state into the existing application.'
+    }
+    $brownfieldStatePath = Join-Path $brownfieldProcessRoot 'LIFECYCLE_STATE.json'
+    $brownfieldStateJson = Get-Content -Raw -Encoding UTF8 -LiteralPath $brownfieldStatePath
+    $brownfieldState = $brownfieldStateJson | ConvertFrom-Json
+    if ($brownfieldState.initiativeMode -ne 'brownfield' -or
+        [System.IO.Path]::GetFullPath([string]$brownfieldState.applicationRoot) -ne
+            [System.IO.Path]::GetFullPath($brownfieldProjectRoot) -or
+        $brownfieldState.currentPrompt -ne '01' -or
+        $brownfieldState.repositoryBaseline.status -notin @('captured', 'not_detected')) {
+        throw 'Brownfield lifecycle state did not preserve mode, application root, baseline and prompt 01.'
+    }
+    if ($null -ne $gitCommand -and
+        ($brownfieldState.repositoryBaseline.status -ne 'captured' -or
+            $brownfieldState.repositoryBaseline.head -ne $brownfieldGitHead -or
+            $brownfieldState.repositoryBaseline.dirty -ne $true -or
+            [int]$brownfieldState.repositoryBaseline.remoteCount -ne 1)) {
+        throw 'Brownfield lifecycle did not capture the existing dirty Git baseline.'
+    }
+    $brownfieldPacket = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $brownfieldProcessRoot 'NEXT_TASK.md')
+    if ($brownfieldPacket -notmatch 'Initiative mode: brownfield' -or
+        $brownfieldPacket -notmatch [regex]::Escape($brownfieldProjectRoot)) {
+        throw 'Brownfield NEXT_TASK.md does not identify the mode and existing application.'
+    }
+    $brownfieldContinueAgain = Invoke-Lifecycle @(
+        'continue',
+        '-ProjectPath', $brownfieldProjectRoot,
+        '-ProcessRoot', $brownfieldProcessRoot,
+        '-BoilerplatePath', $boilerplate
+    )
+    Require-ExitCode -Execution $brownfieldContinueAgain -Expected 0 -Label 'brownfield continue resolves existing process'
+    if ((Get-Content -Raw -Encoding UTF8 -LiteralPath $brownfieldStatePath) -ne $brownfieldStateJson) {
+        throw 'Resolving an existing brownfield lifecycle mutated its durable state.'
+    }
+    $brownfieldContinueByProcess = Invoke-Lifecycle @(
+        'continue',
+        '-ProjectPath', $brownfieldProcessRoot,
+        '-BoilerplatePath', $boilerplate
+    )
+    Require-ExitCode -Execution $brownfieldContinueByProcess -Expected 0 -Label 'continue accepts lifecycle root directly'
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $brownfieldSentinel).Hash -ne $brownfieldBeforeHash) {
+        throw 'Resolving the brownfield lifecycle changed the existing application.'
+    }
+    if ($null -ne $gitCommand) {
+        foreach ($relativeGitPath in @('config', 'HEAD', 'index')) {
+            $gitMetadataPath = Join-Path (Join-Path $brownfieldProjectRoot '.git') $relativeGitPath
+            $metadataHashAfter = (Get-FileHash -Algorithm SHA256 -LiteralPath $gitMetadataPath).Hash
+            if ($metadataHashAfter -ne $brownfieldGitMetadataHashes[$relativeGitPath]) {
+                throw "Brownfield continue changed .git/$relativeGitPath."
+            }
+        }
+        $brownfieldGitHeadAfter = [string]@(& $gitCommand.Source --no-optional-locks -C $brownfieldProjectRoot rev-parse HEAD)[0]
+        $brownfieldGitRemoteAfter = [string]@(& $gitCommand.Source --no-optional-locks -C $brownfieldProjectRoot remote get-url origin)[0]
+        $brownfieldGitStatusAfter = (@(& $gitCommand.Source --no-optional-locks -C $brownfieldProjectRoot status --porcelain=v1) -join "`n")
+        if ($brownfieldGitHeadAfter -ne $brownfieldGitHead -or
+            $brownfieldGitRemoteAfter -ne $brownfieldGitRemote -or
+            $brownfieldGitStatusAfter -ne $brownfieldGitStatus) {
+            throw 'Brownfield continue changed HEAD, remote or local working-tree changes.'
+        }
+    }
+    $otherBrownfieldProject = Join-Path $brownfieldFixtureRoot 'other-application'
+    New-Item -ItemType Directory -Path $otherBrownfieldProject | Out-Null
+    $mismatchedContinue = Invoke-Lifecycle @(
+        'continue',
+        '-ProjectPath', $otherBrownfieldProject,
+        '-ProcessRoot', $brownfieldProcessRoot,
+        '-BoilerplatePath', $boilerplate
+    )
+    if ($mismatchedContinue.ExitCode -eq 0) {
+        throw 'Continue reused a lifecycle that belongs to another application.'
+    }
+    $corruptBrownfieldState = $brownfieldStateJson | ConvertFrom-Json
+    $corruptBrownfieldState.applicationRoot = $brownfieldProcessRoot
+    [System.IO.File]::WriteAllText(
+        $brownfieldStatePath,
+        ($corruptBrownfieldState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $corruptBrownfieldValidate = Invoke-Lifecycle @(
+        'validate',
+        '-ProcessRoot', $brownfieldProcessRoot
+    )
+    if ($corruptBrownfieldValidate.ExitCode -eq 0) {
+        throw 'Validate accepted a brownfield applicationRoot nested in processRoot.'
+    }
+    [System.IO.File]::WriteAllText($brownfieldStatePath, $brownfieldStateJson, $utf8NoBom)
+    $results.Add('brownfield adoption -> isolated, idempotent and application-preserving')
+
+    New-Item -ItemType Directory -Path $brownfieldCollisionRoot | Out-Null
+    $collisionSentinel = Join-Path $brownfieldCollisionRoot 'do-not-overwrite.txt'
+    [System.IO.File]::WriteAllText($collisionSentinel, "occupied`r`n", $utf8NoBom)
+    $collisionContinue = Invoke-Lifecycle @(
+        'continue',
+        '-ProjectPath', $brownfieldProjectRoot,
+        '-ProcessRoot', $brownfieldCollisionRoot,
+        '-BoilerplatePath', $boilerplate
+    )
+    if ($collisionContinue.ExitCode -eq 0 -or
+        -not (Test-Path -LiteralPath $collisionSentinel -PathType Leaf)) {
+        throw 'Brownfield continue overwrote or accepted an occupied process root.'
+    }
+    $insideBoilerplateProcess = Join-Path $brownfieldFixtureRoot 'must-not-adopt-boilerplate'
+    $insideBoilerplateAdopt = Invoke-Lifecycle @(
+        'adopt',
+        '-ProjectPath', $boilerplate,
+        '-ProcessRoot', $insideBoilerplateProcess,
+        '-Owner', 'Fixture Owner',
+        '-BoilerplatePath', $boilerplate
+    )
+    if ($insideBoilerplateAdopt.ExitCode -eq 0 -or
+        (Test-Path -LiteralPath $insideBoilerplateProcess)) {
+        throw 'Adopt accepted BoilerplatePath as the existing application.'
+    }
+    $missingProjectPath = Join-Path $brownfieldFixtureRoot 'missing-application'
+    $missingProcessPath = Join-Path $brownfieldFixtureRoot 'must-not-create-for-missing'
+    $missingContinue = Invoke-Lifecycle @(
+        'continue',
+        '-ProjectPath', $missingProjectPath,
+        '-ProcessRoot', $missingProcessPath,
+        '-BoilerplatePath', $boilerplate
+    )
+    if ($missingContinue.ExitCode -eq 0 -or (Test-Path -LiteralPath $missingProcessPath)) {
+        throw 'Continue initialized a lifecycle for a missing application path.'
+    }
+    if ($null -ne $gitCommand) {
+        $monorepoRoot = Join-Path $brownfieldFixtureRoot 'existing-monorepo'
+        $monorepoProjectRoot = Join-Path $monorepoRoot 'application'
+        $monorepoProcessRoot = Join-Path $monorepoRoot 'lifecycle-process'
+        New-Item -ItemType Directory -Path $monorepoProjectRoot | Out-Null
+        [System.IO.File]::WriteAllText(
+            (Join-Path $monorepoProjectRoot 'app.txt'),
+            "monorepo application`r`n",
+            $utf8NoBom)
+        & $gitCommand.Source -C $monorepoRoot init --quiet --initial-branch=main
+        & $gitCommand.Source -C $monorepoRoot config user.name 'Monorepo Fixture'
+        & $gitCommand.Source -C $monorepoRoot config user.email 'monorepo-fixture@example.invalid'
+        & $gitCommand.Source -C $monorepoRoot add --all
+        & $gitCommand.Source -C $monorepoRoot commit --quiet -m 'monorepo fixture'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not create the disposable monorepo fixture.'
+        }
+        $monorepoContinue = Invoke-Lifecycle @(
+            'continue',
+            '-ProjectPath', $monorepoProjectRoot,
+            '-ProcessRoot', $monorepoProcessRoot,
+            '-BoilerplatePath', $boilerplate
+        )
+        if ($monorepoContinue.ExitCode -eq 0 -or (Test-Path -LiteralPath $monorepoProcessRoot)) {
+            throw 'Continue created ProcessRoot inside the existing Git repository tree.'
+        }
+    }
+    $results.Add('brownfield collisions, boilerplate adoption and missing path -> blocked')
+
+    $disposableCatalogRoot = Join-Path $brownfieldFixtureRoot 'catalog-copy'
+    Copy-Item -LiteralPath $CatalogRoot -Destination $disposableCatalogRoot -Recurse
+    $naturalProjectRoot = Join-Path $brownfieldFixtureRoot 'natural-existing-app'
+    New-Item -ItemType Directory -Path $naturalProjectRoot | Out-Null
+    [System.IO.File]::WriteAllText(
+        (Join-Path $naturalProjectRoot 'app.txt'),
+        "natural-language fixture`r`n",
+        $utf8NoBom)
+    $naturalEntryPoint = Join-Path $disposableCatalogRoot 'software-lifecycle.ps1'
+    $naturalContinue = Invoke-Lifecycle `
+        -ScriptPath $naturalEntryPoint `
+        -Arguments @(
+            'continue',
+            '-ProjectPath', $naturalProjectRoot,
+            '-BoilerplatePath', $boilerplate
+        )
+    Require-ExitCode -Execution $naturalContinue -Expected 0 -Label 'path-only continue uses deterministic process root'
+    $naturalSlug = Split-Path $naturalProjectRoot -Leaf
+    $naturalProcessRoot = Join-Path $brownfieldFixtureRoot "SoftwareProcesses\$naturalSlug"
+    $naturalStatePath = Join-Path $naturalProcessRoot 'LIFECYCLE_STATE.json'
+    if (-not (Test-Path -LiteralPath $naturalStatePath -PathType Leaf)) {
+        throw 'Path-only continue did not create the deterministic isolated lifecycle.'
+    }
+    $naturalState = Get-Content -Raw -Encoding UTF8 -LiteralPath $naturalStatePath | ConvertFrom-Json
+    if ($naturalState.initiativeMode -ne 'brownfield' -or
+        $null -ne $naturalState.productOwner -or
+        [System.IO.Path]::GetFullPath([string]$naturalState.applicationRoot) -ne
+            [System.IO.Path]::GetFullPath($naturalProjectRoot)) {
+        throw 'Path-only continue did not bind the application while preserving the pending owner.'
+    }
+    $naturalContinueAgain = Invoke-Lifecycle `
+        -ScriptPath $naturalEntryPoint `
+        -Arguments @(
+            'continue',
+            '-ProjectPath', $naturalProjectRoot,
+            '-BoilerplatePath', $boilerplate
+        )
+    Require-ExitCode -Execution $naturalContinueAgain -Expected 0 -Label 'path-only continue resolves deterministic process'
+    $results.Add('natural path-only continue -> deterministic adoption and resolution')
+
+    if ($BrownfieldOnly) {
+        Write-Host 'PASS: brownfield lifecycle test.' -ForegroundColor Green
+        $results | ForEach-Object { Write-Host " - $_" }
+        return
+    }
+
+    $forbiddenRoot = Join-Path $boilerplate ("forbidden-lifecycle-" + [Guid]::NewGuid().ToString('N'))
+    $forbiddenStart = Invoke-Lifecycle @(
+        'start',
+        '-Name', 'forbidden-lifecycle',
+        '-Owner', 'Fixture Owner',
+        '-ProcessRoot', $forbiddenRoot,
+        '-BoilerplatePath', $boilerplate
+    )
+    if ($forbiddenStart.ExitCode -eq 0 -or (Test-Path -LiteralPath $forbiddenRoot)) {
+        throw 'Start accepted or created a process root inside BoilerplatePath.'
+    }
+    $results.Add('process root inside boilerplate -> blocked')
+
+    $linkItemType = $(if ($IsWindows) { 'Junction' } else { 'SymbolicLink' })
+    New-Item -ItemType $linkItemType -Path $junctionRoot -Target $boilerplate | Out-Null
+    $junctionProcessRoot = Join-Path $junctionRoot ("junction-child-" + [Guid]::NewGuid().ToString('N'))
+    $junctionStart = Invoke-Lifecycle @(
+        'start',
+        '-Name', 'junction-lifecycle',
+        '-Owner', 'Fixture Owner',
+        '-ProcessRoot', $junctionProcessRoot,
+        '-BoilerplatePath', $boilerplate
+    )
+    if ($junctionStart.ExitCode -eq 0 -or (Test-Path -LiteralPath $junctionProcessRoot)) {
+        throw 'Start accepted a junction that resolves ProcessRoot inside BoilerplatePath.'
+    }
+    $results.Add('junction into boilerplate -> blocked')
+
+    $start = Invoke-Lifecycle @(
+        'start',
+        '-Name', 'lifecycle-e2e',
+        '-Owner', 'Fixture Owner',
+        '-ProcessRoot', $fixtureRoot,
+        '-BoilerplatePath', $boilerplate
+    )
+    Require-ExitCode -Execution $start -Expected 0 -Label 'start'
+
+    foreach ($required in @(
+        'LIFECYCLE_STATE.json',
+        'LIFECYCLE_GATE_EVIDENCE.json',
+        'NEXT_TASK.md',
+        'PROCESS_MANIFEST.json',
+        'QUALITY_GATES.md',
+        '.agents\skills\build-professional-web-software\SKILL.md'
+    )) {
+        if (-not (Test-Path -LiteralPath (Join-Path $fixtureRoot $required))) {
+            throw "Start did not create required path: $required"
+        }
+    }
+
+    $validateInitial = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    Require-ExitCode -Execution $validateInitial -Expected 0 -Label 'initial validate'
+
+    $statePath = Join-Path $fixtureRoot 'LIFECYCLE_STATE.json'
+    $originalStateJson = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath
+    $corruptState = $originalStateJson | ConvertFrom-Json
+    $corruptState.catalogVersion = 'CORRUPTED-CATALOG'
+    $corruptState.processRoot = 'C:\wrong\root'
+    $corruptState.prompts.'01'.status = 'invented-status'
+    [System.IO.File]::WriteAllText(
+        $statePath,
+        ($corruptState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $corruptValidate = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    $corruptNext = Invoke-Lifecycle @('next', '-ProcessRoot', $fixtureRoot)
+    $corruptRecord = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '01',
+        '-Result', 'completed', '-Evidence', 'fixture://must-not-be-recorded'
+    )
+    if ($corruptValidate.ExitCode -eq 0 -or
+        $corruptNext.ExitCode -eq 0 -or
+        $corruptRecord.ExitCode -eq 0) {
+        throw 'validate, next or a mutator accepted a materially corrupted lifecycle state.'
+    }
+    [System.IO.File]::WriteAllText($statePath, $originalStateJson, $utf8NoBom)
+    $results.Add('corrupted catalog/root/status -> validate, next and mutator blocked')
+
+    $invalidSliceState = $originalStateJson | ConvertFrom-Json
+    $invalidSliceState.slices = @([pscustomobject][ordered]@{
+        id = 'INVALID-001'
+        kind = 'banana'
+        surface = 'desktop'
+        requirements = 'FR-INVALID'
+        acceptanceCriteria = 'invalid fixture'
+        outOfScope = 'none'
+        evidence = 'fixture://invalid-slice'
+        status = 'magical'
+    })
+    $invalidSliceState.activeSlice = $null
+    [System.IO.File]::WriteAllText(
+        $statePath,
+        ($invalidSliceState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $invalidSliceValidate = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    $invalidSliceRecord = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '01',
+        '-Result', 'completed', '-Evidence', 'fixture://must-not-be-recorded'
+    )
+    if ($invalidSliceValidate.ExitCode -eq 0 -or $invalidSliceRecord.ExitCode -eq 0) {
+        throw 'A semantically invalid slice was accepted by validate or a mutator.'
+    }
+    [System.IO.File]::WriteAllText($statePath, $originalStateJson, $utf8NoBom)
+    $results.Add('invalid slice kind/surface/status/pointer -> validate and mutator blocked')
+
+    $deadEndState = $originalStateJson | ConvertFrom-Json
+    $deadEndState.currentPrompt = $null
+    $deadEndState.status = 'waiting_decision'
+    $deadEndState.nextAction = 'nonsense_dead_end'
+    [System.IO.File]::WriteAllText(
+        $statePath,
+        ($deadEndState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $deadEndValidate = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    if ($deadEndValidate.ExitCode -eq 0) {
+        throw 'A waiting_decision dead end with a disconnected ready prompt was accepted.'
+    }
+
+    $forgedCompletedState = $originalStateJson | ConvertFrom-Json
+    $forgedCompletedState.currentPrompt = $null
+    $forgedCompletedState.status = 'completed'
+    $forgedCompletedState.nextAction = 'none'
+    [System.IO.File]::WriteAllText(
+        $statePath,
+        ($forgedCompletedState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $forgedCompletedValidate = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    if ($forgedCompletedValidate.ExitCode -eq 0) {
+        throw 'A forged completed lifecycle without prompt 73 and G10 was accepted.'
+    }
+    [System.IO.File]::WriteAllText($statePath, $originalStateJson, $utf8NoBom)
+    $results.Add('dead-end waiting state and forged completion -> blocked')
+
+    foreach ($transition in @(
+        @{ Id = '01'; Next = '02' },
+        @{ Id = '02'; Next = '03' },
+        @{ Id = '03'; Next = '04' }
+    )) {
+        $record = Invoke-Lifecycle @(
+            'record',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $transition.Id,
+            '-Result', 'completed',
+            '-Evidence', "fixture://prompt-$($transition.Id)",
+            '-NextPrompt', $transition.Next
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $($transition.Id)"
+    }
+
+    $blockedGate = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '04',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-04-invalid',
+        '-NextPrompt', '05'
+    )
+    if ($blockedGate.ExitCode -eq 0) {
+        throw 'Prompt 04 crossed G01 with an incomplete product definition.'
+    }
+    $results.Add('invalid G01 -> blocked')
+
+    $gateFixtureRoot = Join-Path $fixtureRoot 'pilot\fixtures\product-definition-gate'
+    Copy-Item -LiteralPath (Join-Path $gateFixtureRoot 'valid-product-definition.md') `
+        -Destination (Join-Path $fixtureRoot 'PRODUCT_DEFINITION.md') -Force
+    Copy-Item -LiteralPath (Join-Path $gateFixtureRoot 'implementation-status.md') `
+        -Destination (Join-Path $fixtureRoot 'IMPLEMENTATION_STATUS.md') -Force
+
+    $passedGate = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '04',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-04-valid',
+        '-NextPrompt', '05'
+    )
+    Require-ExitCode -Execution $passedGate -Expected 0 -Label 'valid G01'
+
+    $validateAfterGate = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    Require-ExitCode -Execution $validateAfterGate -Expected 0 -Label 'post-G01 validate'
+
+    $state = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json') | ConvertFrom-Json
+    if ($state.currentPrompt -ne '05' -or $state.gates.G01.status -ne 'passed') {
+        throw "Unexpected state after G01: prompt=$($state.currentPrompt), G01=$($state.gates.G01.status)"
+    }
+    $results.Add('state after G01 -> prompt 05')
+
+    $next = Invoke-Lifecycle @('next', '-ProcessRoot', $fixtureRoot)
+    Require-ExitCode -Execution $next -Expected 0 -Label 'next'
+    $task = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'NEXT_TASK.md')
+    if ($task -notmatch 'Prompt:\s*05' -or $task -notmatch '\$build-professional-web-software') {
+        throw 'NEXT_TASK.md does not target prompt 05 through the lifecycle skill.'
+    }
+    $results.Add('NEXT_TASK -> prompt 05')
+
+    $invalidOverride = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '05',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-05-invalid-route',
+        '-NextPrompt', '40'
+    )
+    if ($invalidOverride.ExitCode -eq 0) {
+        throw 'A deterministic transition accepted an arbitrary NextPrompt override.'
+    }
+    $results.Add('arbitrary NextPrompt -> blocked')
+
+    foreach ($id in @('05', '06', '07', '08', '09')) {
+        $record = Invoke-Lifecycle @(
+            'record',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $id,
+            '-Result', 'completed',
+            '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+
+    $gateG02 = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '10',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-10',
+        '-GateId', 'G02',
+        '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://architecture-approved',
+        '-ApprovedBy', 'Fixture Architecture Approver'
+    )
+    Require-ExitCode -Execution $gateG02 -Expected 0 -Label 'G02'
+
+    $record11 = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '11',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-11'
+    )
+    Require-ExitCode -Execution $record11 -Expected 0 -Label 'record 11'
+
+    $pendingPilot = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '12',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-12',
+        '-GateId', 'G03',
+        '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://pilot-pending',
+        '-ApprovedBy', 'Fixture Implementation Approver'
+    )
+    if ($pendingPilot.ExitCode -eq 0) {
+        throw 'G03 accepted a pending current-version pilot.'
+    }
+    $results.Add('pending pilot at G03 -> blocked')
+
+    Copy-Item -LiteralPath (Join-Path $fixtureRoot 'pilot\fixtures\implementation-readiness-gate\valid-pilot-approval.md') `
+        -Destination (Join-Path $fixtureRoot 'PILOT_APPROVAL.md') -Force
+
+    $gateG03 = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '12',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-12',
+        '-GateId', 'G03',
+        '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://pilot-approved',
+        '-ApprovedBy', 'Fixture Implementation Approver'
+    )
+    Require-ExitCode -Execution $gateG03 -Expected 0 -Label 'G03'
+
+    $invalidSelection = Invoke-Lifecycle @(
+        'select',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '64',
+        '-Evidence', 'fixture://invalid-selection'
+    )
+    if ($invalidSelection.ExitCode -eq 0) {
+        throw 'The post-definition selector accepted a release prompt.'
+    }
+    $results.Add('out-of-context selection -> blocked')
+
+    $selectFoundation = Invoke-Lifecycle @(
+        'select',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '19',
+        '-SliceId', 'SLICE-001',
+        '-SliceKind', 'page',
+        '-Surface', 'web',
+        '-Requirements', 'FR-001, SEC-001',
+        '-AcceptanceCriteria', 'FR-001 succeeds and SEC-001 denies unauthorized access',
+        '-OutOfScope', 'billing, native application and external identity providers',
+        '-Evidence', 'fixture://slice-approved'
+    )
+    Require-ExitCode -Execution $selectFoundation -Expected 0 -Label 'select first slice foundation'
+
+    foreach ($id in @('19', '20', '21', '22')) {
+        $record = Invoke-Lifecycle @(
+            'record',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $id,
+            '-Result', 'completed',
+            '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+
+    $selectPage = Invoke-Lifecycle @(
+        'select',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '25',
+        '-SliceId', 'SLICE-001',
+        '-SliceKind', 'page',
+        '-Surface', 'web',
+        '-Requirements', 'FR-001, SEC-001',
+        '-AcceptanceCriteria', 'FR-001 succeeds and SEC-001 denies unauthorized access',
+        '-OutOfScope', 'billing, native application and external identity providers',
+        '-Evidence', 'fixture://slice-page-approved'
+    )
+    Require-ExitCode -Execution $selectPage -Expected 0 -Label 'select page slice'
+
+    foreach ($transition in @(
+        @{ Id = '25'; Expected = '15' },
+        @{ Id = '15'; Expected = '26' }
+    )) {
+        $record = Invoke-Lifecycle @(
+            'record',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $transition.Id,
+            '-Result', 'completed',
+            '-Evidence', "fixture://prompt-$($transition.Id)"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "route $($transition.Id)"
+        $routeState = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json') | ConvertFrom-Json
+        if ($routeState.currentPrompt -ne $transition.Expected) {
+            throw "Prompt $($transition.Id) routed to $($routeState.currentPrompt), expected $($transition.Expected)."
+        }
+    }
+
+    $invalidG04 = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '26',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-26',
+        '-GateId', 'G04',
+        '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://quality-template',
+        '-ApprovedBy', 'Fixture UX Approver'
+    )
+    if ($invalidG04.ExitCode -eq 0) {
+        throw 'G04 accepted the pending product-quality template.'
+    }
+    $results.Add('pending product quality at G04 -> blocked')
+
+    Copy-Item -LiteralPath (Join-Path $fixtureRoot 'pilot\fixtures\product-quality-gate\valid-product-quality-baseline.md') `
+        -Destination (Join-Path $fixtureRoot 'PRODUCT_QUALITY_BASELINE.md') -Force
+
+    $gateG04 = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '26',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-26',
+        '-GateId', 'G04',
+        '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://quality-approved',
+        '-ApprovedBy', 'Fixture UX Approver'
+    )
+    Require-ExitCode -Execution $gateG04 -Expected 0 -Label 'G04'
+
+    $finalState = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json') | ConvertFrom-Json
+    if ($finalState.status -ne 'waiting_decision' -or
+        $finalState.gates.G04.status -ne 'passed' -or
+        $finalState.activeSlice.status -ne 'completed') {
+        throw 'First-slice completion did not persist its gate, decision state and evidence.'
+    }
+    $results.Add('first professional slice -> completed and G04 passed')
+
+    $earlyGlobal = Invoke-Lifecycle @(
+        'select',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '23',
+        '-Evidence', 'fixture://premature-global-exit'
+    )
+    if ($earlyGlobal.ExitCode -eq 0) {
+        throw 'Global completion started before surface/page applicability decisions were resolved.'
+    }
+    $results.Add('early prompt 23 exit -> blocked')
+
+    foreach ($id in @('13', '14', '16', '17', '18', '27', '28', '29')) {
+        $decision = Invoke-Lifecycle @(
+            'decide',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $id,
+            '-Result', 'not_applicable',
+            '-Evidence', "fixture://scope-excludes-$id"
+        )
+        Require-ExitCode -Execution $decision -Expected 0 -Label "decide $id"
+    }
+
+    $selectGlobal = Invoke-Lifecycle @(
+        'select',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '23',
+        '-Evidence', 'fixture://must-slices-complete'
+    )
+    Require-ExitCode -Execution $selectGlobal -Expected 0 -Label 'select global requirements'
+
+    foreach ($id in @('23', '24')) {
+        $record = Invoke-Lifecycle @(
+            'record',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $id,
+            '-Result', 'completed',
+            '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+
+    $earlySecurity = Invoke-Lifecycle @(
+        'select',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '39',
+        '-Evidence', 'fixture://premature-security-exit'
+    )
+    if ($earlySecurity.ExitCode -eq 0) {
+        throw 'Security core started before optional capability decisions were resolved.'
+    }
+    $results.Add('early prompt 39 exit -> blocked')
+
+    foreach ($id in 30..38 | ForEach-Object { '{0:D2}' -f $_ }) {
+        $decision = Invoke-Lifecycle @(
+            'decide',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $id,
+            '-Result', 'not_applicable',
+            '-Evidence', "fixture://scope-excludes-$id"
+        )
+        Require-ExitCode -Execution $decision -Expected 0 -Label "decide $id"
+    }
+
+    $gateG05 = Invoke-Lifecycle @(
+        'gate',
+        '-ProcessRoot', $fixtureRoot,
+        '-GateId', 'G05',
+        '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://must-journeys-approved',
+        '-ApprovedBy', 'Fixture Product Approver'
+    )
+    Require-ExitCode -Execution $gateG05 -Expected 0 -Label 'G05'
+
+    $selectSecurity = Invoke-Lifecycle @(
+        'select',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '39',
+        '-Evidence', 'fixture://security-required'
+    )
+    Require-ExitCode -Execution $selectSecurity -Expected 0 -Label 'select security'
+
+    $record39 = Invoke-Lifecycle @(
+        'record',
+        '-ProcessRoot', $fixtureRoot,
+        '-PromptId', '39',
+        '-Result', 'completed',
+        '-Evidence', 'fixture://prompt-39'
+    )
+    Require-ExitCode -Execution $record39 -Expected 0 -Label 'route 39'
+
+    $postG05State = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json') | ConvertFrom-Json
+    if ($postG05State.currentPrompt -ne '40' -or $postG05State.gates.G05.status -ne 'passed') {
+        throw "G05/security routing failed: prompt=$($postG05State.currentPrompt), G05=$($postG05State.gates.G05.status)"
+    }
+    $results.Add('applicability decisions + G05 + route 39 -> 40')
+
+    foreach ($id in @('40', '41', '42', '43', '44')) {
+        $record = Invoke-Lifecycle @(
+            'record',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $id,
+            '-Result', 'completed',
+            '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+    foreach ($id in @('45', '46', '47')) {
+        $decision = Invoke-Lifecycle @(
+            'decide',
+            '-ProcessRoot', $fixtureRoot,
+            '-PromptId', $id,
+            '-Result', 'not_applicable',
+            '-Evidence', "fixture://scope-excludes-$id"
+        )
+        Require-ExitCode -Execution $decision -Expected 0 -Label "decide $id"
+    }
+    $select48 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '48',
+        '-Evidence', 'fixture://hardening-required'
+    )
+    Require-ExitCode -Execution $select48 -Expected 0 -Label 'select hardening'
+    foreach ($id in @('48', '49')) {
+        $record = Invoke-Lifecycle @(
+            'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
+            '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+    $decide50 = Invoke-Lifecycle @(
+        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '50',
+        '-Result', 'not_applicable', '-Evidence', 'fixture://scope-excludes-50'
+    )
+    Require-ExitCode -Execution $decide50 -Expected 0 -Label 'decide 50'
+    $select51 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '51',
+        '-Evidence', 'fixture://quality-required'
+    )
+    Require-ExitCode -Execution $select51 -Expected 0 -Label 'select quality core'
+    foreach ($id in @('51', '52', '53')) {
+        $record = Invoke-Lifecycle @(
+            'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
+            '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+    $invalidG06 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '54',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-54',
+        '-GateId', 'G06', '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://unstructured-hardening',
+        '-ApprovedBy', 'Fixture Security Approver'
+    )
+    if ($invalidG06.ExitCode -eq 0) {
+        throw 'G06 accepted pending/unstructured gate evidence.'
+    }
+    $results.Add('pending structured G06 evidence -> blocked')
+    Copy-Item -LiteralPath (Join-Path $fixtureRoot 'pilot\fixtures\lifecycle-gates\valid-lifecycle-gate-evidence.json') `
+        -Destination (Join-Path $fixtureRoot 'LIFECYCLE_GATE_EVIDENCE.json') -Force
+    $gateG06 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '54',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-54',
+        '-GateId', 'G06', '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://hardening-approved',
+        '-ApprovedBy', 'Fixture Security Approver'
+    )
+    Require-ExitCode -Execution $gateG06 -Expected 0 -Label 'G06'
+
+    $select55 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '55',
+        '-Evidence', 'fixture://delivery-required'
+    )
+    Require-ExitCode -Execution $select55 -Expected 0 -Label 'select delivery'
+    $record55 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '55',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-55'
+    )
+    Require-ExitCode -Execution $record55 -Expected 0 -Label 'record 55'
+    foreach ($id in @('56', '57')) {
+        $decision = Invoke-Lifecycle @(
+            'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
+            '-Result', 'not_applicable', '-Evidence', "fixture://scope-excludes-$id"
+        )
+        Require-ExitCode -Execution $decision -Expected 0 -Label "decide $id"
+    }
+    $select58 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '58',
+        '-Evidence', 'fixture://operations-required'
+    )
+    Require-ExitCode -Execution $select58 -Expected 0 -Label 'select operations'
+    foreach ($id in @('58', '59')) {
+        $record = Invoke-Lifecycle @(
+            'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
+            '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+    $gateG07 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '60',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-60',
+        '-GateId', 'G07', '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://operations-approved',
+        '-ApprovedBy', 'Fixture Operations Approver'
+    )
+    Require-ExitCode -Execution $gateG07 -Expected 0 -Label 'G07'
+
+    $select61 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '61',
+        '-Evidence', 'fixture://acceptance-required'
+    )
+    Require-ExitCode -Execution $select61 -Expected 0 -Label 'select acceptance'
+    foreach ($id in @('61', '62')) {
+        $record = Invoke-Lifecycle @(
+            'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
+            '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+    $lifecycleEvidencePath = Join-Path $fixtureRoot 'LIFECYCLE_GATE_EVIDENCE.json'
+    $validEvidenceBeforeG08 = Get-Content -Raw -Encoding UTF8 -LiteralPath $lifecycleEvidencePath
+    $invalidG08Evidence = $validEvidenceBeforeG08 | ConvertFrom-Json
+    $templateEvidence = Get-Content -Raw -Encoding UTF8 `
+        -LiteralPath (Join-Path $CatalogRoot 'LIFECYCLE_GATE_EVIDENCE.json') | ConvertFrom-Json
+    $invalidG08Evidence.gates.G08 = $templateEvidence.gates.G08
+    [System.IO.File]::WriteAllText(
+        $lifecycleEvidencePath,
+        ($invalidG08Evidence | ConvertTo-Json -Depth 20) + [Environment]::NewLine,
+        $utf8NoBom)
+    $invalidG08 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '63',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-63-read-only',
+        '-GateId', 'G08', '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://fake-review-without-identifiers',
+        '-ApprovedBy', 'Fixture Independent Reviewer'
+    )
+    if ($invalidG08.ExitCode -eq 0) {
+        throw 'G08 accepted free-form review evidence without immutable identifiers and separation.'
+    }
+    $results.Add('free-form G08 review -> blocked')
+    [System.IO.File]::WriteAllText($lifecycleEvidencePath, $validEvidenceBeforeG08, $utf8NoBom)
+    $gateG08 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '63',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-63-read-only',
+        '-GateId', 'G08', '-GateDecision', 'passed',
+        '-GateEvidence', 'LIFECYCLE_GATE_EVIDENCE.json#G08',
+        '-ApprovedBy', 'Fixture Independent Reviewer'
+    )
+    Require-ExitCode -Execution $gateG08 -Expected 0 -Label 'G08'
+    $gateG09 = Invoke-Lifecycle @(
+        'gate', '-ProcessRoot', $fixtureRoot,
+        '-GateId', 'G09', '-GateDecision', 'passed',
+        '-GateEvidence', 'LIFECYCLE_GATE_EVIDENCE.json#G09.authorization',
+        '-ApprovedBy', 'Fixture Release Approver'
+    )
+    Require-ExitCode -Execution $gateG09 -Expected 0 -Label 'G09'
+
+    $approvedEvidenceJson = Get-Content -Raw -Encoding UTF8 -LiteralPath $lifecycleEvidencePath
+    $changedApprovedEvidence = $approvedEvidenceJson | ConvertFrom-Json
+    $changedCandidateSha = '4444444444444444444444444444444444444444'
+    $changedApprovedEvidence.gates.G08.candidate.candidateSha = $changedCandidateSha
+    $changedApprovedEvidence.gates.G08.acceptance.candidateSha = $changedCandidateSha
+    $changedApprovedEvidence.gates.G08.independentReview.candidateSha = $changedCandidateSha
+    $changedApprovedEvidence.gates.G09.authorization.candidateSha = $changedCandidateSha
+    $changedApprovedEvidence.gates.G09.deployment.candidateSha = $changedCandidateSha
+    [System.IO.File]::WriteAllText(
+        $lifecycleEvidencePath,
+        ($changedApprovedEvidence | ConvertTo-Json -Depth 20) + [Environment]::NewLine,
+        $utf8NoBom)
+    $changedEvidenceValidate = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    $changedEvidenceSelect = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '64',
+        '-Evidence', 'LIFECYCLE_GATE_EVIDENCE.json#G09.authorization'
+    )
+    if ($changedEvidenceValidate.ExitCode -eq 0 -or $changedEvidenceSelect.ExitCode -eq 0) {
+        throw "Approved G08/G09 evidence could be changed after approval. validate=$($changedEvidenceValidate.ExitCode), select=$($changedEvidenceSelect.ExitCode)."
+    }
+    [System.IO.File]::WriteAllText($lifecycleEvidencePath, $approvedEvidenceJson, $utf8NoBom)
+    $results.Add('approved G08/G09 evidence mutation -> validate and mutator blocked')
+
+    $select64 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '64',
+        '-Evidence', 'LIFECYCLE_GATE_EVIDENCE.json#G09.authorization'
+    )
+    Require-ExitCode -Execution $select64 -Expected 0 -Label 'select authorized release'
+    $record64 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '64',
+        '-Result', 'completed', '-Evidence', 'LIFECYCLE_GATE_EVIDENCE.json#G09.deployment'
+    )
+    Require-ExitCode -Execution $record64 -Expected 0 -Label 'release execution evidence'
+
+    foreach ($id in @('65', '66')) {
+        $decision = Invoke-Lifecycle @(
+            'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
+            '-Result', 'not_applicable', '-Evidence', "fixture://scope-excludes-$id"
+        )
+        Require-ExitCode -Execution $decision -Expected 0 -Label "decide $id"
+    }
+    $select67 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '67',
+        '-Evidence', 'fixture://post-release-required'
+    )
+    Require-ExitCode -Execution $select67 -Expected 0 -Label 'select post-release validation'
+    foreach ($id in @('67', '68')) {
+        $record = Invoke-Lifecycle @(
+            'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
+            '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
+        )
+        Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
+    }
+    $decide69 = Invoke-Lifecycle @(
+        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '69',
+        '-Result', 'not_applicable', '-Evidence', 'fixture://scope-excludes-69'
+    )
+    Require-ExitCode -Execution $decide69 -Expected 0 -Label 'decide 69'
+    $select70 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '70',
+        '-Evidence', 'fixture://vulnerability-monitoring-required'
+    )
+    Require-ExitCode -Execution $select70 -Expected 0 -Label 'select vulnerability monitoring'
+    $record70 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '70',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-70'
+    )
+    Require-ExitCode -Execution $record70 -Expected 0 -Label 'record 70'
+    $decide71 = Invoke-Lifecycle @(
+        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '71',
+        '-Result', 'not_applicable', '-Evidence', 'fixture://scope-excludes-71'
+    )
+    Require-ExitCode -Execution $decide71 -Expected 0 -Label 'decide 71'
+    $select72 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '72',
+        '-Evidence', 'fixture://continuous-improvement-required'
+    )
+    Require-ExitCode -Execution $select72 -Expected 0 -Label 'select improvement'
+    $record72 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '72',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-72'
+    )
+    Require-ExitCode -Execution $record72 -Expected 0 -Label 'record 72'
+    $gateG10 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '73',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-73',
+        '-GateId', 'G10', '-GateDecision', 'passed',
+        '-GateEvidence', 'fixture://continuous-operations-established'
+    )
+    Require-ExitCode -Execution $gateG10 -Expected 0 -Label 'G10'
+
+    $completedState = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json') | ConvertFrom-Json
+    if ($completedState.status -ne 'completed' -or $completedState.nextAction -ne 'none') {
+        throw "Lifecycle did not finish: status=$($completedState.status), nextAction=$($completedState.nextAction)"
+    }
+    $results.Add('G06 -> G10 -> lifecycle completed')
+
+    $validateComplete = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    Require-ExitCode -Execution $validateComplete -Expected 0 -Label 'completed validate'
+
+    Write-Host 'PASS: software lifecycle end-to-end test.' -ForegroundColor Green
+    $results | ForEach-Object { Write-Host " - $_" }
+    if ($KeepFixture) {
+        Write-Host " - Fixture retained: $fixtureRoot"
+    }
+}
+finally {
+    if (Test-Path -LiteralPath $junctionRoot) {
+        $junctionItem = Get-Item -Force -LiteralPath $junctionRoot
+        $resolvedTemp = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd(
+            [System.IO.Path]::DirectorySeparatorChar,
+            [System.IO.Path]::AltDirectorySeparatorChar)
+        $resolvedJunction = [System.IO.Path]::GetFullPath($junctionRoot)
+        $junctionPrefix = $resolvedTemp + [System.IO.Path]::DirectorySeparatorChar + 'prompts-lifecycle-junction-'
+        if (-not $resolvedJunction.StartsWith($junctionPrefix, [System.StringComparison]::OrdinalIgnoreCase) -or
+            ($junctionItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq 0) {
+            throw "Refusing to remove unverified junction fixture: $junctionRoot"
+        }
+        Remove-Item -LiteralPath $junctionRoot -Force
+    }
+    if (-not $KeepFixture -and (Test-Path -LiteralPath $fixtureRoot -PathType Container)) {
+        $resolvedFixture = [System.IO.Path]::GetFullPath($fixtureRoot)
+        $resolvedTemp = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd(
+            [System.IO.Path]::DirectorySeparatorChar,
+            [System.IO.Path]::AltDirectorySeparatorChar)
+        $requiredPrefix = $resolvedTemp + [System.IO.Path]::DirectorySeparatorChar + 'prompts-lifecycle-e2e-'
+        if (-not $resolvedFixture.StartsWith($requiredPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove unverified fixture path: $resolvedFixture"
+        }
+        Remove-Item -LiteralPath $resolvedFixture -Recurse -Force
+    }
+    if (Test-Path -LiteralPath $brownfieldFixtureRoot -PathType Container) {
+        $resolvedBrownfieldFixture = [System.IO.Path]::GetFullPath($brownfieldFixtureRoot)
+        $resolvedTemp = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd(
+            [System.IO.Path]::DirectorySeparatorChar,
+            [System.IO.Path]::AltDirectorySeparatorChar)
+        $requiredBrownfieldPrefix = $resolvedTemp + [System.IO.Path]::DirectorySeparatorChar + 'prompts-brownfield-e2e-'
+        if (-not $resolvedBrownfieldFixture.StartsWith(
+            $requiredBrownfieldPrefix,
+            [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove unverified brownfield fixture path: $resolvedBrownfieldFixture"
+        }
+        Remove-Item -LiteralPath $resolvedBrownfieldFixture -Recurse -Force
+    }
+}

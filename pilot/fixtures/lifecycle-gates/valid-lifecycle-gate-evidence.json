@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "2026-07-29.4",
+  "gates": {
+    "G06": {
+      "status": "approved",
+      "approvedBy": { "name": "Fixture Security Approver", "identity": "security.approver@example.test", "role": "Security" },
+      "approvedAt": "2026-07-28T23:45:00+01:00",
+      "artifacts": [{ "path": "pilot/fixtures/lifecycle-gates/gate-artifact.txt", "sha256": "a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31", "kind": "security-report" }],
+      "checks": {
+        "securityTestsPassed": true,
+        "authorizationNegativeTestsPassed": true,
+        "dependencyAndSecretScansPassed": true,
+        "accessibilityScopePassed": true,
+        "performanceBudgetsPassed": true,
+        "cacheAndOfflineBehaviorPassed": true,
+        "noUnresolvedCriticalHighFindings": true
+      }
+    },
+    "G07": {
+      "status": "approved",
+      "approvedBy": { "name": "Fixture Operations Approver", "identity": "operations.approver@example.test", "role": "SRE" },
+      "approvedAt": "2026-07-28T23:46:00+01:00",
+      "artifacts": [{ "path": "pilot/fixtures/lifecycle-gates/gate-artifact.txt", "sha256": "a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31", "kind": "operational-readiness" }],
+      "checks": {
+        "ciRequiredChecksPassed": true,
+        "sameArtifactPromotionConfigured": true,
+        "sloAlertsValidated": true,
+        "backupRestoreAndDrTested": true,
+        "migrationAndRollbackTested": true,
+        "runbooksAndOwnersApproved": true
+      }
+    },
+    "G08": {
+      "status": "approved",
+      "approvedBy": { "name": "Fixture Independent Reviewer", "identity": "reviewer@example.test", "role": "Independent reviewer" },
+      "approvedAt": "2026-07-28T23:47:00+01:00",
+      "artifacts": [{ "path": "pilot/fixtures/lifecycle-gates/gate-artifact.txt", "sha256": "a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31", "kind": "candidate-artifact" }],
+      "candidate": {
+        "baseSha": "1111111111111111111111111111111111111111",
+        "candidateSha": "2222222222222222222222222222222222222222",
+        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31"
+      },
+      "acceptance": {
+        "decision": "GO",
+        "candidateSha": "2222222222222222222222222222222222222222",
+        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31"
+      },
+      "independentReview": {
+        "decision": "GO",
+        "implementerIdentity": "implementer@example.test",
+        "reviewerIdentity": "reviewer@example.test",
+        "taskId": "fixture-review-task-001",
+        "readOnly": true,
+        "candidateSha": "2222222222222222222222222222222222222222",
+        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "criticalFindings": 0
+      }
+    },
+    "G09": {
+      "status": "approved",
+      "approvedBy": { "name": "Fixture Release Approver", "identity": "release.approver@example.test", "role": "Release owner" },
+      "approvedAt": "2026-07-28T23:48:00+01:00",
+      "artifacts": [{ "path": "pilot/fixtures/lifecycle-gates/gate-artifact.txt", "sha256": "a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31", "kind": "release-authorization-and-result" }],
+      "authorization": {
+        "scope": "AUTORIZAR_RELEASE",
+        "environment": "fixture-production",
+        "releaseWindow": "2026-07-28T23:50:00+01:00/2026-07-29T00:20:00+01:00",
+        "candidateSha": "2222222222222222222222222222222222222222",
+        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "authorizedByIdentity": "release.approver@example.test",
+        "authorizedAt": "2026-07-28T23:48:00+01:00"
+      },
+      "deployment": {
+        "status": "passed",
+        "environment": "fixture-production",
+        "candidateSha": "2222222222222222222222222222222222222222",
+        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "smokeTestsPassed": true,
+        "rollbackReady": true,
+        "abortCriteria": "rollback on failed smoke, migration health or SLO burn"
+      }
+    },
+    "G10": {
+      "status": "approved",
+      "approvedBy": { "name": "Fixture Continuous Operations Owner", "identity": "operations.owner@example.test", "role": "Service owner" },
+      "approvedAt": "2026-07-28T23:49:00+01:00",
+      "artifacts": [{ "path": "pilot/fixtures/lifecycle-gates/gate-artifact.txt", "sha256": "a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31", "kind": "continuous-operations" }],
+      "checks": {
+        "postReleaseChecksScheduled": true,
+        "sloAndErrorBudgetOwned": true,
+        "bugsAndIncidentsTriaged": true,
+        "vulnerabilitiesMonitored": true,
+        "rumAndCostsReviewed": true,
+        "roiAndProductMetricsReviewed": true,
+        "doraAndImprovementCadenceOwned": true
+      }
+    }
+  }
+}

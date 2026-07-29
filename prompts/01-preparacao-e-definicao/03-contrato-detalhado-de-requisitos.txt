@@ -1,0 +1,501 @@
+# Contrato detalhado dos artefactos de requisitos
+
+Este anexo pertence ao prompt
+`03-levantar-requisitos-funcionais.md`. Define os campos, taxonomias,
+matrizes e testes de qualidade que o Codex deve aplicar aos artefactos
+canónicos. O prompt principal define objetivo, sequência, autonomia e
+conclusão; em caso de sobreposição, prevalece o prompt principal.
+
+Não transformes este contrato num conjunto de tabelas vazias. Instancia apenas
+o que for aplicável, marca `não aplicável` com razão verificável e preserva
+todo o detalhe material necessário para produto, arquitetura, design,
+engenharia e QA tomarem a mesma decisão.
+
+## Entradas e proveniência
+
+Cria primeiro um registo de fontes:
+
+| Source ID | Fonte/localização | Tipo | Data/versão | Stakeholder/owner | Cobertura | Qualidade/limitação | Confiança |
+|---|---|---|---|---|---|---|---|
+
+Tipos possíveis incluem decisão aprovada, entrevista, observação, análise de suporte, pesquisa de mercado, obrigação legal validada, contrato, issue, mockup, analytics, documentação, teste, configuração e código observado.
+
+Aplica estas regras:
+
+- uma afirmação repetida em documentos derivados não constitui múltiplas fontes;
+- mockups, issues, código e benchmarks demonstram intenção ou comportamento, não aprovação automática;
+- em brownfield, distingue `comportamento observado` de `comportamento requerido`;
+- legislação, contratos, políticas de loja e obrigações regulatórias exigem jurisdição, versão/data e revisão competente quando material;
+- regista a data de consulta de fontes externas e a limitação de acesso/licença;
+- nunca uses passwords, tokens, dados pessoais reais ou informação privada na evidência.
+
+Para cada item mantém eixos separados:
+
+| Eixo | Valores permitidos |
+|---|---|
+| Estado de evidência | `observado`, `inferido`, `conflitante`, `não disponível` |
+| Estado do requisito | `rascunho`, `aguarda confirmação`, `aprovado`, `rejeitado`, `bloqueado` |
+| Evidência de implementação | `não avaliada`, `existente por verificar`, `existente verificada`, `não evidenciada` |
+
+Não uses “existe no código” como sinónimo de requisito aprovado nem “inspirado por benchmark” como fonte suficiente de necessidade.
+
+## Fronteira técnica e de produto
+
+O projeto deriva de `BoilerPlateAdvance`. Confirma os módulos e nomes reais antes de os mencionar e mapeia apenas superfícies plausíveis:
+
+- site público static SSR (`Client.Ssr`);
+- aplicação autenticada WASM/PWA (`Client.Web`/`Client.Core`);
+- cliente nativo (`Client.Maui`) quando houver necessidade aprovada;
+- API, persistência, jobs e integrações.
+
+Esta etapa descreve necessidades, consumidores, dados, restrições e resultados. Não decide topologia, framework, provider, protocolo interno ou módulo opcional; essas decisões pertencem aos prompts 05, 06 e 10. Projetos de referência, demos e capacidades do boilerplate sem requisito ficam fora do produto.
+
+## Taxonomia e IDs estáveis
+
+Usa IDs monotónicos, nunca reutilizados nem renumerados para preencher lacunas:
+
+| Prefixo | Conteúdo |
+|---|---|
+| `CAP-###` | capacidade ou resultado de produto |
+| `APP-###` | aplicação lógica/superfície de execução com responsabilidade própria |
+| `PAGE-###` | página, ecrã ou destino interativo material dentro de uma `APP` |
+| `JRN-###` | jornada ponta a ponta e resultado do ator |
+| `FR-###` | comportamento funcional atómico |
+| `BR-###` | regra de negócio, cálculo, política ou invariante |
+| `DATA-###` | semântica, qualidade, ciclo de vida ou obrigação de dados |
+| `PERM-###` | autorização por ação, função, objeto ou âmbito |
+| `INT-###` | necessidade de integração e comportamento na fronteira |
+| `NFR-###` | qualidade mensurável: performance, fiabilidade, acessibilidade, compatibilidade, operação ou custo |
+| `SEC-###` | necessidade de segurança/privacidade já conhecida antes do threat model |
+
+Um requisito contém um único comportamento normativo. Se uma frase tiver dois resultados que podem ser implementados, priorizados ou testados separadamente, divide-a. Liga requisitos relacionados; não os combines com “e/ou”.
+
+## Método de levantamento
+
+### 1. Baseline e mapa do domínio
+
+1. Recolhe decisões, entrevistas, notas, issues, mockups, rotas, modelos, endpoints, testes, configuração, analytics e documentação.
+2. Cria glossário com termo, definição operacional, sinónimos proibidos, fonte e exemplos/contraexemplos.
+3. Identifica stakeholders, atores humanos/sistemas, objetivos, responsabilidades e situações em que atuam.
+4. Identifica objetos de negócio, eventos, estados, unidades, calendários, moedas, fusos horários, mercados, idiomas e dependências externas.
+5. Regista conflitos entre linguagem de produto, código e fontes sem escolher silenciosamente.
+
+### 2. Mapa de capacidades e âmbito
+
+Antes do catálogo detalhado, cria um mapa:
+
+| Capability ID | Capacidade/resultado | Atores | Jornada | Incluída no MVP | Razão/prioridade | Dependências | Exclusões |
+|---|---|---|---|---|---|---|---|
+
+Cada capacidade `Must` deve contribuir diretamente para a jornada principal ou para uma obrigação bloqueante. Capacidades do boilerplate, pedidos de stakeholders e padrões de concorrentes sem ligação a um resultado aprovado ficam como `Should/Could`, `Won't agora` ou pergunta — nunca como `Must` por defeito.
+
+### 3. Inventário e contrato por aplicação
+
+Uma `APP-###` é uma aplicação lógica ou superfície de execução que possui
+responsabilidade, consumidores e comportamento global próprios. Pode ser o site
+público SSR, a aplicação autenticada Web/PWA, o cliente MAUI, a API ou uma
+superfície não visual material como jobs/notificações. Não cries uma `APP`
+apenas porque o boilerplate contém um projeto; exige uma necessidade aprovada.
+
+Mantém `requirements/APPLICATION_CATALOG.md` como índice:
+
+| APP ID | Nome/finalidade | Tipo/superfície | Atores/consumidores | CAP/JRN | Entradas | Páginas/operações | Estado/aprovação | Contrato |
+|---|---|---|---|---|---|---|---|---|
+
+Para cada aplicação ativa cria
+`requirements/applications/APP-<slug>.md` com:
+
+| Grupo | Conteúdo obrigatório |
+|---|---|
+| Identidade | `APP-###`, nome, tipo, versão, owner, estado e fontes |
+| Responsabilidade | resultado que fornece, atores/consumidores e capacidades que possui |
+| Fronteira | dentro/fora do âmbito, entradas, saídas e responsabilidades que pertencem a outra `APP` |
+| Pontos de entrada | URL/origem, launch, deep link, notificação, chamada API, job ou evento aplicável |
+| Navegação global | shell, destinos primários, back/up, breadcrumbs, ajuda, saída e sessão |
+| Identidade e sessão | autenticação, autorização, tenant/ownership, expiração, troca de conta e negação |
+| Dados | objetos lidos/escritos, ownership, cache, consistência, retenção e exportação aplicáveis |
+| Interfaces | APIs, eventos, webhooks, notificações, jobs e dependências externas observáveis |
+| Estados globais | arranque, loading, indisponível, manutenção, offline, atualização, sessão expirada e recuperação |
+| Plataforma | browsers/OS/dispositivos, input, responsive/adaptive, lifecycle, deep links, instalação e updates aplicáveis |
+| Qualidades | NFR/SEC globais mensuráveis, acessibilidade, localização, observabilidade, suporte e custos |
+| Conteúdo público | status HTTP, crawl/indexação, canonical, robots, sitemap, metadata e structured data aplicáveis |
+| Cobertura | `PAGE`, operações não visuais, `JRN/FR/AC`, provas e fatias downstream |
+| Divergências | diferenças deliberadas relativamente a outras aplicações, necessidade/fonte e contrato comum preservado |
+| Aprovação | owner, versão/data, evidência, conflitos e decisões pendentes |
+
+Cria a matriz `capacidade × aplicação`:
+
+| CAP/JRN/FR | APP | Aplicabilidade | Contrato comum | Variante da APP | Razão/fonte | PAGE/operação | Estado |
+|---|---|---|---|---|---|---|---|
+
+Usa apenas:
+
+- `obrigatório`;
+- `contrato partilhado`;
+- `variante específica aprovada`;
+- `não aplicável — <razão>`;
+- `decisão pendente — <owner/evidência>`.
+
+Não assumes paridade. Uma divergência só é aceite quando responde a contexto,
+plataforma, risco ou necessidade de utilizador comprovados; conveniência
+técnica não é justificação. Onde várias aplicações manipulam o mesmo conceito,
+preserva semântica de dados, regras de domínio, permissões, terminologia,
+identificação de ações e taxonomia de erros, salvo divergência aprovada.
+
+### 4. Catálogo e contrato por página/ecrã
+
+Uma `PAGE-###` é um destino visual material que necessita de comportamento,
+dados, permissões, estados ou aceitação próprios, mesmo quando uma SPA não muda
+o URL. Inclui página SSR, rota Web/PWA, ecrã MAUI e passo autónomo de um fluxo.
+Um modal, drawer ou painel recebe `PAGE` próprio apenas se for um destino
+independente, atravessar uma fronteira material ou justificar uma fatia/teste
+autónomo; caso contrário fica como ação/estado da página-mãe.
+
+Mantém `requirements/PAGE_CATALOG.md` como inventário e mapa de navegação:
+
+| PAGE ID | APP ID | Nome/resultado | Rota/screen key/deep link | Tipo | Atores | JRN/passos | Entradas/saídas | Estado/aprovação | Contrato |
+|---|---|---|---|---|---|---|---|---|---|
+
+Cada página em âmbito tem um contrato
+`requirements/pages/PAGE-<slug>.md`. Usa estes grupos e não omitas um grupo
+aplicável:
+
+| Grupo | Conteúdo obrigatório por `PAGE-###` |
+|---|---|
+| Identidade | APP, ID, nome, tipo, versão, owner, prioridade, estado e fontes |
+| Resultado | ator, necessidade, resultado observável, `CAP/JRN` e razão para existir |
+| Acesso | trigger, entrada, pré-condições, autenticação, `PERM`, tenant/ownership e comportamento de negação |
+| Localização | rota/screen key/deep link, parâmetros, query, canonical quando aplicável e comportamento para URL/ID inválido |
+| Navegação | origem, destinos seguintes, back/up/cancelar/sair, breadcrumbs, tabs, links internos e prevenção de página órfã |
+| Estrutura | título/H1, landmarks/regiões, hierarquia de conteúdo, ação principal, ações secundárias e ajuda; requisitos, não layout pixel-perfect |
+| Conteúdo | informação necessária, origem, prioridade, estados de ausência, conteúdo extremo, tom, tradução e formatação |
+| Leitura de dados | `DATA`, filtros, pesquisa, ordenação, agrupamento, paginação/virtualização, atualização, cache e freshness |
+| Ações/mutações | ação, `FR/BR/PERM/DATA/INT`, confirmação, efeito, feedback, undo/cancelamento e auditoria |
+| Formulários | campos, tipo lógico, obrigatoriedade, defaults, ajuda, validação por campo/formulário/servidor, preservação de input e associação de erros |
+| Estados | aplicabilidade, trigger, apresentação, ações disponíveis, anúncio acessível, persistência e recuperação de cada estado |
+| Repetição/conflito | double-submit, idempotência, concorrência, stale data, conflito, autosave, saída com alterações e retoma |
+| Responsive/adaptive | compact/médio/expandido ou desktop/tablet/mobile, reflow, densidade, orientação, zoom, teclado e toque |
+| Native/lifecycle | safe areas, back gesture, app switch/sleep/resume, permissões do dispositivo, offline/sync, deep link e push aplicáveis |
+| Acessibilidade | landmarks, heading/name, ordem de foco/leitura, teclado, foco após navegação/erro, nomes/roles/states, erros, live regions, reflow/zoom e alvo de toque |
+| Descoberta pública | status HTTP, title/description, canonical, robots, sitemap, hreflang, social metadata e structured data aplicáveis |
+| Telemetria | eventos, sucesso/falha/abandono, propriedades permitidas, correlação, consentimento e proibição de PII/secrets |
+| Qualidade/segurança | `NFR/SEC`, desempenho percebido, privacidade, abuso, rate limit, logging seguro e observabilidade |
+| Dependências | páginas, APIs, dados, integrações, decisões e requisitos predecessores |
+| Exclusões | ações, dados, estados, plataformas ou variantes deliberadamente fora desta versão |
+| Aceitação/prova | `AC` por estado/ação, prova prevista, dispositivos/ambientes e mapeamento da fatia downstream |
+| Aprovação | owner, versão/data, evidência, conflitos, perguntas e condição para conclusão |
+
+Para cada página cria uma matriz de ações:
+
+| Action ID | PAGE/APP | Ator | Controlo/trigger | FR/BR | DATA lido/escrito | PERM | Efeito/feedback | Falha/recuperação | AC |
+|---|---|---|---|---|---|---|---|---|---|
+
+E resolve explicitamente a aplicabilidade dos estados:
+
+| Estado | Avaliar quando |
+|---|---|
+| inicial/primeira utilização | a página depende de onboarding, configuração ou ausência de histórico |
+| loading/skeleton/progresso | existe espera inicial, incremental ou operação demorada |
+| vazio/sem resultados | uma coleção, pesquisa ou filtro pode produzir zero itens |
+| parcial/stale | algumas fontes falham, a cache está desatualizada ou o conteúdo chega por etapas |
+| sucesso/confirmado | leitura ou mutação conclui com efeito observável |
+| validação inválida | input está ausente, malformado, ambíguo ou viola regra |
+| falha de dependência/timeout | API, rede, storage ou integração não responde corretamente |
+| anónimo/sessão expirada | autenticação é necessária ou expira durante a tarefa |
+| proibido/objeto alheio | falta autorização funcional, por objeto, owner ou tenant |
+| não encontrado/gone | rota, recurso ou versão deixou de existir |
+| offline/sync pendente | a plataforma pode operar sem rede ou regressar com alterações locais |
+| conflito/concorrência | o objeto mudou, a ordem divergiu ou existe edição simultânea |
+| rate-limited/indisponível/manutenção | proteção ou condição operacional impede continuar |
+| conteúdo extremo | texto longo, zero/máximo, internacionalização, anexos e volume limite |
+
+Para cada estado aplicável especifica conteúdo observável, ações permitidas,
+preservação de trabalho, feedback, anúncio acessível, telemetria e caminho de
+recuperação. `Não aplicável` exige razão específica; uma célula vazia é uma
+lacuna.
+
+Constrói ainda o mapa de passos:
+
+| JRN/passo | Ator | APP | PAGE ou operação não visual | Entrada | Ação | Resposta/estado | Próximo passo | FR/AC |
+|---|---|---|---|---|---|---|---|---|
+
+Cada passo `Must` chega a uma `PAGE` ou operação não visual; cada `PAGE` tem
+pelo menos uma entrada, um resultado, requisitos e critérios. Nenhuma ação de
+página fica sem `FR`, `PERM`, `DATA` e `AC` aplicáveis. Uma página não está
+completa se apenas descrever o happy path ou o layout normal.
+
+### 5. Atores e permissões
+
+Para cada ator regista:
+
+| Actor ID | Ator/perfil | Objetivo | Como obtém acesso | Âmbito/tenant | Dados que pode ver | Ações permitidas | Restrições | Fonte/estado |
+|---|---|---|---|---|---|---|---|---|
+
+Depois cria uma matriz de autorização:
+
+| PERM ID | Ator | Recurso/objeto | Ação | Condição de ownership/âmbito | Resultado permitido | Negação esperada | Auditoria | Fonte/estado |
+|---|---|---|---|---|---|---|---|---|
+
+Não infiras roles, tenancy, ownership ou acesso administrativo. Especifica a negação observável sem revelar a existência ou os dados de objetos indevidos. Distingue autenticação, autorização funcional e autorização por objeto.
+
+### 6. Jornadas ponta a ponta
+
+Especifica cada jornada prioritária:
+
+| Campo | Conteúdo obrigatório |
+|---|---|
+| ID/título | `JRN-###` e resultado expresso na linguagem do ator |
+| Ator e contexto | perfil, dispositivo/canal, frequência e situação de uso |
+| Trigger | evento observável que inicia a jornada |
+| Pré-condições | dados, estado, permissões e dependências necessárias |
+| Happy path | passos numerados com ação e resposta do sistema |
+| Alternativas | escolhas válidas e respetivos resultados |
+| Falhas | input inválido, ausência de dados/permissão, conflito e dependência indisponível aplicáveis |
+| Recuperação | retry, correção, cancelamento, undo, retoma ou contacto de suporte |
+| Pós-condições | estado, dados, eventos, notificações e auditoria resultantes |
+| Resultado/métrica | resultado observável e medida de sucesso/proteção |
+| Ligações | APP/PAGE ou operação não visual, requisitos, regras, dados, permissões, NFR e exclusões relacionados |
+
+Para a jornada principal cobre, quando aplicável: primeira utilização, retorno, loading, vazio, erro, sucesso, sem permissão, sessão expirada, offline/conectividade degradada, conteúdo extremo, repetição/double-submit, concorrência e falha parcial. Marca `não aplicável` apenas com justificação específica.
+
+### 7. Requisitos funcionais atómicos
+
+Cada `FR-###` deve usar este contrato:
+
+| Campo | Conteúdo obrigatório |
+|---|---|
+| ID, título e versão | identificador estável e histórico da alteração |
+| Declaração normativa | ator/sistema + comportamento único + objeto + condição |
+| Intenção/resultado | porque existe e que resultado suporta |
+| Ator e jornada | `Actor ID` e `JRN-###` |
+| Aplicação/página | `APP-###` e `PAGE-###`, ou operação não visual justificada |
+| Trigger | ação, evento ou condição temporal |
+| Pré-condições | estado, dados, autorização e dependências |
+| Inputs | campos/eventos, origem, tipo, obrigatoriedade, formato, limites e validação |
+| Processamento | sequência observável sem impor arquitetura |
+| Outputs | resposta, conteúdo, estado e efeitos persistentes |
+| Pós-condições | invariantes e eventos verdadeiros após sucesso/falha |
+| Estados e transições | estado inicial/final e transições válidas |
+| Regras relacionadas | `BR-###` |
+| Dados relacionados | `DATA-###`; leitura/criação/alteração/eliminação |
+| Permissões | `PERM-###` e caso negativo |
+| Exceções/recuperação | erro seguro, ação do utilizador e resultado de recuperação |
+| Repetição/concorrência | idempotência, double-submit, conflito e ordenação, se aplicável |
+| Superfícies | APP/PAGE e SSR, Web/PWA, MAUI, API ou integração necessárias; não assumidas |
+| Dependências | requisitos e decisões que têm de preceder |
+| Prioridade | `Must/Should/Could/Won't agora` com racional |
+| Fonte e confiança | `Source ID`, estado de evidência e conflitos |
+| Aprovação | estado, owner, versão/data e evidência |
+| Fora do âmbito | comportamentos semelhantes deliberadamente excluídos |
+
+Um campo material desconhecido é uma pergunta ou bloqueio, não texto vago. Usa `não aplicável` apenas quando a razão estiver registada.
+
+### 8. Regras de negócio, estados e invariantes
+
+Regista regras separadamente:
+
+| BR ID | Regra/invariante | Entidades/ações abrangidas | Inputs | Limites e exemplos | Precedência/exceções | Vigência/fuso/moeda/arredondamento | Fonte/owner | Cenários de aceitação |
+|---|---|---|---|---|---|---|---|---|
+
+Para objetos com ciclo de vida, cria a máquina de estados:
+
+| Objeto | Estado atual | Evento/ação | Ator | Guarda/pré-condição | Novo estado | Efeitos | Transição inválida | BR/FR |
+|---|---|---|---|---|---|---|---|---|
+
+Explicita cálculos, unidades, precisão, arredondamento, inclusividade de limites, precedência entre regras, datas efetivas e comportamento retroativo. Se duas implementações incompatíveis puderem satisfazer a frase, a regra ainda não está pronta.
+
+### 9. Dados e privacidade
+
+Cria um dicionário suficiente para decidir semântica e risco, sem desenhar ainda a base de dados:
+
+| DATA ID | Objeto/atributo | Definição e formato lógico | Origem/owner | Classificação | Obrigatoriedade/validação | Qualidade/unicidade | Cria/lê/altera/elimina | Retenção/eliminação | Exportação/correção | Auditoria | Fonte/estado |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+
+Inclui:
+
+- dados pessoais, sensíveis, financeiros, de autenticação e conteúdo de utilizador;
+- finalidade, minimização, destinatários e transferências conhecidas;
+- conservação, eliminação, anonimização, exportação e correção quando materiais;
+- ownership, isolamento entre contas/organizações e visibilidade;
+- duplicados, ordenação, timezone, localização, encoding e qualidade;
+- consistência, concorrência, histórico e auditoria necessários.
+
+Não inventes base legal, prazo de retenção ou obrigação regulatória. Uma decisão ausente que altere recolha, acesso, partilha, retenção ou eliminação de dados `Must` é bloqueante.
+
+### 10. Integrações e efeitos externos
+
+Especifica a necessidade antes de escolher provider:
+
+| INT ID | Capacidade externa | Trigger | Dados enviados/recebidos | Contrato/resultado esperado | Latência/timeout | Repetição/idempotência | Falha/fallback/reconciliação | Quotas/custo | Segurança/privacidade | Owner/SLA | Estado |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+
+Cobre callbacks/webhooks, ordenação, duplicados, retries limitados, indisponibilidade, resposta parcial, reconciliação e comportamento quando o efeito externo aconteceu mas a confirmação falhou. Não executes chamadas reais, mensagens, compras ou alterações em contas.
+
+### 11. Requisitos não funcionais mensuráveis
+
+Para cada qualidade material cria um requisito com contexto de medição:
+
+| NFR/SEC ID | Categoria | Jornada/âmbito | Métrica/SLI | Alvo/limite | Percentil/janela | Carga/dataset/dispositivo/rede | Ambiente e método de medição | Comportamento ao falhar | Fonte/owner | Estado |
+|---|---|---|---|---|---|---|---|---|---|---|
+
+Avalia explicitamente:
+
+- segurança e privacidade;
+- acessibilidade e tecnologias de apoio;
+- desempenho percebido e de servidor;
+- capacidade, escala, quotas e limites de recursos;
+- disponibilidade, resiliência, degradação, timeout e recuperação;
+- integridade, concorrência, idempotência e consistência;
+- compatibilidade de browser/dispositivo/OS e política de versões;
+- localização, idioma, timezone, moeda e formatos;
+- SEO/crawl/metadata para conteúdo público, quando aplicável;
+- PWA, offline, sincronização e atualização, quando aplicável;
+- observabilidade, auditoria, suporte e diagnóstico;
+- backup/restore, RPO e RTO para dados/serviços críticos;
+- manutenção, portabilidade, dependências e limites de custo quando constituírem restrições do produto.
+
+Não escrevas “rápido”, “escalável”, “seguro”, “intuitivo”, “alta disponibilidade”, “tempo real”, “compatível” ou “fácil de manter” sem população, medida, limiar, condições e método de verificação. Quando ainda não existe baseline, define como a obter, owner e prazo; não inventes uma meta.
+
+### 12. Experiência, acessibilidade e conteúdo
+
+Aplica `PRODUCT_EXCELLENCE.md` às jornadas prioritárias. Pesquisa referências atuais comparáveis e regista apenas padrões que resolvam uma necessidade já demonstrada.
+
+Converte-os em requisitos observáveis, por exemplo:
+
+- estrutura, landmarks, headings, navegação e identificação consistentes no
+  conjunto completo de páginas;
+- prioridade e localização da ação principal;
+- informação mínima para decidir e concluir a tarefa;
+- prevenção de erro, confirmação, undo e recuperação;
+- teclado, foco, nomes/roles/states e anúncios de estado;
+- toque, alcance, densidade e comportamento mobile;
+- conteúdo extremo, localização e mensagens acionáveis;
+- transparência, consentimento, preço/cancelamento e ausência de dark patterns.
+
+Não copies identidade, texto, código, assets ou composição distintiva. Não uses “parecer moderno/profissional” como requisito.
+
+### 13. Critérios e cenários de aceitação
+
+Cria IDs `AC-<REQ>-##` e liga-os a um único requisito. Escreve cenários com:
+
+```text
+Dado <estado inicial verificável>
+E <dados/permissão/dependência relevante>
+Quando <uma ação ou evento numa APP/PAGE identificada>
+Então <resultado observável nessa APP/PAGE ou operação não visual>
+E <efeito observável no servidor/dados/eventos>
+E <ausência de efeito indevido, quando relevante>
+```
+
+Cada requisito `Must` deve cobrir:
+
+1. o caso principal;
+2. validação/erro relevante;
+3. ausência de autenticação/permissão quando existir fronteira de acesso;
+4. valor limite ou conteúdo extremo;
+5. repetição, concorrência ou falha de dependência quando puder causar duplicação, perda, corrupção ou cobrança;
+6. recuperação do erro quando a jornada tiver continuação segura.
+
+Se um tipo de cenário não se aplicar, regista a justificação. Não uses critérios que apenas repetem o requisito, dependem de inspeção subjetiva ou dizem “funciona corretamente”. Indica o tipo de prova previsto: revisão de produto, teste unitário, integração, contrato, browser, acessibilidade, segurança, performance ou operação — sem fabricar evidência ainda inexistente.
+
+### 14. Priorização, dependências e cortes
+
+Prioriza com `Must/Should/Could/Won't agora`:
+
+- `Must` — indispensável à jornada principal, obrigação bloqueante ou proteção contra dano material;
+- `Should` — valor importante que pode transitar sem invalidar o primeiro resultado;
+- `Could` — melhoria independente e adiável;
+- `Won't agora` — exclusão explícita desta versão, com condição de reavaliação.
+
+Regista racional, custo/risco relativo, dependências, conflito e owner da decisão. Não classifiques tudo como `Must`.
+
+Propõe fatias verticais candidatas, sem iniciar implementação:
+
+| Slice candidata | Tipo | APP/PAGE | Resultado do ator | JRN/FR/BR/DATA/PERM/NFR | Superfície | Dados/dependências | Critérios-chave | Prompts seguintes | Fora do âmbito | Risco |
+|---|---|---|---|---|---|---|---|---|---|---|
+
+A primeira fatia candidata deve produzir um resultado utilizável pequeno e atravessar as camadas necessárias; não deve ser “criar todas as entidades”, “construir toda a UI” ou outra camada horizontal.
+
+Quando uma `PAGE` tiver implementações distintas, cria uma candidata por
+`PAGE × APP/superfície` e prepara a sequência
+`25 -> 13|15|17 -> 26`. Para uma capacidade partilhada ou não visual usa
+`27 -> superfície aplicável -> 28`. Não seleciones nem executes estes prompts
+nesta etapa.
+
+## Matriz de rastreabilidade obrigatória
+
+Em `requirements/REQUIREMENTS_TRACEABILITY.md`, mantém pelo menos:
+
+| ID | Versão | Declaração resumida | JRN/passo/ator | APP/PAGE/operação | Fonte | Evidência/confiança | Prioridade | Superfície | BR/DATA/PERM/NFR/SEC/INT | Dependências | AC IDs | Prova prevista | Fatia/prompts | Aprovação | Conflitos/questões |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
+Acrescenta uma vista de cobertura:
+
+```text
+fonte -> jornada/passo -> APP -> PAGE/operação -> requisito
+      -> regra/dado/permissão/qualidade -> cenário de aceitação
+      -> prova prevista -> fatia candidata/prompts
+```
+
+Verifica rastreabilidade:
+
+- para trás: cada requisito aponta para necessidade/fonte real;
+- para a frente: cada fonte e objetivo `Must` chega a requisitos e aceitação;
+- por aplicação: cada capacidade tem aplicabilidade, variante e razão decididas;
+- por página: cada passo, ação e estado chega a requisito, aceitação e prova;
+- por navegação: cada página tem entrada/saída e não existem páginas órfãs;
+- horizontal: jornadas, regras, dados, permissões, integrações e NFR não se contradizem;
+- entre aplicações: contratos de domínio comuns e divergências aprovadas não se contradizem;
+- de exclusão: itens `Won't agora` e fora do âmbito não reaparecem implicitamente em critérios ou dependências.
+
+## Questões, pressupostos, conflitos e decisões
+
+Mantém um registo:
+
+| ID | Tipo | Questão/decisão/conflito | Requisitos afetados | Opções e impacto | Evidência necessária | Owner | Prazo | Bloqueia | Estado |
+|---|---|---|---|---|---|---|---|---|---|
+
+Uma ambiguidade sobre dados, permissões, contrato público, cobrança, preço, retenção, identidade, integração irreversível, legalidade, jornada `Must` ou arquitetura necessária é bloqueante. Não escolhas a opção “mais comum”.
+
+Para dúvidas reversíveis, identifica explicitamente o pressuposto, o limite do impacto, a forma de validação e a condição que o invalida. Um pressuposto não pode receber estado `aprovado`.
+
+## Revisão de qualidade e completude
+
+Antes da entrega:
+
+1. procura requisitos compostos, duplicados, contraditórios, órfãos ou que descrevem solução;
+2. substitui pronomes, adjetivos e quantificadores vagos por termos do glossário e medidas;
+3. verifica unidades, limites inclusivos/exclusivos, timezone, moeda, precisão e arredondamento;
+4. tenta construir duas implementações semanticamente incompatíveis que ainda passem o mesmo critério; se conseguires, detalha-o;
+5. verifica casos anónimo, sem permissão, objeto de outro owner/tenant, input vazio/inválido/extremo, repetição, concorrência, timeout e falha parcial onde aplicáveis;
+6. confirma que nenhuma capacidade foi incluída apenas porque existe no boilerplate ou num benchmark;
+7. confirma que todas as aplicações ativas e páginas em âmbito têm contrato modular e aprovação rastreável;
+8. confirma que cada passo `Must` tem APP/PAGE ou operação não visual e que nenhuma página, ação ou estado está órfão;
+9. confirma que cada `Must` tem fonte, estado aprovado, ator/jornada, APP/PAGE, comportamento atómico, dependências, aceitação observável e prova prevista;
+10. confirma que NFR materiais têm medida e condições ou uma decisão bloqueante;
+11. confirma que páginas públicas, interativas e com mutações cobrem os requisitos específicos aplicáveis;
+12. confirma que diferenças entre aplicações têm necessidade/fonte e preservam contratos comuns;
+13. confirma que cada `PAGE × APP` distinto está ligado a uma fatia e sequência downstream;
+14. confirma que perguntas e conflitos aparecem na matriz, e não apenas em narrativa;
+15. revê todos os links, IDs e referências cruzadas.
+
+Produz um relatório de cobertura com contagens, não uma afirmação genérica:
+
+| Verificação | Total aplicável | Coberto | Lacunas/IDs | Resultado |
+|---|---:|---:|---|---|
+| Aplicações ativas com contrato `APP` |  |  |  | passou/falhou |
+| Capacidades `Must` com aplicabilidade por APP |  |  |  | passou/falhou |
+| Páginas/ecrãs com contrato `PAGE` e navegação |  |  |  | passou/falhou |
+| Passos `Must` mapeados a PAGE/operação |  |  |  | passou/falhou |
+| Ações de página ligadas a FR/PERM/DATA/AC |  |  |  | passou/falhou |
+| Estados aplicáveis resolvidos por página |  |  |  | passou/falhou |
+| Divergências entre aplicações justificadas |  |  |  | passou/falhou |
+| PAGE × APP com fatia/prompts downstream |  |  |  | passou/falhou |
+| `Must` com fonte e aprovação |  |  |  | passou/falhou |
+| `Must` com aceitação observável |  |  |  | passou/falhou |
+| Jornadas com falha e recuperação |  |  |  | passou/falhou |
+| Requisitos com dados/permissões avaliados |  |  |  | passou/falhou |
+| NFR materiais mensuráveis |  |  |  | passou/falhou |
+| Questões bloqueantes abertas |  |  |  | passou/falhou |
+
+Não declares a especificação pronta se alguma linha bloqueante falhar.

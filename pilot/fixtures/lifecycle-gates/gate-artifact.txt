@@ -1,0 +1,2 @@
+Deterministic fixture evidence for lifecycle gates G06 through G10.
+Candidate and release identifiers in the JSON fixture are synthetic and must never be used outside tests.

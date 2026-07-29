@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Professional Web Software"
+  short_description: "Run the gated professional web lifecycle"
+  default_prompt: "Use $build-professional-web-software to start or continue a professional web software lifecycle."

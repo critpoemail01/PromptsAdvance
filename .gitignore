@@ -1,0 +1,11 @@
+.DS_Store
+**/.DS_Store
+
+# Disposable lifecycle and evaluation output
+pilot/temp/
+artifacts/
+
+# Local editor and transient files
+*.log
+*.tmp
+*.bak
