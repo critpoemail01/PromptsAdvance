@@ -46,7 +46,7 @@ Abre esta pasta no Codex e envia:
 Usa $build-professional-web-software.
 Inicia uma nova iniciativa chamada "nome-da-iniciativa".
 O responsável de produto é "nome-do-responsável".
-Usa o BoilerPlateAdvance desta workspace.
+Usa o `BoilerPlateAdvance` em `C:\Work\BoilerPlateAdvance`.
 Inicializa o processo e executa apenas o primeiro prompt.
 ```
 
@@ -69,7 +69,9 @@ Na raiz deste catálogo:
   -Owner "Nome do responsável"
 ```
 
-Por omissão, a instância é criada em `..\SoftwareProcesses\nome-da-iniciativa` e usa o `BoilerPlateAdvance` irmão deste catálogo. Para outro destino ou boilerplate:
+Por omissão, a instância é criada em `..\SoftwareProcesses\nome-da-iniciativa`
+e usa `C:\Work\BoilerPlateAdvance`, na pasta irmã deste catálogo. Para outro
+destino ou boilerplate:
 
 ```powershell
 .\software-lifecycle.ps1 start `
@@ -131,7 +133,7 @@ prompts pode ser registado sem editar o estado:
 - estado legível por máquina em `LIFECYCLE_STATE.json`;
 - seleção do prompt atual e geração do respetivo pacote;
 - validação da estrutura e do Gate A;
-- bloqueio do Gate G03 enquanto `PILOT_APPROVAL.md` não provar 13/13 na versão
+- bloqueio do Gate G03 enquanto `PILOT_APPROVAL.md` não provar 15/15 na versão
   atual, sem falhas críticas e com avaliação humana/revisão separada;
 - validação mecânica do Gate G04 através de baseline, benchmark, rubrica
   crítica, usabilidade, acessibilidade e regressão visual;

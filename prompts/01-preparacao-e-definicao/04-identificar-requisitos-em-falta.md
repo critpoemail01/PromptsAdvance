@@ -41,7 +41,7 @@ Se `PRODUCT_DEFINITION.md` não existir, estiver vazio ou não for rastreável a
    - NFR materiais são mensuráveis ou originam uma decisão bloqueante;
    - conflitos e perguntas em aberto não foram escondidos em texto narrativo.
 5. Confirma que o MVP contém uma jornada ponta a ponta coerente e pequena, com inclusões e exclusões explícitas.
-6. Confirma a viabilidade face ao `BoilerPlateAdvance`, orçamento, prazo, competências, dependências, legalidade, privacidade e acesso ao público. Limita-te a adequação e riscos; não escolhas ainda módulos ou topologia.
+6. Confirma a viabilidade face ao `BoilerPlateAdvance` em `C:\Work\BoilerPlateAdvance`, orçamento, prazo, competências, dependências, legalidade, privacidade e acesso ao público. Limita-te a adequação e riscos; não escolhas ainda módulos ou topologia.
 7. Confirma que existe uma métrica de resultado, baseline ou método para a obter, meta, horizonte temporal, métricas de proteção e critério de continuar/parar.
 8. Atualiza em `PRODUCT_DEFINITION.md` DOR-01 a DOR-12 como `passou`, `falhou` ou `não verificável`, sempre com evidência e ação concreta.
 

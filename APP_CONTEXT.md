@@ -102,6 +102,7 @@ Aliases resolvidos por esta secção:
 | Modelo de receita | A preencher | pendente | — |
 | Plano de monetização aprovado | A preencher | pendente | — |
 | Orçamento de implementação | A preencher | pendente | — |
+| Custo máximo anual do domínio `.com` (valor, moeda e impostos) | A preencher | pendente | — |
 | Prazo ou fase alvo | A preencher | pendente | — |
 | Competências/recursos disponíveis | A preencher | pendente | — |
 | Restrições de negócio | A preencher | pendente | — |
@@ -114,6 +115,7 @@ Aliases:
 - `[MODELO]`
 - `[PLANO_DE_MONETIZAÇÃO]`
 - `[ORÇAMENTO]`, `[PRAZO]`, `[COMPETÊNCIAS]`, `[RESTRIÇÕES]`
+- `[CUSTO_MAXIMO_ANUAL_DOMINIO]`
 
 ## Arquitetura e superfícies
 
@@ -158,7 +160,7 @@ Aliases:
 
 | Finalidade | Valor real | Estado | Fonte |
 |---|---|---|---|
-| Raiz do BoilerPlateAdvance | A preencher | pendente | Sistema de ficheiros |
+| Raiz do BoilerPlateAdvance | `C:\Work\BoilerPlateAdvance` | confirmado | Localização canónica desta workspace |
 | Raiz da aplicação | A preencher | pendente | Sistema de ficheiros |
 | Solution filter Web | A preencher | pendente | Repositório |
 | Projeto de testes | A preencher | pendente | Repositório |

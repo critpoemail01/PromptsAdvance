@@ -60,7 +60,7 @@ function Require-Material {
 
 Require-Exact -Key 'Catalog version' -Expected ([string]$manifest.catalogVersion)
 Require-Exact -Key 'Status' -Expected 'approved'
-Require-Exact -Key 'Suite cases' -Expected '13/13'
+Require-Exact -Key 'Suite cases' -Expected '15/15'
 Require-Exact -Key 'Critical failures' -Expected '0'
 foreach ($key in @('Human evaluator', 'Independent reviewer', 'Evidence', 'Approved at')) {
     Require-Material -Key $key

@@ -45,7 +45,7 @@ Bloqueia quando um serviço, framework, provider ou módulo é escolhido sem req
 - nenhuma vulnerabilidade crítica/alta aceite silenciosamente.
 
 Executa `scripts/Test-ImplementationReadinessGate.ps1`. O gate permanece
-bloqueado se `PILOT_APPROVAL.md` não indicar 13/13 na mesma `catalogVersion`,
+bloqueado se `PILOT_APPROVAL.md` não indicar 15/15 na mesma `catalogVersion`,
 zero falhas críticas, avaliação humana e revisor separado.
 
 ## G04 — Direção profissional da primeira slice

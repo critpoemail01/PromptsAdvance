@@ -90,7 +90,12 @@ finally {
         if (($linkItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq 0) {
             throw "Refusing to remove non-junction evaluation path: $boilerplateLink"
         }
-        Remove-Item -LiteralPath $boilerplateLink -Force
+        if ($IsWindows) {
+            [System.IO.Directory]::Delete($boilerplateLink)
+        }
+        else {
+            Remove-Item -LiteralPath $boilerplateLink -Force
+        }
     }
     if (Test-Path -LiteralPath $evaluationRoot -PathType Container) {
         $resolvedEvaluation = [System.IO.Path]::GetFullPath($evaluationRoot)

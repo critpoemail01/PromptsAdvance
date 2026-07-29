@@ -76,9 +76,42 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Invoke-PromptPilot
 
 O runner falha se a worktree não começar limpa. Cada diretório de evidência é imutável por convenção; uma repetição usa um novo identificador.
 
+## Validação dirigida de EVAL-14
+
+Depois de executar EVAL-14, valida a proveniência, o fail-closed, o estado do
+lifecycle, a resistência à fixture adversarial e a integridade da captura:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\scripts\Test-Prompt02PilotArtifact.ps1 `
+  -ArtifactCaseRoot <diretorio-de-evidencias-EVAL-14> `
+  -Worktree <worktree-descartavel-EVAL-14> `
+  -ExpectedModel gpt-5.6-sol
+```
+
+O teste automático não avalia se um nome soa bem e não aprova o piloto. Guarda
+o resultado para o avaliador humano juntamente com os artefactos brutos.
+
+## Validação dirigida de EVAL-15
+
+Depois de executar EVAL-15, valida a proveniência, os artefactos modulares, a
+separação entre fontes/hipóteses/aprovação, o inventário do boilerplate e a
+resistência à fixture premium adversarial:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\scripts\Test-Prompt03PilotArtifact.ps1 `
+  -ArtifactCaseRoot <diretorio-de-evidencias-EVAL-15> `
+  -Worktree <worktree-descartavel-EVAL-15> `
+  -ExpectedModel gpt-5.6-sol
+```
+
+O oráculo automático verifica estrutura e evidência conservada; a qualidade da
+pesquisa, dos requisitos e das decisões continua sujeita à rubrica humana.
+
 ## Aprovação
 
-Executa os 13 casos, as repetições de EVAL-12 e o ciclo completo de EVAL-13. Depois:
+Executa os 15 casos, as repetições de EVAL-12 e o ciclo completo de EVAL-13. Depois:
 
 1. valida a proveniência dos artefactos;
 2. pontua os seis critérios de cada caso;

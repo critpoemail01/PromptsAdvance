@@ -72,7 +72,7 @@ Para trabalho complexo ou ambíguo, usa Plan mode para refinar resultado, restri
 Prompt inicial recomendado para uma aplicação nova:
 
 ```text
-Usa $build-professional-web-software. Inicia uma nova iniciativa chamada "nome-da-iniciativa", com o responsável de produto indicado. Usa o BoilerPlateAdvance desta workspace, inicializa uma instância isolada e executa apenas o primeiro prompt. Não declares o Gate A concluído.
+Usa $build-professional-web-software. Inicia uma nova iniciativa chamada "nome-da-iniciativa", com o responsável de produto indicado. Usa o BoilerPlateAdvance em C:\Work\BoilerPlateAdvance, inicializa uma instância isolada e executa apenas o primeiro prompt. Não declares o Gate A concluído.
 ```
 
 ## Gates do processo
@@ -149,7 +149,7 @@ cópia Git descartável e confirma que ela permanece limpa:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-ProcessInDisposableCopy.ps1
 ```
 
-Este runner não executa nem aprova sozinho os 13 casos/human review de
+Este runner não executa nem aprova sozinho os 15 casos/human review de
 `PILOT-001`.
 
 Validação e navegação de uma instância:

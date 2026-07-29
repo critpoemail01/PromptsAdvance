@@ -2,9 +2,9 @@
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-29.4 |
+| Catalog version | 2026-07-29.10 |
 | Status | approved |
-| Suite cases | 13/13 |
+| Suite cases | 15/15 |
 | Critical failures | 0 |
 | Human evaluator | Fixture Human Evaluator |
 | Independent reviewer | Fixture Independent Reviewer |

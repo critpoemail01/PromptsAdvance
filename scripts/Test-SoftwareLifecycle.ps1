@@ -1073,7 +1073,12 @@ finally {
             ($junctionItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq 0) {
             throw "Refusing to remove unverified junction fixture: $junctionRoot"
         }
-        Remove-Item -LiteralPath $junctionRoot -Force
+        if ($IsWindows) {
+            [System.IO.Directory]::Delete($junctionRoot)
+        }
+        else {
+            Remove-Item -LiteralPath $junctionRoot -Force
+        }
     }
     if (-not $KeepFixture -and (Test-Path -LiteralPath $fixtureRoot -PathType Container)) {
         $resolvedFixture = [System.IO.Path]::GetFullPath($fixtureRoot)

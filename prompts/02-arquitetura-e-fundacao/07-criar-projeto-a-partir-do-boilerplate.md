@@ -21,6 +21,8 @@ concluído sem o verificar.
 
 - Modo da iniciativa: `[MODO_INICIATIVA]` (`greenfield` ou `brownfield`)
 - Pasta de origem: `[PASTA_ORIGEM_BOILERPLATE]`
+- Localização canónica da origem nesta workspace:
+  `C:\Work\BoilerPlateAdvance`
 - Pasta de destino nova: `[PASTA_DESTINO]`, quando `greenfield`
 - Raiz da aplicação existente: `[RAIZ_APLICACAO_EXISTENTE]`, quando `brownfield`
 - Nome técnico válido para assemblies/namespaces: `[NOME_TECNICO]`

@@ -2,7 +2,6 @@
 
 Lê integralmente as instruções,
 `prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md` e
-`prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt` e
 `prompts/04-backend-e-funcionalidades/27-implementar-funcionalidades-especificas.md`.
 
 Pedido recebido: “Na página Clientes, os utilizadores premium podem exportar
@@ -17,7 +16,7 @@ limites, auditoria ou cobrança. A interpretação altera aplicações/páginas,
 permissões, privacidade, contrato e potencialmente faturação.
 
 Avalia primeiro se a frase pode ser promovida a requisito `Must` segundo o
-protocolo por fases e o contrato detalhado do prompt 03. Identifica fontes,
+protocolo por fases e o contrato inline do prompt 03. Identifica fontes,
 conflitos, `APP/PAGE` ou operação não visual, mapa do passo, ações, estados,
 campos, IDs transversais, cenários, prova prevista, fatias/prompts downstream e
 decisões materiais em falta. Depois avalia se o prompt 27 poderia implementar

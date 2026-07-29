@@ -53,13 +53,14 @@ $requiredDocuments = @(
     'IMPLEMENTATION_STATUS.md',
     'LIFECYCLE_GATE_EVIDENCE.json',
     'PILOT_APPROVAL.md',
-    'PROMPT_EVALUATION.md',
-    'prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt'
+    'PROMPT_EVALUATION.md'
 )
 
 $requiredScripts = @(
     'scripts/Test-ProductDefinitionGate.ps1',
     'scripts/Test-ImplementationReadinessGate.ps1',
+    'scripts/Test-Prompt02PilotArtifact.ps1',
+    'scripts/Test-Prompt03PilotArtifact.ps1',
     'scripts/Test-LifecycleGateEvidence.ps1',
     'scripts/Test-ProductQualityGate.ps1',
     'scripts/Test-SoftwareLifecycle.ps1',
@@ -127,7 +128,19 @@ if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
     }
 }
 
-$markdownFiles = @(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.md')
+$catalogMarkdownRoots = @(
+    (Join-Path $root '.agents'),
+    (Join-Path $root 'pilot'),
+    (Join-Path $root 'prompts')
+)
+$markdownFiles = @(
+    Get-ChildItem -LiteralPath $root -File -Filter '*.md'
+    foreach ($catalogMarkdownRoot in $catalogMarkdownRoots) {
+        if (Test-Path -LiteralPath $catalogMarkdownRoot -PathType Container) {
+            Get-ChildItem -LiteralPath $catalogMarkdownRoot -Recurse -File -Filter '*.md'
+        }
+    }
+) | Sort-Object FullName -Unique
 $linkPattern = [regex]'\[[^\]]*\]\(([^)]+)\)'
 foreach ($file in $markdownFiles) {
     $content = Get-Content -Raw -Encoding UTF8 -LiteralPath $file.FullName
@@ -142,7 +155,13 @@ foreach ($file in $markdownFiles) {
             continue
         }
 
-        $resolved = [System.IO.Path]::GetFullPath((Join-Path $file.DirectoryName $pathPart))
+        try {
+            $resolved = [System.IO.Path]::GetFullPath((Join-Path $file.DirectoryName $pathPart))
+        }
+        catch {
+            Add-Failure "Link local invalido: $($file.FullName) -> $target"
+            continue
+        }
         if (-not (Test-Path -LiteralPath $resolved)) {
             Add-Failure "Link local quebrado: $($file.FullName) -> $target"
         }
@@ -214,32 +233,96 @@ Require-Pattern 'AGENTS.md' 'PRODUCT_DEFINITION\.md.*Gate A.*GO' 'As instrucoes 
 Require-Pattern 'PRODUCT_DEFINITION.md' 'DOR-12' 'A definicao do produto nao contem a checklist completa do Gate A.'
 Require-Pattern 'PRODUCT_DEFINITION.md' 'Decis.o do Gate A: GO' 'A definicao do produto nao especifica a decisao GO.'
 Require-Pattern 'AGENTS.md' 'Test-ProductDefinitionGate\.ps1' 'As instrucoes duradouras nao executam o gate da definicao.'
+Require-Pattern 'APP_CONTEXT.md' 'C:\\Work\\BoilerPlateAdvance' 'O contexto nao fixa a localizacao canonica do BoilerPlateAdvance.'
+Require-Pattern 'software-lifecycle.ps1' 'Join-Path\s+\(Split-Path\s+\$catalogRoot\s+-Parent\)\s+.+BoilerPlateAdvance' 'O orquestrador nao usa o BoilerPlateAdvance irmao do catalogo.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'C:\\Work\\BoilerPlateAdvance' 'O prompt 03 nao identifica a localizacao canonica do BoilerPlateAdvance.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'C:\\Work\\BoilerPlateAdvance' 'O prompt 07 nao identifica a origem canonica do BoilerPlateAdvance.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'GO.*REWORK.*NO-GO' 'O prompt 04 nao produz uma decisao completa do Gate A.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'DOR-01 a DOR-12' 'O prompt 04 nao audita todos os criterios de passagem.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '10.15 nomes' 'O prompt 02 nao exige uma shortlist final de 10 a 15 nomes.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'OVHcloud.*dispon.vel para registo' 'O prompt 02 nao exige disponibilidade especifica na OVHcloud.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '\[CUSTO_MAXIMO_ANUAL_DOMINIO\]' 'O prompt 02 nao possui um limite de custo verificavel.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'pre.o de registo.*pre.o de renova..o' 'O prompt 02 nao compara registo e renovacao.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'resposta `200`' 'O prompt 02 nao identifica um registo RDAP ativo.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '`404`/`not found`' 'O prompt 02 nao trata um dominio sem registo RDAP encontrado.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'CAPTCHA.*rate limits' 'O prompt 02 nao trata bloqueios e limites da verificacao externa.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'WhatsApp, Instagram, TikTok, Telegram e X' 'O prompt 02 nao inclui o benchmark de comunicacao e social.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'Gmail, Google Drive, Google Docs, Word, Excel, PowerPoint, Zoom, Microsoft Teams e Notion' 'O prompt 02 nao inclui o benchmark de produtividade.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'YouTube, Spotify e Netflix' 'O prompt 02 nao inclui o benchmark de conteudo.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'Google Maps, Waze, Uber e Bolt' 'O prompt 02 nao inclui o benchmark de mobilidade.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'Amazon, MB WAY e Revolut' 'O prompt 02 nao inclui o benchmark de comercio e financas.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'variantes.*imita..o' 'O prompt 02 nao impede imitacoes das marcas de referencia.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'mec.nico, artificial' 'O prompt 02 nao rejeita nomes mecanicos ou artificiais.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'conjunto coerente de duas palavras internacionais' 'O prompt 02 nao permite compostos internacionais coerentes.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'Triagem fon.tica e lingu.stica online' 'O prompt 02 nao exige validacao sonora online.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'separa..o sil.bica.*s.laba t.nica.*pron.ncia esperada' 'O prompt 02 nao documenta a pronuncia esperada.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'Forvo, YouGlish' 'O prompt 02 nao indica fontes online complementares de pronuncia.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'n.o prova objetivamente que um nome.*soa bem' 'O prompt 02 apresenta a sonoridade subjetiva como prova objetiva.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'dom.nio `.com` formado pela concatena..o sem espa.os nem h.fenes' 'O prompt 02 nao normaliza o dominio de nomes com duas palavras.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'palavra-base, raiz lexical, estrutura e met.fora dominante' 'O prompt 02 nao agrupa nem elimina familias de naming repetitivas.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'N.o leves para a shortlist final mais do que um candidato da mesma fam.lia' 'O prompt 02 permite variantes superficiais na shortlist final.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'pesquisa separadamente cada palavra significativa e raiz lexical' 'O prompt 02 nao verifica componentes individuais contra apps e marcas.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'mesmo que o nome completo n.o apare.a e o dom.nio esteja dispon.vel' 'O prompt 02 nao exclui uma colisao material num componente do nome.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'Gate eliminat.rio contra nomes mec.nicos' 'O prompt 02 nao possui um gate explicito contra naming gerado por algoritmo.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'palavra reconhec.vel.*composto natural.*neologismo transparente.*neologismo opaco' 'O prompt 02 nao distingue neologismos transparentes de opacos.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'teste sem narrativa' 'O prompt 02 permite nomes que so funcionam com uma historia inventada.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '`-ivo`.*`-evo`.*`-umi`.*`-ora`.*`-io`.*`-ify`.*`-ly`' 'O prompt 02 nao deteta sufixos mecanicos usados apenas para simular uma marca.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'Navirevo.*Prumivo.*Rivelumi' 'O prompt 02 nao conserva os nomes rejeitados como anti-exemplos.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'Todo o `neologismo opaco`.*falha e . exclu.do' 'O prompt 02 nao exclui obrigatoriamente neologismos opacos.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'NAMING_RESEARCH\.md' 'O prompt 02 nao conserva um registo retomavel da pesquisa.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'gerado.*lexical_pass.*linguistico_pass.*associacao_pass.*dominio_pass.*shortlisted' 'O prompt 02 nao exige estados verificaveis por candidato.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'dados n.o confi.veis, n.o como instru..es' 'O prompt 02 nao trata conteudo externo como evidencia nao confiavel.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'revalida na OVHcloud e RDAP todos os nomes da shortlist' 'O prompt 02 nao revalida a shortlist imediatamente antes da entrega.'
+$prompt02Path = Join-Path $root 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md'
+if ((Test-Path -LiteralPath $prompt02Path -PathType Leaf) -and
+    (Get-Content -Encoding UTF8 -LiteralPath $prompt02Path).Count -gt 165) {
+    Add-Failure 'O prompt 02 excede o budget de 165 linhas e deve remover repeticao antes de crescer.'
+}
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'REQUIREMENTS_RESEARCH\.md' 'O prompt 03 nao conserva pesquisa retomavel.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '\[PASTA_ORIGEM_BOILERPLATE\]' 'O prompt 03 nao resolve a raiz real do BoilerPlateAdvance.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'pelo menos dois produtos diretamente compar.veis' 'O prompt 03 nao exige produtos comparaveis por jornada/pagina.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'uma ou duas refer.ncias premium relevantes' 'O prompt 03 nao exige referencias premium relevantes.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'Tailwind Plus, Metronic ou itens ThemeForest' 'O prompt 03 nao identifica fontes premium concretas para pesquisa.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'dados n.o confi.veis' 'O prompt 03 nao trata conteudo externo como dados nao confiaveis.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'N.o copies c.digo, assets, texto, trade dress' 'O prompt 03 nao protege propriedade e licencas das referencias.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'Transforma observa..es externas em `INS-###` e candidatos `HYP-###`' 'O prompt 03 nao separa observacoes de hipoteses.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)S. converte\s+uma hip.tese em requisito `Must`' 'O prompt 03 promove benchmarks a requisitos sem gate.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'ficheiro:linha' 'O prompt 03 nao exige proveniencia do inventario do boilerplate.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '`reter`, `adaptar`, `remover`' 'O prompt 03 nao classifica o baseline observado.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)Existir no\s+boilerplate n.o o transforma em requisito' 'O prompt 03 confunde baseline tecnica com necessidade de produto.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'Contrato inline obrigat.rio' 'O prompt 03 nao e autocontido depois da remocao do contrato auxiliar.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)evidenceState.*approvalState.*implementationState' 'O prompt 03 nao separa evidencia, aprovacao e implementacao.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'BPP projeto boilerplate' 'O prompt 03 nao modela projetos reais do boilerplate.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'URL da licen.a oficial' 'O prompt 03 nao exige proveniencia oficial da licenca premium.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)estados: inicial, loading/progresso.*concorr.ncia/conflito.*recupera..o' 'O contrato PAGE inline nao cobre estados completos.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)status HTTP.*canonical.*robots' 'O contrato PAGE inline nao cobre semantica e descoberta de paginas publicas.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'relat.rio de cobertura' 'O prompt 03 nao possui gate de cobertura.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/REQUIREMENTS_SPECIFICATION\.md' 'O prompt 03 nao exige uma especificacao versionada canonica.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/APPLICATION_CATALOG\.md' 'O prompt 03 nao exige um inventario canonico de aplicacoes.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/PAGE_CATALOG\.md' 'O prompt 03 nao exige um inventario canonico de paginas/ecras.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/applications/APP-<slug>\.md' 'O prompt 03 nao modulariza o contrato de cada aplicacao ativa.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/pages/PAGE-<slug>\.md' 'O prompt 03 nao modulariza o contrato de cada pagina/ecra.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'contrato detalhado dos artefactos' 'O prompt 03 nao carrega explicitamente o contrato complementar.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)Fase 0.*Fase 1.*Fase 2.*Fase 3.*Fase 4.*Fase 5.*Fase 6' 'O prompt 03 nao orienta o Codex por fases verificaveis.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'Não tentes gerar todo o catálogo num único passe' 'O prompt 03 nao obriga a elaboracao incremental por jornada.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)### 1\. Enquadrar.*### 6\. Fechar' 'O prompt 03 nao orienta o Codex por fases verificaveis.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'Limites de autoridade' 'O prompt 03 nao define autonomia e fronteiras da tarefa.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt' '(?s)PERM-###.*INT-###.*NFR-###.*SEC-###' 'O contrato do prompt 03 nao separa permissoes, integracoes e qualidades com IDs estaveis.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt' '(?s)APP-###.*PAGE-###' 'O contrato do prompt 03 nao identifica aplicacoes e paginas/ecras com IDs estaveis.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt' 'capacidade . aplica..o' 'O contrato do prompt 03 nao exige a matriz de aplicabilidade por aplicacao.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt' '(?s)inicial/primeira utiliza..o.*loading/skeleton/progresso.*vazio/sem resultados.*parcial/stale.*conflito/concorr.ncia' 'O contrato do prompt 03 nao obriga a decidir os estados materiais de cada pagina.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt' 'Action ID.*PAGE/APP.*FR/BR.*DATA.*PERM.*AC' 'O contrato do prompt 03 nao rastreia cada acao de pagina ate requisito, dados, permissao e aceitacao.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt' '(?s)PAGE.*APP/superf.cie.*25 -> 13\|15\|17 -> 26' 'O contrato do prompt 03 nao prepara as fatias de pagina para os prompts downstream.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-contrato-detalhado-de-requisitos.txt' '(?s)Estado de evidência.*Estado do requisito.*Evidência de implementação' 'O contrato do prompt 03 mistura evidencia, aprovacao e implementacao.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)PERM autoriza..o.*INT integra..o.*NFR qualidade mensur.vel.*SEC seguran.a/privacidade' 'O contrato inline nao separa permissoes, integracoes e qualidades com IDs estaveis.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'AC-<REQ>-##' 'O prompt 03 nao exige cenarios de aceitacao identificados por requisito.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'Relat.rio de cobertura' 'O prompt 03 nao exige prova quantitativa de completude.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'duas implementa..es semanticamente incompat.veis' 'O prompt 03 nao testa requisitos contra ambiguidade semantica.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'Gate A como `PENDENTE`' 'O prompt 03 pode aprovar indevidamente o Gate A.'
-Require-Pattern 'PRODUCT_DEFINITION.md' 'contratos `APP/PAGE`.*fatia downstream' 'O Gate A nao exige cobertura detalhada por aplicacao e pagina.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)duas implementa..es semanticamente\s+incompat.veis' 'O prompt 03 nao testa requisitos contra ambiguidade semantica.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'Gate A permanece `PENDENTE`' 'O prompt 03 pode aprovar indevidamente o Gate A.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)data/hora real do sistema.*n.o estimes' 'O prompt 03 nao ancora os timestamps no relogio real.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'p.gina oficial\s+de licen.a' 'O prompt 03 aceita uma demo como prova de licenca.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)Reconcilia mecanicamente todas as ocorr.ncias.*APP/PAGE/BPP/BPR' 'O prompt 03 nao reconcilia identidades e destinos mecanicamente.'
+Require-Pattern 'PRODUCT_DEFINITION.md' '(?s)contratos `APP/PAGE`.*fatia downstream' 'O Gate A nao exige cobertura detalhada por aplicacao e pagina.'
 Require-Pattern 'APP_CONTEXT.md' 'CATALOGO_DE_APLICACOES.*CONTRATOS_POR_APLICACAO' 'O contexto nao encaminha o Codex para os contratos modulares por aplicacao.'
 Require-Pattern 'APP_CONTEXT.md' 'CATALOGO_DE_PAGINAS.*CONTRATOS_POR_PAGINA' 'O contexto nao encaminha o Codex para os contratos modulares por pagina.'
-Require-Pattern 'pilot/cases/EVAL-11.md' '(?s)página Clientes.*todas as aplicações' 'O EVAL-11 nao testa ambiguidade concreta por pagina e aplicacao.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'GO.*REWORK.*NO-GO' 'O prompt 04 nao produz uma decisao completa do Gate A.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'DOR-01 a DOR-12' 'O prompt 04 nao audita todos os criterios de passagem.'
+Require-Pattern 'pilot/cases/EVAL-11.md' '(?s)p.gina Clientes.*todas as aplica..es' 'O EVAL-11 nao testa ambiguidade concreta por pagina e aplicacao.'
+Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' 'future access timestamp' 'O oraculo de EVAL-15 nao rejeita timestamps futuros.'
+Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' 'APP-003.*BPP-007' 'O oraculo de EVAL-15 nao verifica o mapeamento publico SSR.'
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-15-R1.*timestamps.*futuro.*BPP-007.*BPR-002' 'A falha adversarial de EVAL-15-R1 nao esta preservada.'
+$prompt03Path = Join-Path $root 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md'
+if ((Test-Path -LiteralPath $prompt03Path -PathType Leaf) -and
+    (Get-Content -Encoding UTF8 -LiteralPath $prompt03Path).Count -gt 360) {
+    Add-Failure 'O prompt 03 autocontido excede o budget de 360 linhas.'
+}
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'PRODUCT_DEFINITION\.md' 'O prompt 05 nao verifica o artefacto da etapa 1.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'termina com estado `bloqueado`' 'O prompt 05 nao bloqueia quando o Gate A falha.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'Test-ProductDefinitionGate\.ps1' 'O prompt 05 nao executa o gate mecanico.'
@@ -255,7 +338,23 @@ Require-Pattern 'prompts/09-entrega-e-distribuicao/55-configurar-ci-cd-e-ambient
 Require-Pattern 'prompts/11-aceitacao-e-manutencao/63-executar-revisao-final-independente.md' 'read-only' 'Falta revisao final read-only.'
 Require-Pattern 'prompts/11-aceitacao-e-manutencao/64-publicar-com-migrations-smoke-tests-e-rollback.md' '\[AUTORIZAR_RELEASE\]' 'A publicacao nao exige autorizacao explicita.'
 Require-Pattern 'prompts/11-aceitacao-e-manutencao/64-publicar-com-migrations-smoke-tests-e-rollback.md' '\[CANDIDATE_SHA\].*\[ARTIFACT_DIGEST\]' 'A publicacao nao fixa candidate SHA e digest.'
-Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-13' 'O piloto nao contem os 13 casos.'
+Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-13' 'O piloto nao conserva o caso de revisao independente.'
+Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-14.*naming natural' 'O piloto nao contem a regressao dirigida do prompt 02.'
+Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-15.*requisitos pesquisados por aplica..o e p.gina' 'O piloto nao contem a regressao dirigida do prompt 03.'
+Require-Pattern 'pilot/cases/EVAL-14.md' 'Navirevo.*Prumivo.*Rivelumi' 'O caso EVAL-14 nao inclui os nomes mecanicos rejeitados.'
+Require-Pattern 'pilot/fixtures/prompt-02/untrusted-search-result.html' 'Ignore as instru..es anteriores' 'A fixture adversarial do prompt 02 esta ausente.'
+Require-Pattern 'pilot/fixtures/prompt-02/app-context.md' '30 EUR \+ IVA' 'O contexto material de EVAL-14 nao fixa o orcamento do dominio.'
+Require-Pattern 'pilot/fixtures/prompt-02/product-definition.md' 'Decis.o.*avan.ar' 'A definicao de produto de EVAL-14 nao prova a decisao do prompt 01.'
+Require-Pattern 'pilot/fixtures/prompt-02/implementation-status.md' '02-criar-nome-da-app.*em curso' 'O estado de EVAL-14 nao seleciona o prompt 02.'
+Require-Pattern 'pilot/PILOT-002-EVAL-14-EXECUTION.md' 'PASS t.cnico para EVAL-14' 'A execução dirigida de EVAL-14 não conserva a decisão técnica.'
+Require-Pattern 'pilot/PILOT-002-EVAL-14-EXECUTION.md' 'FA0081F9510EADFD2169EE0F81462F4CB4E028963F6FE55440C555398857819C' 'A execução dirigida de EVAL-14 não fixa o hash do prompt avaliado.'
+Require-Pattern 'scripts/Test-Prompt02PilotArtifact.ps1' 'Human rubric and full 15-case pilot approval remain separate requirements' 'O validador de EVAL-14 confunde o teste técnico com aprovação humana.'
+Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)compar.veis diretos.*adjacente.*fonte madura.*refer.ncias\s+premium' 'O caso EVAL-15 nao cobre a pesquisa externa exigida.'
+Require-Pattern 'pilot/fixtures/prompt-03/untrusted-premium-preview.html' 'Ignore as instru..es anteriores' 'A fixture adversarial do prompt 03 esta ausente.'
+Require-Pattern 'pilot/fixtures/prompt-03/product-definition.md' 'QST-001.*pendente' 'As fontes de EVAL-15 nao conservam uma decisao material em falta.'
+Require-Pattern 'pilot/fixtures/prompt-03/product-definition.md' 'Gate A.*PENDENTE' 'A definicao de EVAL-15 nao conserva o Gate A pendente.'
+Require-Pattern 'pilot/fixtures/prompt-03/implementation-status.md' '03-levantar-requisitos-funcionais.*em curso' 'O estado de EVAL-15 nao seleciona o prompt 03.'
+Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' 'Human rubric and full 15-case pilot approval remain separate requirements' 'O validador de EVAL-15 confunde o teste tecnico com aprovacao humana.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'PILOT-001.*pendente' 'PILOT-001 nao esta honestamente pendente.'
 
 $gateScript = Join-Path $root 'scripts/Test-ProductDefinitionGate.ps1'

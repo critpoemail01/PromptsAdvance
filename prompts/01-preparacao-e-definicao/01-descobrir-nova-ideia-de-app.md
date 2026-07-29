@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Como primeiro passo de produto, identifica oportunidades de aplicações web/mobile com procura comprovável, problema claro e potencial de negócio compatível com o `BoilerPlateAdvance`. Produz uma recomendação fundamentada; não implementes código.
+Como primeiro passo de produto, identifica oportunidades de aplicações web/mobile com procura comprovável, problema claro e potencial de negócio compatível com o `BoilerPlateAdvance` localizado em `C:\Work\BoilerPlateAdvance`. Produz uma recomendação fundamentada; não implementes código.
 
 Este prompt inicia, mas não aprova, `PRODUCT_DEFINITION.md`. Mesmo quando a recomendação for `avançar`, o Gate A permanece `PENDENTE` até o prompt 04 validar toda a definição.
 
