@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-29.10 |
+| Catalog version | 2026-07-29.11 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -35,4 +35,7 @@ detetar timestamps futuros e destinos BPP/BPR contraditórios. A versão
 2026-07-29.10 tornou o prompt 03 autocontido após a remoção intencional do
 contrato auxiliar e confirmou `C:\Work\BoilerPlateAdvance` como localização
 canónica da base. Estas alterações materiais exigem repetir
-EVAL-15 e a suite completa.
+EVAL-15 e a suite completa. A versão 2026-07-29.11 acrescentou a vista derivada
+`DEVELOPER_REQUIREMENTS_CHECKLIST.md`, com requisitos organizados por página e
+funcionalidade e paridade obrigatória com a especificação detalhada. A nova
+saída e o oráculo associado exigem nova execução de EVAL-15 e dos 15 casos.

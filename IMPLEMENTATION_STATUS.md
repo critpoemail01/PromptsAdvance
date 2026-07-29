@@ -45,7 +45,7 @@ Esta tabela replica o estado resumido de `PRODUCT_DEFINITION.md`; esse documento
 | DOR-03 — procura, alternativas, acesso e diferenciação | pendente | — |
 | DOR-04 — nome de trabalho aprovado e triado | pendente | — |
 | DOR-05 — jornada, aplicações/páginas, MVP e exclusões | pendente | — |
-| DOR-06 — requisitos e contratos `APP/PAGE` verificáveis | pendente | — |
+| DOR-06 — detalhe e checklist do programador em paridade | pendente | — |
 | DOR-07 — NFR materiais mensuráveis | pendente | — |
 | DOR-08 — métricas, meta e critério de continuar/parar | pendente | — |
 | DOR-09 — orçamento, prazo, competências e viabilidade | pendente | — |
@@ -69,9 +69,9 @@ Acrescenta uma linha quando um prompt entra no plano. Não marques prompts opcio
 
 ## Requisitos
 
-| ID | APP/PAGE/operação | Prioridade | Resumo | Critérios de aceitação | Estado | Evidência |
-|---|---|---|---|---|---|---|
-| A preencher | A preencher | Must/Should/Could | A preencher | A preencher | não iniciado | — |
+| ID | APP/PAGE/operação | Prioridade | Resumo | Critérios de aceitação | Validação do programador | Estado | Evidência |
+|---|---|---|---|---|---|---|---|
+| A preencher | A preencher | Must/Should/Could | A preencher | A preencher | não iniciado/bloqueado/implementado/validado | não iniciado | — |
 
 ## Fatias verticais
 

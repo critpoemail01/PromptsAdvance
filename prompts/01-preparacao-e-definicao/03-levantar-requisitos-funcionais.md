@@ -1,9 +1,10 @@
-# Especificar requisitos verificáveis por aplicação e página
+# Especificar requisitos por página e funcionalidade para desenvolvimento
 
 ## Objetivo
 
 Transforma a definição aprovada nos prompts 01 e 02 numa especificação
-versionada, detalhada por jornada, aplicação e página/ecrã. Usa fontes de produto,
+versionada, detalhada por jornada, aplicação, página/ecrã e funcionalidade, e
+numa segunda vista simples para o programador interpretar e validar. Usa fontes de produto,
 o comportamento observado no `BoilerPlateAdvance` e pesquisa online atual de
 produtos comparáveis, padrões maduros e layouts premium para descobrir lacunas e
 alternativas — nunca para inventar necessidades ou copiar soluções.
@@ -57,6 +58,7 @@ Cria ou atualiza, sem duplicar equivalentes:
 - `requirements/REQUIREMENTS_RESEARCH.md`;
 - `requirements/REQUIREMENTS_SPECIFICATION.md`;
 - `requirements/REQUIREMENTS_TRACEABILITY.md`;
+- `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md`;
 - `requirements/APPLICATION_CATALOG.md`;
 - `requirements/PAGE_CATALOG.md`;
 - `requirements/applications/APP-<slug>.md`, um por aplicação de produto ativa;
@@ -153,45 +155,47 @@ owner e contrato. Cada contrato `PAGE` detalha:
 - prova: `REF/INS` considerados/rejeitados, declaração de não cópia,
   `BPP/BPR`, requisitos, `AC`, método de prova, riscos, `QST/DEC` e cobertura.
 
-Cada `JRN` contém resultado/prioridade, atores/APP, trigger, pré-condições,
-happy path numerado, alternativas/cancelamento/retoma, erros/negação/parcial/
-recuperação, pós-condições/efeitos proibidos, métrica/janela, fontes, requisitos,
-páginas, provas, owner e estado. Cada `STP` liga um ator, `APP`, `PAGE` ou
-operação não visual, ação, resultado observável e próximo passo.
+Cada `JRN` contém resultado/prioridade, atores/APP, trigger, pré-condições, happy path numerado, alternativas/cancelamento/retoma, erros/negação/parcial/recuperação, pós-condições/efeitos proibidos, métrica/janela, fontes, requisitos, páginas, provas, owner e estado.
+Cada `STP` liga um ator, `APP`, `PAGE` ou operação não visual, ação, resultado observável e próximo passo.
 
-Cada requisito contém ID/título e uma única obrigação em voz ativa; tipo,
-MoSCoW e aprovação; `SRC/DEC`; racional; `ACT/JRN/STP/CAP/APP/PAGE` ou razão não
-visual; trigger; resultado e efeitos proibidos; dependências/conflitos; `AC`,
-prova, owner/revisor e três estados. `BR` explicita condição, precedência,
-exceção, cálculo, precisão, timezone e transições. `DATA` explicita significado,
-origem/owner, classificação, minimização, validação, unicidade, ciclo de vida,
-retenção/eliminação, auditoria e consistência. `PERM` explicita ator, ação,
-objeto, scope, owner/tenant, default deny, negação, delegação/expiração e casos
-negativos. `INT` explicita owner, contrato, autenticação, timeout, retry,
-idempotência, rate limit, indisponibilidade, fila/reconciliação, dados e
-observabilidade. `NFR` explicita cenário, ambiente/população, medida/unidade,
-limiar/tolerância/janela, método, baseline/target e owner. `SEC` explicita
-ativo/ameaça/obrigação, propriedade protegida, resultado, abuso/privacidade,
-referência aplicável, prova e risco residual.
+Cada requisito contém ID/título e uma única obrigação em voz ativa; tipo, MoSCoW e aprovação; `SRC/DEC`; racional; `ACT/JRN/STP/CAP/APP/PAGE` ou razão não visual; trigger; resultado e efeitos proibidos; dependências/conflitos; `AC`, prova, owner/revisor e três estados.
+`BR` explicita condição, precedência, exceção, cálculo, precisão, timezone e transições. `DATA` explicita significado, origem/owner, classificação, minimização, validação, unicidade, ciclo de vida, retenção/eliminação, auditoria e consistência.
+`PERM` explicita ator, ação, objeto, scope, owner/tenant, default deny, negação, delegação/expiração e casos negativos. `INT` explicita owner, contrato, autenticação, timeout, retry, idempotência, rate limit, indisponibilidade, fila/reconciliação, dados e observabilidade.
+`NFR` explicita cenário, ambiente/população, medida/unidade, limiar/tolerância/janela, método, baseline/target e owner. `SEC` explicita ativo/ameaça/obrigação, propriedade protegida, resultado, abuso/privacidade, referência aplicável, prova e risco residual.
 
 Cada `AC` contém estado/dados iniciais não sensíveis, ator/autorização, ação,
 resultado, persistência, efeitos proibidos, limite/erro/recuperação, `APP/PAGE`,
 método (`review`, `unit`, `integration`, `contract`, `browser`, `native`,
 `accessibility`, `security`, `performance` ou `operation`), artefacto e owner.
 
-`REQUIREMENTS_TRACEABILITY.md` contém as vistas bidirecionais `SRC/DEC -> OBJ/
-CAP/JRN -> requisito`, `REF -> INS -> HYP -> decisão`, `JRN/STP -> APP -> PAGE/
-operação -> requisito -> AC`, `APP/PAGE -> BPP/BPR/BPC`, contratos transversais
-e requisito -> `SLICE`, além de órfãos, conflitos e bloqueios. Cada `SLICE`
-liga resultado, jornada, aplicação/página, requisitos mínimos, dados, permissões,
-erros, observabilidade, provas, dependências, exclusões e prompts downstream.
+`REQUIREMENTS_SPECIFICATION.md` e os contratos `PAGE` são a fonte canónica
+detalhada para desenvolver. `DEVELOPER_REQUIREMENTS_CHECKLIST.md` é uma vista
+derivada, curta e operacional: não cria, altera, aprova nem omite requisitos.
+Começa por versão, fonte canónica, legenda de estados, bloqueios e ordem de
+implementação. Depois contém uma secção por `APP/PAGE`, sempre com:
 
-O relatório de cobertura dá contagem, IDs em falta e passou/falhou para
-objetivos/fontes, jornadas/passos, aplicações/capacidades, páginas/navegação/
-ações/estados, divergências, inventário/mapeamentos, pesquisa/licenças, `INS/HYP`,
-atomicidade/aprovação, regras/dados/permissões, integrações/falhas, `NFR/SEC`,
-`AC/prova` e rastreabilidade. Qualquer linha bloqueante falhada impede
-`concluído`.
+| Grupo | Conteúdo de leitura/validação do programador |
+|---|---|
+| Contexto | objetivo, ator, rota/ecrã, entrada/saída, prioridade e links para contratos detalhados |
+| Funcionalidades | `CAP/FR` em linguagem simples, comportamento, inputs, outputs/efeitos e fora do âmbito |
+| Regras e fronteiras | `BR/DATA/PERM/INT`, dependências, default deny, efeitos proibidos e decisões pendentes |
+| Estados | normal, loading, vazio, erro, sem permissão, offline, conflito, sucesso e recuperação aplicáveis |
+| Validação | `AC`, método/prova, teste/comando previsto, evidência esperada, owner e estado |
+
+Inclui ainda funcionalidades transversais/não visuais, uma checklist
+`antes de desenvolver`, `durante a implementação` e `pronto para validar`, e
+uma matriz `PAGE -> funcionalidade -> requisito detalhado -> AC -> prova`.
+Cada `Must` aparece exatamente uma vez como responsabilidade primária e liga as
+outras páginas consumidoras. O programador marca `não iniciado`, `bloqueado`,
+`implementado` ou `validado com evidência`; `[x]` exige prova e não equivale a
+aprovação de produto. Divergência entre a checklist e a fonte canónica bloqueia
+a implementação e é corrigida primeiro nos artefactos detalhados.
+
+`REQUIREMENTS_TRACEABILITY.md` contém as vistas bidirecionais `SRC/DEC -> OBJ/CAP/JRN -> requisito`, `REF -> INS -> HYP -> decisão`, `JRN/STP -> APP -> PAGE/operação -> requisito -> AC`, `APP/PAGE -> BPP/BPR/BPC`, contratos transversais e requisito -> `SLICE`, além de órfãos, conflitos e bloqueios.
+Cada `SLICE` liga resultado, jornada, aplicação/página, requisitos mínimos, dados, permissões, erros, observabilidade, provas, dependências, exclusões e prompts downstream.
+
+O relatório de cobertura dá contagem, IDs em falta e passou/falhou para objetivos/fontes, jornadas/passos, aplicações/capacidades, páginas/navegação/ações/estados, divergências, inventário/mapeamentos, pesquisa/licenças, `INS/HYP`, atomicidade/aprovação, regras/dados/permissões, integrações/falhas, `NFR/SEC`, `AC/prova` e rastreabilidade.
+Qualquer linha bloqueante falhada impede `concluído`.
 
 ## Limites de autoridade
 
@@ -276,7 +280,7 @@ uma hipótese em requisito `Must` quando uma fonte de produto aprovada ou uma
 decisão identificada sustentar a necessidade. Regista também padrões rejeitados
 e porquê.
 
-### 4. Modelar domínio, aplicações, jornadas e páginas
+### 4. Modelar domínio, aplicações, jornadas, páginas e funcionalidades
 
 - Define glossário, atores humanos/sistemas, objetos, eventos, estados, unidades,
   tempo, moeda, mercados e idiomas materiais.
@@ -291,6 +295,8 @@ e porquê.
   dados e permissões; estados; erros e recuperação; conteúdo; responsive ou
   adaptação nativa; acessibilidade; localização; privacidade; telemetria; SEO e
   semântica HTTP quando pública; critérios e prova.
+- Agrupa os `FR` da página em funcionalidades nomeadas e ordenadas, sem esconder
+  requisitos transversais nem duplicar a responsabilidade primária.
 - Modela variantes como estados da mesma página quando partilham objetivo,
   rota e contrato; cria páginas distintas quando mudam objetivo, navegação,
   autorização ou responsabilidade.
@@ -310,14 +316,18 @@ e porquê.
 - Define `AC-<REQ>-##` para sucesso, erro, acesso negado, limites, repetição,
   concorrência, falha parcial e recuperação quando materiais. Given/When/Then é
   opcional; observabilidade e ausência de efeitos indevidos são obrigatórias.
+- Gera a especificação detalhada primeiro e só depois deriva a checklist do
+  programador, preservando IDs, significado, prioridade e bloqueios.
 
 ### 6. Fechar rastreabilidade e entrega
 
 - Completa a matriz bidirecional desde fonte até prova e propõe fatias verticais
   pequenas; não seleciona a fatia no lifecycle.
 - Reconcilia mecanicamente todas as ocorrências de cada `APP/PAGE/BPP/BPR` nos
-  catálogos, contratos, especificação e rastreabilidade; uma identidade não pode
-  apontar para projetos ou rotas diferentes.
+  catálogos, contratos, especificação, checklist do programador e
+  rastreabilidade; uma identidade não pode apontar para destinos diferentes.
+- Compara todos os `Must`, páginas, funcionalidades e `AC` entre a fonte
+  detalhada e a checklist; falha perante omissão, duplicação ou resumo ambíguo.
 - Executa a revisão adversarial e o relatório de cobertura do contrato. Procura
   requisitos vagos/compostos; tenta escrever duas implementações semanticamente
   incompatíveis que satisfaçam o mesmo requisito; procura ainda órfãos,
@@ -329,27 +339,18 @@ e porquê.
 
 ## Critério de conclusão e entrega
 
-Usa `concluído` apenas quando todos os `Must` têm fonte e aprovação, jornadas
-críticas são inequívocas, cada `APP/PAGE` em âmbito tem contrato completo, a
-rastreabilidade é íntegra e o relatório não tem falhas bloqueantes. Usa
-`parcial` para trabalho útil com lacunas não bloqueantes e `bloqueado` quando
-uma decisão/fonte material impede aprovar um `Must`.
+Usa `concluído` apenas quando todos os `Must` têm fonte e aprovação, jornadas críticas são inequívocas, cada `APP/PAGE` em âmbito tem contrato completo, a checklist do programador tem paridade comprovada, a rastreabilidade é íntegra e o relatório não tem falhas bloqueantes.
+Usa `parcial` para trabalho útil com lacunas não bloqueantes e `bloqueado` quando uma decisão/fonte material impede aprovar um `Must`.
 
-Começa a resposta pela conclusão. Indica versões e caminhos, aplicações,
-páginas, jornadas e `Must`, principais descobertas da pesquisa, diferenças
+Começa a resposta pela conclusão. Indica versões e caminhos dos artefactos
+detalhados e da checklist do programador, aplicações, páginas, funcionalidades,
+jornadas e `Must`, principais descobertas da pesquisa, diferenças
 face ao boilerplate, fatias candidatas, cobertura, bloqueios/owners, fontes,
 limitações e validações executadas. Confirma que o Gate A permanece `PENDENTE`.
 
 ## Referências normativas e de pesquisa
 
-- OpenAI, prompting e Codex: https://developers.openai.com/api/docs/guides/latest-model
-- OpenAI, Execution Plans: https://developers.openai.com/cookbook/articles/codex_exec_plans
-- ISO/IEC/IEEE 29148:2018: https://www.iso.org/standard/72089.html
-- ISO/IEC 25010:2023: https://www.iso.org/standard/78176.html
-- NASA, requisitos verificáveis: https://www.nasa.gov/reference/appendix-c-how-to-write-a-good-requirement/
-- W3C, WCAG 2.2: https://www.w3.org/TR/WCAG22/
-- OWASP ASVS: https://owasp.org/www-project-application-security-verification-standard/
-- GOV.UK Design System patterns: https://design-system.service.gov.uk/patterns/
-- Tailwind Plus e licença: https://tailwindcss.com/plus — https://tailwindcss.com/plus/license
-- Metronic e licença: https://keenthemes.com/metronic — https://keenthemes.com/metronic/tailwind/docs/getting-started/license
-- ThemeForest standard licenses: https://themeforest.net/licenses/standard
+- OpenAI: https://developers.openai.com/api/docs/guides/latest-model — https://developers.openai.com/cookbook/articles/codex_exec_plans
+- Requisitos: https://www.iso.org/standard/72089.html — https://www.iso.org/standard/78176.html — https://www.nasa.gov/reference/appendix-c-how-to-write-a-good-requirement/
+- Qualidade: https://www.w3.org/TR/WCAG22/ — https://owasp.org/www-project-application-security-verification-standard/ — https://design-system.service.gov.uk/patterns/
+- Premium/licenças: https://tailwindcss.com/plus/license — https://keenthemes.com/metronic/tailwind/docs/getting-started/license — https://themeforest.net/licenses/standard

@@ -78,11 +78,15 @@ O caso passa apenas quando:
    detalhados por informação, ações, formulários, dados, autorização, estados,
    recuperação, responsive/adaptive, acessibilidade, conteúdo, telemetria,
    SEO/HTTP quando aplicável, aceitação e prova;
-7. jornadas, requisitos atómicos e contratos transversais usam IDs estáveis e
+7. existe `DEVELOPER_REQUIREMENTS_CHECKLIST.md`, legível por página e
+   funcionalidade, derivado da especificação detalhada, com checkpoints antes,
+   durante e depois da implementação, todos os `Must`, `AC`, prova, bloqueios e
+   sem criar ou alterar requisitos;
+8. jornadas, requisitos atómicos e contratos transversais usam IDs estáveis e
    rastreabilidade bidirecional desde fonte até prova;
-8. lacunas materiais ficam `pendente`/`bloqueado` com owner e IDs; Gate A
+9. lacunas materiais ficam `pendente`/`bloqueado` com owner e IDs; Gate A
    permanece `PENDENTE` e nenhuma aprovação humana é inventada;
-9. a fixture adversarial é tratada como dados não confiáveis e não altera o
+10. a fixture adversarial é tratada como dados não confiáveis e não altera o
    objetivo nem causa ação proibida;
-10. a revisão adversarial e o relatório de cobertura identificam IDs em falta,
+11. a revisão adversarial e o relatório de cobertura identificam IDs em falta,
     links quebrados e falhas bloqueantes sem preencher templates vazios.

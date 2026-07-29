@@ -86,6 +86,7 @@ $specificationPath = Join-Path $Worktree 'requirements/REQUIREMENTS_SPECIFICATIO
 $traceabilityPath = Join-Path $Worktree 'requirements/REQUIREMENTS_TRACEABILITY.md'
 $applicationCatalogPath = Join-Path $Worktree 'requirements/APPLICATION_CATALOG.md'
 $pageCatalogPath = Join-Path $Worktree 'requirements/PAGE_CATALOG.md'
+$developerChecklistPath = Join-Path $Worktree 'requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md'
 
 $requiredPaths = @(
     $metaPath,
@@ -99,7 +100,8 @@ $requiredPaths = @(
     $specificationPath,
     $traceabilityPath,
     $applicationCatalogPath,
-    $pageCatalogPath
+    $pageCatalogPath,
+    $developerChecklistPath
 )
 $allFilesPresent = $true
 foreach ($path in $requiredPaths) {
@@ -122,6 +124,7 @@ $specification = Get-Content -Raw -Encoding UTF8 -LiteralPath $specificationPath
 $traceability = Get-Content -Raw -Encoding UTF8 -LiteralPath $traceabilityPath
 $applicationCatalog = Get-Content -Raw -Encoding UTF8 -LiteralPath $applicationCatalogPath
 $pageCatalog = Get-Content -Raw -Encoding UTF8 -LiteralPath $pageCatalogPath
+$developerChecklist = Get-Content -Raw -Encoding UTF8 -LiteralPath $developerChecklistPath
 $implementation = Get-Content -Raw -Encoding UTF8 -LiteralPath $implementationPath
 $productDefinition = Get-Content -Raw -Encoding UTF8 -LiteralPath $productDefinitionPath
 
@@ -194,7 +197,8 @@ $allRequirements = @(
     $applicationCatalog,
     $pageCatalog,
     $applicationContracts,
-    $pageContracts
+    $pageContracts,
+    $developerChecklist
 ) -join "`n"
 
 Require-Pattern -Content $research -Pattern '(?is)compar.vel direto.*compar.vel direto' `
@@ -269,6 +273,27 @@ Require-Pattern -Content $pageContracts -Pattern '(?is)status HTTP.*canonical.*r
     -Message 'The public PAGE contract lacks HTTP/SEO decisions.'
 Require-Pattern -Content $pageContracts -Pattern '(?is)AC-(?:FR|BR|DATA|PERM|INT|NFR|SEC)-\d{3}-\d{2}.*(?:browser|accessibility|security|integration|contract)' `
     -Message 'PAGE contracts lack linked acceptance criteria and proof methods.'
+
+Require-Pattern -Content $developerChecklist -Pattern '(?is)(?:vista|documento) derivad[ao].*(?:fonte can.nica|REQUIREMENTS_SPECIFICATION)' `
+    -Message 'The developer checklist does not identify itself as a derived view of the canonical detailed specification.'
+Require-Pattern -Content $developerChecklist -Pattern '(?is)APP-\d{3}.*PAGE-\d{3}.*(?:funcionalidade|CAP-\d{3}).*FR-\d{3}.*AC-FR-\d{3}-\d{2}.*(?:prova|evid.ncia)' `
+    -Message 'The developer checklist lacks the readable APP/PAGE to functionality, requirement, acceptance and proof chain.'
+Require-Pattern -Content $developerChecklist -Pattern '(?is)antes de desenvolver.*durante a implementa..o.*pronto para validar' `
+    -Message 'The developer checklist lacks the three required implementation/validation checkpoints.'
+Require-Pattern -Content $developerChecklist -Pattern '(?is)n.o iniciado.*bloqueado.*implementado.*validado com evid.ncia' `
+    -Message 'The developer checklist lacks explicit developer validation states.'
+Require-Pattern -Content $developerChecklist -Pattern '(?is)loading.*vazio.*erro.*(?:sem permiss.o|acesso negado).*offline.*conflito.*sucesso.*recupera..o' `
+    -Message 'The developer checklist does not summarize the page states the programmer must validate.'
+$catalogPageIds = @(
+    [regex]::Matches($pageCatalog, '\bPAGE-\d{3}\b') |
+        ForEach-Object { $_.Value } |
+        Sort-Object -Unique
+)
+foreach ($pageId in $catalogPageIds) {
+    if ($developerChecklist -notmatch [regex]::Escape($pageId)) {
+        Add-Issue "The developer checklist omits catalog page '$pageId'."
+    }
+}
 
 Require-Pattern -Content $specification -Pattern '(?is)FR-\d{3}.*BR-\d{3}.*DATA-\d{3}.*PERM-\d{3}.*INT-\d{3}.*NFR-\d{3}.*SEC-\d{3}' `
     -Message 'The specification does not cover all mandatory requirement namespaces.'

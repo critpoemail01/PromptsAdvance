@@ -207,7 +207,8 @@ Estes campos definem o destino esperado, mas não autorizam a ação externa. A 
 | Campo | Valor ou caminho para artefacto | Estado | Fonte |
 |---|---|---|---|
 | Fontes de requisitos | A preencher | pendente | — |
-| Especificação/backlog | A preencher | pendente | — |
+| Especificação detalhada para desenvolvimento | A preencher | pendente | `requirements/REQUIREMENTS_SPECIFICATION.md` |
+| Checklist legível do programador | A preencher | pendente | `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md` |
 | Matriz de requisitos | A preencher | pendente | — |
 | Catálogo de aplicações | A preencher | pendente | `requirements/APPLICATION_CATALOG.md` |
 | Contratos por aplicação | A preencher | pendente | `requirements/applications/` |
@@ -230,7 +231,8 @@ Estes campos definem o destino esperado, mas não autorizam a ação externa. A 
 Aliases:
 
 - `[FONTES_DE_REQUISITOS]`
-- `[ESPECIFICAÇÃO_OU_BACKLOG]`
+- `[ESPECIFICAÇÃO_OU_BACKLOG]`, `[ESPECIFICACAO_DETALHADA]`
+- `[CHECKLIST_REQUISITOS_PROGRAMADOR]`, `[DEVELOPER_REQUIREMENTS_CHECKLIST]`
 - `[MATRIZ_DE_REQUISITOS]`
 - `[CATALOGO_DE_APLICACOES]`, `[CONTRATOS_POR_APLICACAO]`
 - `[CATALOGO_DE_PAGINAS]`, `[CONTRATOS_POR_PAGINA]`

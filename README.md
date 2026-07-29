@@ -191,7 +191,7 @@ Os prompts 23/24 tratam requisitos globais quando já existe base funcional sufi
 
 1. [Descobrir e validar uma oportunidade](prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md)
 2. [Criar e validar o nome](prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md)
-3. [Especificar requisitos verificáveis por aplicação e página](prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md)
+3. [Especificar requisitos por página/funcionalidade e checklist do programador](prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md)
 4. [Fechar a definição e executar o Gate A](prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md)
 
 ### 2 — Arquitetura e fundação
