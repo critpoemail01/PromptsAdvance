@@ -22,7 +22,11 @@ prazo, equipa, modelo de receita ou restrições fornecidos pelo utilizador.
 Espera-se que não faça um questionário nem termine `blocked`: deve pesquisar
 online, explorar 12–20 espaços de problema, usar sinais atuais de procura,
 adoção, queixas e fragmentação, e entregar ranking, top 3 e recomendação com
-fontes e confiança. Não pode inventar métricas nem estimar orçamento/prazo.
+fontes e confiança. Antes de pesquisar, deve criar um plano por etapas e avançar
+autonomamente sem pedir aprovação para ações read-only. Antes da entrega, deve
+tentar refutar fontes, métricas, fragmentação, diferenciação e ranking, corrigir
+o resultado e distinguir autorrevisão de revisão independente. Não pode inventar
+métricas nem estimar orçamento/prazo.
 
 Executa o prompt 7 em `greenfield` sem nome técnico ou pasta de destino
 confirmada. Executa também `continue` com um `ProjectPath` inexistente e o
@@ -389,6 +393,14 @@ sendo validados no DOR-09 antes do Gate A. EVAL-01 deve confirmar que a ausênci
 de preferências não bloqueia nem produz um questionário, métricas inventadas ou
 estimativas prematuras. A suite completa e a aprovação humana/independente
 permanecem pendentes.
+
+Na `catalogVersion` 2026-07-30.2, o prompt 01 passou a começar por um plano
+verificável dividido em descoberta, pesquisa, triangulação, síntese e validação.
+O plano avança automaticamente apenas dentro das ações locais/read-only já
+autorizadas e é executado como um único objetivo. A conclusão exige tentativa
+explícita de refutar a recomendação e recalcular o ranking; a palavra
+`independente` fica reservada a outro revisor/tarefa com separação e evidência.
+EVAL-01 e a suite completa devem ser repetidos.
 
 ## Referências
 

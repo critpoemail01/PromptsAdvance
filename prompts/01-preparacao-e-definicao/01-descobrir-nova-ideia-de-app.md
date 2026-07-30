@@ -1,5 +1,43 @@
 # Descobrir e validar uma oportunidade de aplicação
 
+## Protocolo de execução obrigatório
+
+Antes da pesquisa, cria um plano curto, explícito e verificável. Divide-o pelo
+menos nestas etapas, indicando resultado esperado e critério de passagem:
+
+1. enquadrar o objetivo e congelar critérios de descoberta;
+2. definir estratégia, janela e diversidade das fontes;
+3. explorar amplamente espaços de problema e sinais de mercado;
+4. triangular evidência, fragilidades, fragmentação e alternativas;
+5. pontuar, comparar e aprofundar as finalistas;
+6. executar validação adversarial, corrigir a análise e entregar a recomendação.
+
+Considera o plano aprovado para as ações locais, reversíveis e de pesquisa
+online read-only previstas neste prompt e avança sem pedir confirmação entre
+etapas. Essa aprovação automática não autoriza compras, contactos, criação de
+contas, recolha de dados privados, escrita em serviços externos nem qualquer
+outra ação externa; aplica sempre os limites do `EXECUTION_CONTRACT.md`.
+
+Executa o plano como um único objetivo: produzir a melhor recomendação
+evidenciada de oportunidade de aplicação. Atualiza o plano se uma premissa
+falhar, conserva as decisões e evidências de cada etapa e não interrompas a
+pesquisa apenas para narrar progresso.
+
+Antes de concluir, separa a redação da revisão e tenta demonstrar que o resultado
+está errado. Procura seleção conveniente de fontes, sinais não independentes,
+viés de novidade, métricas sem proveniência, confusão entre popularidade e
+necessidade, queixas minoritárias, alternativas omitidas, fragmentação não
+comprovada, diferenciação copiável e incompatibilidade com o boilerplate. Corrige
+a análise, recalcula a pontuação e regista findings que permaneçam.
+
+Quando existir outra tarefa ou revisor realmente separado, entrega-lhe apenas o
+objetivo, critérios, matriz de evidência e resultado candidato para uma revisão
+read-only; o revisor tenta refutar a shortlist e devolve findings, sem editar os
+artefactos. Só chama a esta validação `independente` quando registares a identidade
+ou tarefa, a separação e a evidência. Se não existir revisor separado, executa a
+autorrevisão adversarial completa, declara essa limitação e nunca a descrevas como
+independente.
+
 ## Objetivo
 
 Como primeiro passo de produto, parte de uma folha em branco e identifica autonomamente oportunidades de aplicações web/mobile que o mercado atual demonstre necessitar. Pesquisa procura, adoção, queixas, fragmentação e mudanças recentes; recomenda aplicações novas com um problema claro, melhoria defensável e adequação preliminar ao `BoilerPlateAdvance` localizado em `C:\Work\BoilerPlateAdvance`. Não implementes código.

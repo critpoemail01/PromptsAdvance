@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-30.1 |
+| Catalog version | 2026-07-30.2 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -45,3 +45,7 @@ Mercado, público, equipa, monetização, restrições, orçamento e prazo deixa
 bloquear o arranque; orçamento e prazo transitam para o DOR-09 antes do Gate A.
 Esta alteração do comportamento de descoberta exige repetir EVAL-01 e a suite
 completa.
+A versão 2026-07-30.2 acrescentou ao início do prompt 01 planeamento por etapas,
+execução autónoma como objetivo único e validação adversarial com critérios
+explícitos de separação para qualquer alegação de independência. EVAL-01 e a
+suite completa devem ser repetidos.
