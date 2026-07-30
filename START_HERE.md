@@ -95,6 +95,18 @@ O comando `next` cria ou atualiza `NEXT_TASK.md`. Abre uma tarefa Codex na inst�
 Usa $build-professional-web-software e executa integralmente NEXT_TASK.md.
 ```
 
+`NEXT_TASK.md` exige uma tentativa estruturada antes da execução. O Codex usa:
+
+```powershell
+.\software-lifecycle.ps1 work-start -ProcessRoot C:\Caminho\Processo
+```
+
+Depois regista goals, verificações e findings através de `checkpoint`, `verify`,
+`finding-add`, `finding-resolve` e `finding-gate`. A conclusão não avança
+enquanto a tentativa atual não passar o closeout. Para trabalho parcial ou
+bloqueado, o resultado é registado honestamente e uma nova tentativa retoma o
+mesmo prompt.
+
 Quando o estado indicar `waiting_decision`, a skill escolhe o próximo lote com
 `software-lifecycle.ps1 select`, registando a vertical slice e a evidência. Não
 edites `currentPrompt` manualmente.

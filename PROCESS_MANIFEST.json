@@ -1,11 +1,13 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-07-30.2",
+  "catalogVersion": "2026-07-30.4",
   "name": "Professional Web Software Lifecycle",
   "promptCount": 73,
   "executionPolicy": {
     "onePromptPerTask": true,
     "planRequiredForComplexWork": true,
+    "taskLedgerRequired": true,
+    "findingsGateRequired": true,
     "adversarialReviewRequired": true,
     "externalActionsRequireExplicitAuthorization": true,
     "brownfieldIsolationRequired": true,

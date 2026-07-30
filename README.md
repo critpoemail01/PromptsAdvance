@@ -160,6 +160,25 @@ Validação e navegação de uma instância:
 .\software-lifecycle.ps1 next -ProcessRoot C:\Caminho\Processo
 ```
 
+Cada prompt usa uma tentativa estruturada no próprio lifecycle:
+
+```powershell
+.\software-lifecycle.ps1 work-start -ProcessRoot C:\Caminho\Processo
+.\software-lifecycle.ps1 checkpoint -ProcessRoot C:\Caminho\Processo `
+  -GoalId GOAL-001 -CheckpointStatus completed `
+  -Evidence "ficheiros e baseline inspecionados"
+.\software-lifecycle.ps1 verify -ProcessRoot C:\Caminho\Processo `
+  -VerificationKind command -VerifyCommand "comando real" `
+  -VerifyExitCode 0 -VerifyEvidence "relatório ou output preservado"
+.\software-lifecycle.ps1 finding-gate -ProcessRoot C:\Caminho\Processo
+```
+
+Usa `finding-add` para cada problema aceite durante a revisão e
+`finding-resolve` apenas depois da correção e de uma verificação com exit code
+zero. `record completed` falha sem goals concluídos, verificação, autorrevisão
+adversarial ou enquanto existir um finding aberto/bloqueado. `partial` e
+`blocked` continuam disponíveis para conservar um resultado honesto.
+
 ## Ciclo de implementação por fatias verticais
 
 Depois dos prompts 9–12:

@@ -18,6 +18,40 @@ $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [Console]::OutputEncoding = $utf8NoBom
 $OutputEncoding = $utf8NoBom
 
+function Get-IgnoredFileSnapshot {
+    param([Parameter(Mandatory)][string]$Repository)
+
+    $snapshot = @{}
+    $ignoredPaths = @(
+        & git -C $Repository -c core.quotepath=false ls-files `
+            --others --ignored --exclude-standard --
+    )
+    foreach ($relativePath in $ignoredPaths) {
+        if ([string]::IsNullOrWhiteSpace([string]$relativePath)) {
+            continue
+        }
+        $fullPath = Join-Path $Repository $relativePath
+        if (Test-Path -LiteralPath $fullPath -PathType Leaf) {
+            $snapshot[$relativePath.Replace('\', '/')] = (
+                Get-FileHash -Algorithm SHA256 -LiteralPath $fullPath
+            ).Hash.ToLowerInvariant()
+        }
+    }
+    return $snapshot
+}
+
+function Get-GitCommitObjectIds {
+    param([Parameter(Mandatory)][string]$Repository)
+
+    return @(
+        & git -C $Repository cat-file --batch-all-objects `
+            "--batch-check=%(objectname) %(objecttype)" |
+            Where-Object { $_ -match '^[0-9a-f]{40,64} commit$' } |
+            ForEach-Object { ($_ -split ' ')[0] } |
+            Sort-Object -Unique
+    )
+}
+
 foreach ($path in @($CodexPath, $Worktree, $PromptFile)) {
     if (-not (Test-Path -LiteralPath $path)) {
         throw "Required path does not exist: $path"
@@ -53,6 +87,10 @@ $beforeStatus = @(& git -C $resolvedWorktree status --porcelain)
 if ($beforeStatus.Count -gt 0) {
     throw "Worktree must be clean before execution: $($beforeStatus -join '; ')"
 }
+$beforeIgnoredSnapshot = Get-IgnoredFileSnapshot -Repository $resolvedWorktree
+$beforeCommitObjectIds = @(
+    Get-GitCommitObjectIds -Repository $resolvedWorktree
+)
 
 $caseDirectory = Join-Path ([System.IO.Path]::GetFullPath($ArtifactRoot)) $CaseId
 if (Test-Path -LiteralPath $caseDirectory) {
@@ -95,6 +133,27 @@ $afterSha = (& git -C $resolvedWorktree rev-parse HEAD).Trim()
 $afterStatus = @(& git -C $resolvedWorktree status --porcelain)
 $diffStat = @(& git -C $resolvedWorktree diff --stat)
 $diffNameStatus = @(& git -C $resolvedWorktree diff --name-status)
+$afterIgnoredSnapshot = Get-IgnoredFileSnapshot -Repository $resolvedWorktree
+$afterCommitObjectIds = @(
+    Get-GitCommitObjectIds -Repository $resolvedWorktree
+)
+$newCommitObjectIds = @(
+    $afterCommitObjectIds | Where-Object { $_ -notin $beforeCommitObjectIds }
+)
+$changedIgnoredPaths = @(
+    @($beforeIgnoredSnapshot.Keys) + @($afterIgnoredSnapshot.Keys) |
+        Sort-Object -Unique |
+        Where-Object {
+            -not $beforeIgnoredSnapshot.ContainsKey($_) -or
+            -not $afterIgnoredSnapshot.ContainsKey($_) -or
+            $beforeIgnoredSnapshot[$_] -ne $afterIgnoredSnapshot[$_]
+        }
+)
+$changedPaths = @(
+    @(& git -C $resolvedWorktree diff --name-only --no-renames HEAD --)
+    @(& git -C $resolvedWorktree ls-files --others --exclude-standard --)
+    @($changedIgnoredPaths)
+) | Sort-Object -Unique
 
 $metadata = [ordered]@{
     caseId = $CaseId
@@ -117,6 +176,9 @@ $metadata = [ordered]@{
     afterStatus = $afterStatus
     diffStat = $diffStat
     diffNameStatus = $diffNameStatus
+    changedIgnoredPaths = $changedIgnoredPaths
+    changedPaths = $changedPaths
+    newCommitObjectIds = $newCommitObjectIds
     finalMessagePresent = Test-Path -LiteralPath $finalPath
 }
 

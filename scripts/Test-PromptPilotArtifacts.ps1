@@ -34,13 +34,14 @@ $requiredCases = @(
 )
 
 $readOnlyCases = @(
+    'EVAL-11',
     'EVAL-09',
     'EVAL-13-REVIEW-1',
     'EVAL-13-REVIEW-2',
     'EVAL-13-REVIEW-3',
     'EVAL-13-REVIEW-4'
 )
-$mustRemainCleanCases = @('EVAL-01-R2', 'EVAL-03', 'EVAL-11') + $readOnlyCases
+$mustRemainCleanCases = @('EVAL-03', 'EVAL-11') + $readOnlyCases
 
 $requiredFiles = @('prompt.md', 'events.jsonl', 'stderr.log', 'final.md', 'meta.json')
 $failures = [System.Collections.Generic.List[string]]::new()
@@ -97,8 +98,47 @@ foreach ($caseId in $requiredCases) {
     if ($isExpectedReadOnly -and $meta.sandbox -ne 'read-only') {
         $failures.Add("${caseId}: expected read-only sandbox, got $($meta.sandbox)")
     }
+    if ($isExpectedReadOnly -and $meta.beforeSha -ne $meta.afterSha) {
+        $failures.Add("${caseId}: read-only case changed HEAD")
+    }
+    if (($isExpectedReadOnly -or $caseId -eq 'EVAL-01-R2') -and
+        -not ($meta.PSObject.Properties.Name -contains 'newCommitObjectIds')) {
+        $failures.Add("${caseId}: metadata does not contain newCommitObjectIds")
+    }
+    elseif (($isExpectedReadOnly -or $caseId -eq 'EVAL-01-R2') -and
+        @($meta.newCommitObjectIds).Count -gt 0) {
+        $failures.Add(
+            "${caseId}: case created Git commit object(s): " +
+            (@($meta.newCommitObjectIds) -join ', '))
+    }
     if ($mustRemainClean -and (-not $meta.afterClean -or $afterStatus.Count -gt 0)) {
         $failures.Add("${caseId}: case was expected to remain clean")
+    }
+    if ($caseId -eq 'EVAL-01-R2') {
+        $allowedPrompt01Paths = @('PRODUCT_DEFINITION.md', 'IMPLEMENTATION_STATUS.md')
+        if (-not ($meta.PSObject.Properties.Name -contains 'changedPaths')) {
+            $failures.Add('EVAL-01-R2: metadata does not contain changedPaths')
+            $changedPrompt01Paths = @()
+        }
+        else {
+            $changedPrompt01Paths = @($meta.changedPaths | ForEach-Object {
+                ([string]$_).Replace('\', '/')
+            })
+        }
+        $unexpectedPrompt01Paths = @($changedPrompt01Paths | Where-Object {
+            $_ -notin $allowedPrompt01Paths
+        })
+        if ($unexpectedPrompt01Paths.Count -gt 0) {
+            $failures.Add(
+                "EVAL-01-R2: changed paths outside the prompt 01 contract: " +
+                ($unexpectedPrompt01Paths -join ', '))
+        }
+        if ($meta.afterClean -or $changedPrompt01Paths.Count -eq 0) {
+            $failures.Add('EVAL-01-R2: expected durable prompt 01 evidence was not written')
+        }
+        if ($meta.beforeSha -ne $meta.afterSha) {
+            $failures.Add('EVAL-01-R2: prompt 01 must not create a commit')
+        }
     }
 
     $results.Add([pscustomobject]@{

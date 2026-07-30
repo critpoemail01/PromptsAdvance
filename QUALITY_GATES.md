@@ -43,6 +43,8 @@ Bloqueia quando um serviço, framework, provider ou módulo é escolhido sem req
 - comandos reais de restore, build, testes e execução registados;
 - ambientes e referências a segredos definidos sem valores sensíveis;
 - contratos e primeira vertical slice selecionados;
+- task ledger e findings gate da versão atual exercitados no piloto, sem bypass
+  de `record completed`;
 - piloto da versão atual sem falha crítica e com avaliação exigida;
 - nenhuma vulnerabilidade crítica/alta aceite silenciosamente.
 
@@ -172,6 +174,9 @@ SHA e digest autorizados e exige smoke tests, rollback e critérios de aborto.
 ## Integridade
 
 - O executor faz revisão adversarial antes de concluir.
+- `record completed` exige objetivos concluídos, verificação observável,
+  autorrevisão adversarial registada e zero findings `open`/`blocked` na mesma
+  tentativa.
 - “Independente” exige outra tarefa/revisor e separação comprovada.
 - Falha de ferramenta não equivale a sucesso; usa `não verificável`.
 - Aprovação não transita para outra versão, SHA, digest, baseline ou ambiente.

@@ -27,6 +27,12 @@ Antes da implementação, cria um plano curto, ordenado e verificável. Para alt
 
 Cada etapa deve indicar o resultado esperado e como será validada. Atualiza o plano quando a realidade do repositório contrariar uma premissa.
 
+Quando o lifecycle estiver ativo, inicia uma tentativa estruturada com
+`software-lifecycle.ps1 work-start` antes de executar o prompt. Mantém os
+objetivos no `LIFECYCLE_STATE.json` apenas através de `checkpoint`, regista
+validações com `verify` e não reutilizes evidência de outra tentativa. Um plano
+conversacional não substitui este ledger durável.
+
 Depois da fundação, o lote predefinido é uma vertical slice pequena e completa: requisito, UI, contrato, backend/dados, autorização, estados, testes e observabilidade mínima. Não termines grandes fases de UI ou backend isoladamente quando a qualidade só puder ser avaliada na jornada integrada.
 
 Avança autonomamente em ações locais, reversíveis e claramente incluídas no âmbito. Não peças confirmações repetidas para decisões de implementação normais que possam ser comprovadas pelo repositório.
@@ -83,6 +89,14 @@ Depois da implementação e dos testes direcionados, assume que o resultado est�
 6. Corrige apenas falhas causadas pela implementação ou incluídas no âmbito autorizado. Regista separadamente problemas preexistentes ou adjacentes.
 7. Repete os testes afetados depois de cada correção e termina apenas quando os critérios passarem ou o impedimento estiver demonstrado.
 
+Cada problema aceite durante a revisão deve ser registado com `finding-add`.
+Um finding só passa a `resolved` com evidência da correção, comando de
+verificação, exit code zero e resultado observado. `finding-gate` e o fecho da
+tentativa falham enquanto existir um finding `open` ou `blocked`. Não omitas um
+finding por ser incómodo ou fora do lote: resolve-o, termina `partial`/`blocked`
+ou regista-o no mecanismo de backlog autorizado pelo prompt antes de abrir uma
+nova tentativa.
+
 Uma autorrevisão adversarial feita pelo mesmo agente não deve ser descrita como “independente”. Usa esse termo apenas quando a verificação tiver sido executada por outra tarefa, outro agente/revisor ou uma execução sem o contexto da implementação, e identifica a evidência dessa separação.
 
 ### Revisão final independente
@@ -122,6 +136,8 @@ Na entrega, apresenta de forma concisa:
 - próximo passo recomendado, sem o executar fora do âmbito;
 - estado final: `concluído`, `parcial`, `bloqueado` ou `não aplicável`.
 - prompt/gate atual e registo correspondente em `LIFECYCLE_STATE.json`, quando o lifecycle estiver ativo.
+- identificador da tentativa, objetivos, verificações e findings do task ledger
+  quando o lifecycle estiver ativo.
 
 Usa `concluído` apenas quando todos os critérios em âmbito tiverem evidência suficiente. Usa `parcial` quando existe progresso utilizável mas falta validação ou implementação em âmbito. Usa `bloqueado` quando uma dependência material impede prosseguir com segurança. Usa `não aplicável` apenas com justificação.
 

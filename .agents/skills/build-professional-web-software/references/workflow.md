@@ -17,11 +17,13 @@ For every task:
 2. run `validate`;
 3. prepare `next`;
 4. resolve inputs and plan;
-5. execute one prompt;
-6. validate behavior and perform adversarial review;
-7. update evidence;
-8. record the honest result;
-9. cross a gate only with its required evidence and approval.
+5. start one durable work attempt and checkpoint its goals;
+6. execute one prompt;
+7. validate behavior, record verification and perform adversarial review;
+8. record, resolve and gate every accepted finding;
+9. update evidence;
+10. record the honest result;
+11. cross a gate only with its required evidence and approval.
 
 Keep related work in the same initiative, but use one Codex task per coherent prompt/slice result. Use isolated worktrees for concurrent changes.
 
@@ -127,6 +129,10 @@ After release, run 65–67 immediately/as scheduled, then establish 68–73 with
 
 - `blocked`: keep the same prompt, record the exact missing decision/access/evidence.
 - `partial`: preserve useful work, list incomplete criteria, and retry the same prompt.
+- `completed`: require a closed work attempt with completed goals, passing
+  verification, completed adversarial self-review and no open/blocked findings.
+- interrupted task: preserve the current attempt; resume its next incomplete
+  goal instead of creating a competing attempt.
 - gate failure: return to the smallest upstream prompt that owns the missing evidence.
 - changed requirement: update traceability and invalidate downstream approvals affected by the change.
 - changed SHA, digest, environment or visual baseline: re-run the relevant acceptance/review gate.

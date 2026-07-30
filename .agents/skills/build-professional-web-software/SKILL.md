@@ -86,12 +86,36 @@ Use the explicit initializer when discovery is not desired:
 
 1. Read `NEXT_TASK.md` and its embedded prompt.
 2. Resolve all material inputs and show their source/confidence/status.
-3. For non-trivial work, create a short staged plan and continue autonomously through safe local actions.
-4. Implement only the current prompt or selected vertical-slice lot.
-5. Run prompt-specific checks plus the applicable quality gate.
-6. Perform an adversarial self-review; call it independent only when another separated reviewer/task actually performed it.
-7. Update human-readable artefacts and durable evidence.
-8. Record the result with the lifecycle tool.
+3. Start the durable task ledger with `work-start`; for non-trivial work, pass
+   the staged plan as `kind::description` goals.
+4. Checkpoint goals with evidence, and record proportionate validation with
+   `verify`.
+5. Implement only the current prompt or selected vertical-slice lot.
+6. Run prompt-specific checks plus the applicable quality gate.
+7. Perform an adversarial self-review. Record accepted issues with
+   `finding-add`, resolve them only with correction and verification evidence,
+   then run `finding-gate`. Call a review independent only when another
+   separated reviewer/task actually performed it.
+8. Update human-readable artefacts and durable evidence.
+9. Record the result with the lifecycle tool. `completed` is rejected until
+   the task-ledger closeout passes; use `partial` or `blocked` honestly when it
+   does not.
+
+Example start:
+
+```powershell
+.\software-lifecycle.ps1 work-start `
+  -ProcessRoot . `
+  -Goal "inspect::Confirm current behavior and evidence",
+        "change::Execute the scoped prompt",
+        "verify::Run proportionate validation",
+        "review::Perform adversarial self-review"
+```
+
+For a small, fully evidenced task, `closeout` may complete the standard goals
+atomically, but it still requires a passing verification record, adversarial
+review evidence and zero open findings. Complex tasks should checkpoint each
+goal separately so the evidence remains diagnostic.
 
 Example:
 

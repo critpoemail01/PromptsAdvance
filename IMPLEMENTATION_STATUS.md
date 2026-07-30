@@ -67,6 +67,23 @@ GATE_A_DECISION: PENDENTE
 
 Acrescenta uma linha quando um prompt entra no plano. Não marques prompts opcionais como aplicáveis até a arquitetura ou os requisitos selecionarem o módulo.
 
+## Tentativa de trabalho atual
+
+Esta tabela resume a tentativa estruturada conservada em
+`LIFECYCLE_STATE.json`. Não a atualizes como substituto dos comandos
+`work-start`, `checkpoint`, `verify`, `finding-add`, `finding-resolve` e
+`record`.
+
+| Campo | Valor |
+|---|---|
+| Attempt ID | A preencher |
+| Prompt | A preencher |
+| Objetivos concluídos | 0/0 |
+| Verificações com evidência | 0 |
+| Findings abertos/bloqueados | 0 |
+| Autorrevisão adversarial | pendente |
+| Estado | não iniciado |
+
 ## Requisitos
 
 | ID | APP/PAGE/operação | Prioridade | Resumo | Critérios de aceitação | Validação do programador | Estado | Evidência |

@@ -39,6 +39,10 @@ Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações: limita-te
 - Criar repositórios remotos, adicionar ou substituir `origin`, fazer commit/push e alterar regras do GitHub são ações externas: exige alvo exato e autorização explícita, verifica conflitos e nunca uses `force push`.
 - A candidata de produção exige revisão final independente, read-only e sobre commit/artefacto imutável. O revisor não corrige a própria candidata; findings regressam ao implementador e uma nova candidata exige nova revisão.
 - Quando existir uma instância do lifecycle, não alteres `currentPrompt`, gates ou estados diretamente para contornar validações. Regista cada resultado com `software-lifecycle.ps1 record` e evidência durável. Deixa as transições determinísticas ao orquestrador e usa `select` apenas nas decisões permitidas por `status`.
+- Em cada prompt de uma instância, inicia o task ledger com
+  `software-lifecycle.ps1 work-start`, checkpointa goals e verificações, regista
+  findings aceites e fecha-os com evidência. `record completed` só é válido
+  depois do closeout da mesma tentativa e com zero findings abertos/bloqueados.
 
 ## Documentação específica da aplicação
 

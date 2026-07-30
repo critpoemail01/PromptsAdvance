@@ -68,13 +68,30 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Invoke-PromptPilot
   -CodexPath <codex.exe> `
   -Model gpt-5.6-sol `
   -Worktree <worktree-limpo> `
-  -CaseId EVAL-01 `
+  -CaseId EVAL-01-R2 `
   -PromptFile .\pilot\cases\EVAL-01.md `
   -ArtifactRoot <diretorio-de-evidencias> `
   -Sandbox workspace-write
 ```
 
+EVAL-01-R2 deve alterar, no máximo, `PRODUCT_DEFINITION.md` e
+`IMPLEMENTATION_STATUS.md`; deixar a worktree limpa já não é o resultado
+esperado, porque o prompt 01 conserva a descoberta nesses artefactos. A revisão
+humana confirma qualidade e atualidade das fontes, coerência do scoring,
+sensibilidade, decisão, separação da revisão e ausência de métricas inventadas.
+
 O runner falha se a worktree não começar limpa. Cada diretório de evidência é imutável por convenção; uma repetição usa um novo identificador.
+
+## Validação do task ledger
+
+Em EVAL-04, conserva o `LIFECYCLE_STATE.json` antes do finding, com o finding
+aberto, depois da resolução e depois de `record completed`. Guarda também o
+output e exit code de `finding-gate` e da tentativa de conclusão bloqueada.
+
+Em EVAL-11, executa os bypasses numa instância descartável separada: sem
+`work-start`, goals incompletos, verificação ausente, autorrevisão ausente,
+finding aberto e pointers/IDs/evidência corrompidos. Confirma que cada comando
+falha sem avançar `currentPrompt`, gates ou slices.
 
 ## Validação dirigida de EVAL-14
 

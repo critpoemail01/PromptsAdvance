@@ -10,6 +10,9 @@ $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [Console]::InputEncoding = $utf8NoBom
 [Console]::OutputEncoding = $utf8NoBom
 $OutputEncoding = $utf8NoBom
+if (-not (Test-Path -LiteralPath 'variable:IsWindows')) {
+    $IsWindows = $env:OS -eq 'Windows_NT'
+}
 
 if ([string]::IsNullOrWhiteSpace($CatalogRoot)) {
     $CatalogRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))

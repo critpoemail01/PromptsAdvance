@@ -11,6 +11,9 @@ $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [Console]::InputEncoding = $utf8NoBom
 [Console]::OutputEncoding = $utf8NoBom
 $OutputEncoding = $utf8NoBom
+if (-not (Test-Path -LiteralPath 'variable:IsWindows')) {
+    $IsWindows = $env:OS -eq 'Windows_NT'
+}
 
 if ([string]::IsNullOrWhiteSpace($CatalogRoot)) {
     $CatalogRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -41,7 +44,7 @@ $brownfieldCollisionRoot = Join-Path $brownfieldFixtureRoot 'occupied-process'
 $boilerplate = [System.IO.Path]::GetFullPath((Join-Path $CatalogRoot '..\BoilerPlateAdvance'))
 $results = [System.Collections.Generic.List[string]]::new()
 
-function Invoke-Lifecycle {
+function Invoke-RawLifecycle {
     param(
         [Parameter(Mandatory)][string[]]$Arguments,
         [string]$ScriptPath = $entryPoint
@@ -56,6 +59,82 @@ function Invoke-Lifecycle {
         ExitCode = $exitCode
         Output = ($output | Out-String).Trim()
     }
+}
+
+function Get-LifecycleArgument {
+    param(
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [Parameter(Mandatory)][string]$Name
+    )
+
+    $index = [Array]::IndexOf($Arguments, $Name)
+    if ($index -lt 0 -or $index + 1 -ge $Arguments.Count) {
+        return $null
+    }
+    return [string]$Arguments[$index + 1]
+}
+
+function Prepare-TestWorkCloseout {
+    param([Parameter(Mandatory)][string[]]$Arguments)
+
+    if ($Arguments.Count -lt 1 -or [string]$Arguments[0] -ne 'record') {
+        return
+    }
+    $root = Get-LifecycleArgument -Arguments $Arguments -Name '-ProcessRoot'
+    $promptId = Get-LifecycleArgument -Arguments $Arguments -Name '-PromptId'
+    if ([string]::IsNullOrWhiteSpace($root) -or
+        [string]::IsNullOrWhiteSpace($promptId) -or
+        -not (Test-Path -LiteralPath (Join-Path $root 'LIFECYCLE_STATE.json') -PathType Leaf)) {
+        return
+    }
+
+    try {
+        $manifest = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'PROCESS_MANIFEST.json') |
+            ConvertFrom-Json
+        $state = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'LIFECYCLE_STATE.json') |
+            ConvertFrom-Json
+    }
+    catch {
+        return
+    }
+    if ($null -eq $manifest.executionPolicy.PSObject.Properties['taskLedgerRequired'] -or
+        -not [bool]$manifest.executionPolicy.taskLedgerRequired -or
+        [string]$state.currentPrompt -ne $promptId) {
+        return
+    }
+
+    if ([string]::IsNullOrWhiteSpace([string]$state.activeWorkAttemptId)) {
+        $start = Invoke-RawLifecycle @(
+            'work-start',
+            '-ProcessRoot', $root
+        )
+        if ($start.ExitCode -ne 0) {
+            return
+        }
+    }
+    $closeout = Invoke-RawLifecycle @(
+        'closeout',
+        '-ProcessRoot', $root,
+        '-Evidence', "fixture://work-$promptId",
+        '-VerificationKind', 'command',
+        '-VerifyCommand', "fixture://verify-$promptId",
+        '-VerifyExitCode', '0',
+        '-VerifyEvidence', "fixture://verification-$promptId",
+        '-ReviewEvidence', "fixture://adversarial-review-$promptId"
+    )
+    if ($closeout.ExitCode -ne 0) {
+        return
+    }
+}
+
+function Invoke-Lifecycle {
+    param(
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [string]$ScriptPath = $entryPoint
+    )
+
+    Prepare-TestWorkCloseout -Arguments $Arguments
+    return Invoke-RawLifecycle -Arguments $Arguments -ScriptPath $ScriptPath
 }
 
 function Require-ExitCode {
@@ -375,6 +454,113 @@ try {
 
     $statePath = Join-Path $fixtureRoot 'LIFECYCLE_STATE.json'
     $originalStateJson = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath
+
+    $missingLedgerRecord = Invoke-RawLifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '01',
+        '-Result', 'completed', '-Evidence', 'fixture://missing-ledger'
+    )
+    if ($missingLedgerRecord.ExitCode -eq 0) {
+        throw 'record completed accepted a prompt without work-start.'
+    }
+    $workStart = Invoke-RawLifecycle @(
+        'work-start', '-ProcessRoot', $fixtureRoot
+    )
+    Require-ExitCode -Execution $workStart -Expected 0 -Label 'work-start'
+    $checkpoint = Invoke-RawLifecycle @(
+        'checkpoint', '-ProcessRoot', $fixtureRoot,
+        '-GoalId', 'GOAL-001',
+        '-CheckpointStatus', 'completed',
+        '-Evidence', 'fixture://baseline-inspected'
+    )
+    Require-ExitCode -Execution $checkpoint -Expected 0 -Label 'goal checkpoint'
+    $verification = Invoke-RawLifecycle @(
+        'verify', '-ProcessRoot', $fixtureRoot,
+        '-VerificationKind', 'command',
+        '-VerifyCommand', 'fixture://targeted-check',
+        '-VerifyExitCode', '0',
+        '-VerifyEvidence', 'fixture://targeted-check-pass'
+    )
+    Require-ExitCode -Execution $verification -Expected 0 -Label 'work verification'
+    $incompleteLedgerRecord = Invoke-RawLifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '01',
+        '-Result', 'completed', '-Evidence', 'fixture://incomplete-ledger'
+    )
+    if ($incompleteLedgerRecord.ExitCode -eq 0) {
+        throw 'record completed accepted incomplete goals and verification.'
+    }
+    $findingAdd = Invoke-RawLifecycle @(
+        'finding-add', '-ProcessRoot', $fixtureRoot,
+        '-Title', 'Seeded task-ledger regression',
+        '-Severity', 'high',
+        '-Source', 'fixture-adversarial-review',
+        '-Location', 'software-lifecycle.ps1',
+        '-Evidence', 'fixture://finding-open'
+    )
+    Require-ExitCode -Execution $findingAdd -Expected 0 -Label 'finding-add'
+    $openFindingGate = Invoke-RawLifecycle @(
+        'finding-gate', '-ProcessRoot', $fixtureRoot
+    )
+    if ($openFindingGate.ExitCode -eq 0) {
+        throw 'finding-gate accepted an open finding.'
+    }
+    $openFindingCloseout = Invoke-RawLifecycle @(
+        'closeout', '-ProcessRoot', $fixtureRoot,
+        '-Evidence', 'fixture://work-closeout',
+        '-VerificationKind', 'command',
+        '-VerifyCommand', 'fixture://verify-ledger',
+        '-VerifyExitCode', '0',
+        '-VerifyEvidence', 'fixture://verification-ledger',
+        '-ReviewEvidence', 'fixture://review-ledger'
+    )
+    if ($openFindingCloseout.ExitCode -eq 0) {
+        throw 'closeout accepted an open finding.'
+    }
+    $findingResolve = Invoke-RawLifecycle @(
+        'finding-resolve', '-ProcessRoot', $fixtureRoot,
+        '-FindingId', 'FIND-001',
+        '-ResolutionEvidence', 'fixture://finding-fixed',
+        '-VerifyCommand', 'fixture://verify-finding',
+        '-VerifyExitCode', '0',
+        '-VerifyEvidence', 'fixture://finding-regression-pass'
+    )
+    Require-ExitCode -Execution $findingResolve -Expected 0 -Label 'finding-resolve'
+    $closedLedger = Invoke-RawLifecycle @(
+        'closeout', '-ProcessRoot', $fixtureRoot,
+        '-Evidence', 'fixture://work-closeout',
+        '-VerificationKind', 'command',
+        '-VerifyCommand', 'fixture://verify-ledger',
+        '-VerifyExitCode', '0',
+        '-VerifyEvidence', 'fixture://verification-ledger',
+        '-ReviewEvidence', 'fixture://review-ledger'
+    )
+    Require-ExitCode -Execution $closedLedger -Expected 0 -Label 'work closeout'
+    $closedFindingGate = Invoke-RawLifecycle @(
+        'finding-gate', '-ProcessRoot', $fixtureRoot
+    )
+    Require-ExitCode -Execution $closedFindingGate -Expected 0 -Label 'closed finding gate'
+
+    $closedLedgerStateJson = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath
+    $corruptLedgerState = $closedLedgerStateJson | ConvertFrom-Json
+    $corruptLedgerState.activeWorkAttemptId = 'ATT-missing'
+    [System.IO.File]::WriteAllText(
+        $statePath,
+        ($corruptLedgerState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $corruptLedgerValidate = Invoke-RawLifecycle @(
+        'validate', '-ProcessRoot', $fixtureRoot
+    )
+    if ($corruptLedgerValidate.ExitCode -eq 0) {
+        throw 'validate accepted a corrupt activeWorkAttemptId.'
+    }
+    [System.IO.File]::WriteAllText($statePath, $closedLedgerStateJson, $utf8NoBom)
+    $completedLedgerRecord = Invoke-RawLifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '01',
+        '-Result', 'completed', '-Evidence', 'fixture://closed-ledger'
+    )
+    Require-ExitCode -Execution $completedLedgerRecord -Expected 0 -Label 'record with closed ledger'
+    [System.IO.File]::WriteAllText($statePath, $originalStateJson, $utf8NoBom)
+    $results.Add('task ledger goals, verification, review and findings gate -> enforced')
+
     $corruptState = $originalStateJson | ConvertFrom-Json
     $corruptState.catalogVersion = 'CORRUPTED-CATALOG'
     $corruptState.processRoot = 'C:\wrong\root'

@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-30.2 |
+| Catalog version | 2026-07-30.4 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -49,3 +49,23 @@ A versão 2026-07-30.2 acrescentou ao início do prompt 01 planeamento por etapa
 execução autónoma como objetivo único e validação adversarial com critérios
 explícitos de separação para qualquer alegação de independência. EVAL-01 e a
 suite completa devem ser repetidos.
+A versão 2026-07-30.3 otimizou o prompt 01 para o Codex/GPT-5.6 com resultado e
+critério de conclusão explícitos, routing e fallbacks de pesquisa, pontuação
+ponderada reproduzível, análise de sensibilidade, stopping conditions e formato
+de entrega orientado à decisão. A revisão separada passou a ser obrigatória para
+o estado `concluído`; sem essa capacidade, o resultado permanece `parcial`.
+O caso executável EVAL-01 foi alinhado com a descoberta zero-input e o oráculo
+passou a limitar tracked, renames, untracked e commits aos dois artefactos
+autorizados, incluindo alterações em ficheiros ignorados por Git através de
+snapshots SHA-256 e novos objetos Git `commit`, mesmo após reset. Os bloqueios
+antigos do prompt 07 ficaram cobertos pelo caso executável EVAL-11. EVAL-01 e a
+suite completa devem ser repetidos. A lista das cinco aplicações passou também
+a exigir uma explicação uniforme e objetiva de problema, solução, modelo de
+negócio, novidade e razão comparativa para apostar.
+
+A versão 2026-07-30.4 integrou um task ledger nativo no lifecycle: cada prompt
+passa a ter uma tentativa estruturada com goals, verificações, autorrevisão
+adversarial e findings. `record completed` deve falhar sem closeout da mesma
+tentativa ou enquanto existir um finding aberto/bloqueado. EVAL-04, EVAL-11 e a
+suite completa têm de ser repetidos numa cópia descartável; avaliação humana e
+revisão separada continuam obrigatórias. O estado permanece `pending`.

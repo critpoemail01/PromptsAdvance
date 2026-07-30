@@ -1,7 +1,10 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory, Position = 0)]
-    [ValidateSet('start', 'adopt', 'continue', 'status', 'next', 'select', 'decide', 'gate', 'record', 'validate')]
+    [ValidateSet(
+        'start', 'adopt', 'continue', 'status', 'next', 'select', 'decide',
+        'gate', 'record', 'validate', 'work-start', 'checkpoint', 'verify',
+        'finding-add', 'finding-resolve', 'finding-gate', 'closeout')]
     [string]$Command,
 
     [string]$Name,
@@ -29,7 +32,27 @@ param(
     [string]$Surface,
     [string]$Requirements,
     [string]$AcceptanceCriteria,
-    [string]$OutOfScope
+    [string]$OutOfScope,
+
+    [string[]]$Goal,
+    [string]$GoalId,
+    [ValidateSet('completed', 'blocked')]
+    [string]$CheckpointStatus,
+
+    [ValidateSet('command', 'inspection', 'render', 'connector', 'review')]
+    [string]$VerificationKind,
+    [string]$VerifyCommand,
+    [Nullable[int]]$VerifyExitCode,
+    [string]$VerifyEvidence,
+    [string]$ReviewEvidence,
+
+    [string]$FindingId,
+    [string]$Title,
+    [ValidateSet('critical', 'high', 'medium', 'low')]
+    [string]$Severity,
+    [string]$Source,
+    [string]$Location,
+    [string]$ResolutionEvidence
 )
 
 Set-StrictMode -Version Latest
@@ -273,6 +296,206 @@ function Get-PromptState {
         throw "Prompt $Id is missing from LIFECYCLE_STATE.json."
     }
     return $property.Value
+}
+
+function Test-TaskLedgerRequired {
+    param([Parameter(Mandatory)]$Manifest)
+
+    $policy = $Manifest.executionPolicy
+    return $null -ne $policy -and
+        $null -ne $policy.PSObject.Properties['taskLedgerRequired'] -and
+        [bool]$policy.taskLedgerRequired
+}
+
+function Add-LifecycleHistoryAction {
+    param(
+        [Parameter(Mandatory)]$State,
+        [Parameter(Mandatory)][string]$Action,
+        [Parameter(Mandatory)][string]$Evidence
+    )
+
+    $State.history = @($State.history) + @([ordered]@{
+        at = [DateTimeOffset]::Now.ToString('o')
+        action = $Action
+        evidence = $Evidence
+    })
+}
+
+function Get-ActiveWorkAttempt {
+    param(
+        [Parameter(Mandatory)]$State,
+        [switch]$AllowMissing
+    )
+
+    $pointer = $State.PSObject.Properties['activeWorkAttemptId']
+    if ($null -eq $pointer -or
+        [string]::IsNullOrWhiteSpace([string]$State.activeWorkAttemptId)) {
+        if ($AllowMissing) {
+            return $null
+        }
+        throw 'No active work attempt exists. Run work-start before recording progress.'
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$State.currentPrompt)) {
+        throw 'An active work attempt cannot exist without a current prompt.'
+    }
+
+    $promptState = Get-PromptState -State $State -Id ([string]$State.currentPrompt)
+    $matches = @(
+        @($promptState.attempts) |
+            Where-Object {
+                $null -ne $_.PSObject.Properties['id'] -and
+                [string]$_.id -eq [string]$State.activeWorkAttemptId
+            }
+    )
+    if ($matches.Count -ne 1) {
+        throw "Active work attempt '$($State.activeWorkAttemptId)' must match exactly one attempt in prompt $($State.currentPrompt)."
+    }
+    if ([string]$matches[0].result -ne 'in_progress') {
+        throw "Active work attempt '$($State.activeWorkAttemptId)' is not in progress."
+    }
+    return $matches[0]
+}
+
+function New-WorkAttempt {
+    param(
+        [Parameter(Mandatory)][string]$PromptId,
+        [AllowNull()][string[]]$GoalDefinitions
+    )
+
+    $definitions = @(
+        $GoalDefinitions |
+            Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }
+    )
+    if (@($definitions).Count -eq 0) {
+        $definitions = @(
+            'inspect::Inspect the applicable instructions, workspace and baseline evidence',
+            'change::Execute the smallest coherent task scope',
+            'verify::Run proportionate verification and preserve its evidence',
+            'review::Perform adversarial self-review and close every finding'
+        )
+    }
+
+    $goals = @()
+    $index = 0
+    foreach ($definition in $definitions) {
+        $goalMatch = [regex]::Match(
+            [string]$definition,
+            '^(inspect|plan|change|verify|review|other)::(.+)$')
+        if ([string]::IsNullOrWhiteSpace([string]$definition) -or -not $goalMatch.Success) {
+            throw "Goal must use kind::description with kind inspect, plan, change, verify, review or other: $definition"
+        }
+        $description = $goalMatch.Groups[2].Value.Trim()
+        $kind = $goalMatch.Groups[1].Value
+        Require-SafeText -Value $description -Label 'Goal description'
+        $index++
+        $goals += [ordered]@{
+            id = 'GOAL-{0:D3}' -f $index
+            kind = $kind
+            description = $description
+            status = 'pending'
+            evidence = $null
+            updatedAt = $null
+        }
+    }
+
+    foreach ($requiredKind in @('inspect', 'verify', 'review')) {
+        if (@($goals | Where-Object { $_.kind -eq $requiredKind }).Count -lt 1) {
+            throw "Work attempts require at least one '$requiredKind' goal."
+        }
+    }
+
+    return [ordered]@{
+        id = 'ATT-' + [Guid]::NewGuid().ToString('N')
+        promptId = $PromptId
+        startedAt = [DateTimeOffset]::Now.ToString('o')
+        finishedAt = $null
+        result = 'in_progress'
+        evidence = $null
+        goals = $goals
+        findings = @()
+        verification = @()
+        adversarialReview = [ordered]@{
+            type = 'self_adversarial'
+            status = 'pending'
+            evidence = $null
+            completedAt = $null
+        }
+    }
+}
+
+function Add-WorkVerification {
+    param(
+        [Parameter(Mandatory)]$Attempt,
+        [Parameter(Mandatory)][string]$Kind,
+        [AllowNull()][string]$CommandText,
+        [AllowNull()][Nullable[int]]$ExitCode,
+        [Parameter(Mandatory)][string]$Evidence
+    )
+
+    Require-SafeText -Value $Evidence -Label 'VerifyEvidence'
+    if ($Kind -eq 'command') {
+        Require-SafeText -Value $CommandText -Label 'VerifyCommand'
+        if ($null -eq $ExitCode) {
+            throw 'VerifyExitCode is required for command verification.'
+        }
+        if ([int]$ExitCode -ne 0) {
+            throw "A passing command verification requires exit code 0; found $ExitCode."
+        }
+    }
+    elseif (-not [string]::IsNullOrWhiteSpace([string]$CommandText)) {
+        Require-SafeText -Value $CommandText -Label 'VerifyCommand'
+    }
+
+    $Attempt.verification = @($Attempt.verification) + @([ordered]@{
+        id = 'VERIFY-{0:D3}' -f (@($Attempt.verification).Count + 1)
+        kind = $Kind
+        command = $CommandText
+        exitCode = $(if ($null -eq $ExitCode) { $null } else { [int]$ExitCode })
+        status = 'passed'
+        evidence = $Evidence
+        at = [DateTimeOffset]::Now.ToString('o')
+    })
+}
+
+function Assert-WorkAttemptCanComplete {
+    param([Parameter(Mandatory)]$Attempt)
+
+    $incompleteGoals = @(
+        @($Attempt.goals) |
+            Where-Object {
+                [string]$_.status -ne 'completed' -or
+                [string]::IsNullOrWhiteSpace([string]$_.evidence)
+            }
+    )
+    if ($incompleteGoals.Count -gt 0) {
+        throw "Work attempt $($Attempt.id) has incomplete goals: $($incompleteGoals.id -join ', ')."
+    }
+
+    $passingVerification = @(
+        @($Attempt.verification) |
+            Where-Object {
+                [string]$_.status -eq 'passed' -and
+                -not [string]::IsNullOrWhiteSpace([string]$_.evidence)
+            }
+    )
+    if ($passingVerification.Count -lt 1) {
+        throw "Work attempt $($Attempt.id) has no passing verification evidence."
+    }
+
+    if ($null -eq $Attempt.adversarialReview -or
+        [string]$Attempt.adversarialReview.type -ne 'self_adversarial' -or
+        [string]$Attempt.adversarialReview.status -ne 'completed' -or
+        [string]::IsNullOrWhiteSpace([string]$Attempt.adversarialReview.evidence)) {
+        throw "Work attempt $($Attempt.id) has no completed adversarial self-review."
+    }
+
+    $blockingFindings = @(
+        @($Attempt.findings) |
+            Where-Object { [string]$_.status -in @('open', 'blocked') }
+    )
+    if ($blockingFindings.Count -gt 0) {
+        throw "Work attempt $($Attempt.id) has open or blocked findings: $($blockingFindings.id -join ', ')."
+    }
 }
 
 function Get-GateState {
@@ -796,6 +1019,16 @@ Read AGENTS.md and every mandatory document it references before acting.
 Resolve material inputs from APP_CONTEXT.md, approved decisions and repository evidence.
 For a brownfield initiative, treat the existing application as read-only evidence until the current prompt authorizes a scoped change. Never copy BoilerPlateAdvance over it, replace its Git history/remotes, or mark existing behavior complete without verification.
 For non-trivial work, create and maintain a short staged plan before implementation.
+Before task actions, start the durable work ledger:
+
+```powershell
+.\software-lifecycle.ps1 work-start -ProcessRoot "$Root" -Goal "inspect::Inspect current evidence","change::Execute the scoped work","verify::Run proportionate validation","review::Perform adversarial self-review"
+```
+
+Checkpoint each goal with durable evidence. Record every accepted review issue
+with `finding-add`, resolve it only with correction and verification evidence,
+and run `finding-gate` before completion. A `completed` result is rejected until
+all goals, verification, adversarial review and findings pass the closeout gate.
 Apply QUALITY_GATES.md and the prompt-specific acceptance criteria.
 Perform the required adversarial review and do not claim independent review unless separation is real.
 Update APP_CONTEXT.md, IMPLEMENTATION_STATUS.md, relevant quality artefacts and LIFECYCLE_STATE.json through the lifecycle recorder.
@@ -833,6 +1066,11 @@ function Test-Lifecycle {
     $manifest = Get-Manifest $Root
     $state = Get-State $Root
 
+    if ((Test-TaskLedgerRequired -Manifest $manifest) -and
+        ($null -eq $manifest.executionPolicy.PSObject.Properties['findingsGateRequired'] -or
+            -not [bool]$manifest.executionPolicy.findingsGateRequired)) {
+        $issues.Add('taskLedgerRequired requires findingsGateRequired in the manifest.')
+    }
     if ([int]$state.schemaVersion -ne 1) {
         $issues.Add("Unsupported lifecycle state schemaVersion: $($state.schemaVersion).")
     }
@@ -976,6 +1214,112 @@ function Test-Lifecycle {
         }
         if ($promptState.status -eq 'not_applicable' -and $promptState.applicability -eq 'required') {
             $issues.Add("Required prompt $($property.Name) is marked not_applicable.")
+        }
+
+        $structuredAttempts = @(
+            @($promptState.attempts) |
+                Where-Object { $null -ne $_.PSObject.Properties['id'] }
+        )
+        $attemptIds = @($structuredAttempts | ForEach-Object { [string]$_.id })
+        $duplicateAttemptIds = @(
+            $attemptIds |
+                Group-Object |
+                Where-Object { $_.Count -gt 1 }
+        )
+        if ($duplicateAttemptIds.Count -gt 0) {
+            $issues.Add("Prompt $($property.Name) has duplicate work attempt ids: $($duplicateAttemptIds.Name -join ', ').")
+        }
+        foreach ($attempt in $structuredAttempts) {
+            if ([string]$attempt.promptId -ne [string]$property.Name) {
+                $issues.Add("Work attempt $($attempt.id) belongs to prompt '$($attempt.promptId)', not '$($property.Name)'.")
+            }
+            if ([string]$attempt.result -notin @('in_progress', 'completed', 'partial', 'blocked', 'not_applicable')) {
+                $issues.Add("Work attempt $($attempt.id) has invalid result '$($attempt.result)'.")
+            }
+            $goalIds = @(@($attempt.goals) | ForEach-Object { [string]$_.id })
+            if ($goalIds.Count -lt 1) {
+                $issues.Add("Work attempt $($attempt.id) has no goals.")
+            }
+            if (@($goalIds | Group-Object | Where-Object { $_.Count -gt 1 }).Count -gt 0) {
+                $issues.Add("Work attempt $($attempt.id) has duplicate goal ids.")
+            }
+            foreach ($goalItem in @($attempt.goals)) {
+                if ([string]$goalItem.kind -notin @('inspect', 'plan', 'change', 'verify', 'review', 'other')) {
+                    $issues.Add("Work attempt $($attempt.id) goal $($goalItem.id) has invalid kind '$($goalItem.kind)'.")
+                }
+                if ([string]$goalItem.status -notin @('pending', 'completed', 'blocked')) {
+                    $issues.Add("Work attempt $($attempt.id) goal $($goalItem.id) has invalid status '$($goalItem.status)'.")
+                }
+                if ([string]$goalItem.status -eq 'completed' -and
+                    [string]::IsNullOrWhiteSpace([string]$goalItem.evidence)) {
+                    $issues.Add("Work attempt $($attempt.id) goal $($goalItem.id) completed without evidence.")
+                }
+            }
+            $findingIds = @(@($attempt.findings) | ForEach-Object { [string]$_.id })
+            if (@($findingIds | Group-Object | Where-Object { $_.Count -gt 1 }).Count -gt 0) {
+                $issues.Add("Work attempt $($attempt.id) has duplicate finding ids.")
+            }
+            foreach ($finding in @($attempt.findings)) {
+                if ([string]$finding.severity -notin @('critical', 'high', 'medium', 'low')) {
+                    $issues.Add("Work attempt $($attempt.id) finding $($finding.id) has invalid severity '$($finding.severity)'.")
+                }
+                if ([string]$finding.status -notin @('open', 'blocked', 'resolved')) {
+                    $issues.Add("Work attempt $($attempt.id) finding $($finding.id) has invalid status '$($finding.status)'.")
+                }
+                if ([string]$finding.status -eq 'resolved' -and
+                    ([string]::IsNullOrWhiteSpace([string]$finding.resolutionEvidence) -or
+                        $null -eq $finding.resolutionVerification -or
+                        [string]$finding.resolutionVerification.status -ne 'passed')) {
+                    $issues.Add("Work attempt $($attempt.id) finding $($finding.id) resolved without passing resolution evidence.")
+                }
+            }
+            if ([string]$attempt.result -eq 'completed') {
+                try {
+                    Assert-WorkAttemptCanComplete -Attempt $attempt
+                }
+                catch {
+                    $issues.Add($_.Exception.Message)
+                }
+            }
+        }
+        if ((Test-TaskLedgerRequired -Manifest $manifest) -and
+            $promptState.status -eq 'completed' -and
+            @($structuredAttempts | Where-Object { [string]$_.result -eq 'completed' }).Count -lt 1) {
+            $issues.Add("Completed prompt $($property.Name) has no completed structured work attempt.")
+        }
+    }
+
+    if (Test-TaskLedgerRequired -Manifest $manifest) {
+        if ($null -eq $state.PSObject.Properties['activeWorkAttemptId']) {
+            $issues.Add('State is missing activeWorkAttemptId while the task ledger is required.')
+        }
+        else {
+            $inProgressAttempts = @(
+                foreach ($promptProperty in $state.prompts.PSObject.Properties) {
+                    @($promptProperty.Value.attempts) |
+                        Where-Object {
+                            $null -ne $_.PSObject.Properties['id'] -and
+                            [string]$_.result -eq 'in_progress'
+                        }
+                }
+            )
+            if ([string]::IsNullOrWhiteSpace([string]$state.activeWorkAttemptId)) {
+                if ($inProgressAttempts.Count -gt 0) {
+                    $issues.Add('In-progress work attempts exist without activeWorkAttemptId.')
+                }
+            }
+            else {
+                $activeMatches = @(
+                    $inProgressAttempts |
+                        Where-Object { [string]$_.id -eq [string]$state.activeWorkAttemptId }
+                )
+                if ($activeMatches.Count -ne 1) {
+                    $issues.Add("activeWorkAttemptId '$($state.activeWorkAttemptId)' must match exactly one in-progress attempt.")
+                }
+                elseif ([string]$activeMatches[0].promptId -ne [string]$state.currentPrompt) {
+                    $issues.Add("Active work attempt '$($state.activeWorkAttemptId)' does not belong to currentPrompt '$($state.currentPrompt)'.")
+                }
+            }
         }
     }
 
@@ -1487,6 +1831,7 @@ function New-LifecycleInstance {
         currentStage = '01'
         currentPrompt = '01'
         nextAction = 'execute_prompt'
+        activeWorkAttemptId = $null
         activeSlice = $null
         slices = @()
         selectedSurfaces = @()
@@ -1714,6 +2059,207 @@ if (-not (Test-Lifecycle -Root $ProcessRoot -Quiet -SkipExternalGateValidators))
     throw 'Lifecycle validation failed before command execution; run validate for details. No state was changed.'
 }
 
+if ($Command -eq 'work-start') {
+    if ([string]::IsNullOrWhiteSpace([string]$state.currentPrompt)) {
+        throw 'work-start requires a current prompt.'
+    }
+    if ($null -ne (Get-ActiveWorkAttempt -State $state -AllowMissing)) {
+        throw "Work attempt '$($state.activeWorkAttemptId)' is already active."
+    }
+
+    $attempt = New-WorkAttempt -PromptId ([string]$state.currentPrompt) -GoalDefinitions $Goal
+    $promptState = Get-PromptState -State $state -Id ([string]$state.currentPrompt)
+    $promptState.attempts = @($promptState.attempts) + @($attempt)
+    $state.activeWorkAttemptId = $attempt.id
+    $promptState.status = 'ready'
+    $state.status = 'ready'
+    $state.nextAction = 'execute_prompt'
+    $state.blockers = @()
+    Add-LifecycleHistoryAction -State $state -Action "work-start:$($attempt.id):prompt-$($state.currentPrompt)" `
+        -Evidence "goals=$(@($attempt.goals).Count)"
+    Save-State -State $state -Root $ProcessRoot
+    Write-Host "WORK STARTED: $($attempt.id) for prompt $($state.currentPrompt)." -ForegroundColor Green
+    foreach ($goalItem in @($attempt.goals)) {
+        Write-Host " - $($goalItem.id) [$($goalItem.kind)]: $($goalItem.description)"
+    }
+    exit 0
+}
+
+if ($Command -eq 'checkpoint') {
+    Require-SafeText -Value $GoalId -Label 'GoalId'
+    if ([string]::IsNullOrWhiteSpace([string]$CheckpointStatus)) {
+        throw 'CheckpointStatus is required.'
+    }
+    Require-SafeText -Value $Evidence -Label 'Evidence'
+    $attempt = Get-ActiveWorkAttempt -State $state
+    $matches = @(@($attempt.goals) | Where-Object { [string]$_.id -eq $GoalId })
+    if ($matches.Count -ne 1) {
+        throw "Goal '$GoalId' must match exactly one goal in work attempt $($attempt.id)."
+    }
+    $goalItem = $matches[0]
+    $goalItem.status = $CheckpointStatus
+    $goalItem.evidence = $Evidence
+    $goalItem.updatedAt = [DateTimeOffset]::Now.ToString('o')
+    if ([string]$goalItem.kind -eq 'review') {
+        $attempt.adversarialReview.status = $(if ($CheckpointStatus -eq 'completed') { 'completed' } else { 'pending' })
+        $attempt.adversarialReview.evidence = $Evidence
+        $attempt.adversarialReview.completedAt = $(if ($CheckpointStatus -eq 'completed') {
+            [DateTimeOffset]::Now.ToString('o')
+        } else {
+            $null
+        })
+    }
+    Add-LifecycleHistoryAction -State $state -Action "checkpoint:$($attempt.id):$($GoalId):$($CheckpointStatus)" `
+        -Evidence $Evidence
+    Save-State -State $state -Root $ProcessRoot
+    Write-Host "CHECKPOINT: $GoalId -> $CheckpointStatus." -ForegroundColor Green
+    exit 0
+}
+
+if ($Command -eq 'verify') {
+    if ([string]::IsNullOrWhiteSpace([string]$VerificationKind)) {
+        throw 'VerificationKind is required.'
+    }
+    $attempt = Get-ActiveWorkAttempt -State $state
+    Add-WorkVerification -Attempt $attempt -Kind $VerificationKind -CommandText $VerifyCommand `
+        -ExitCode $VerifyExitCode -Evidence $VerifyEvidence
+    Add-LifecycleHistoryAction -State $state -Action "verify:$($attempt.id):$VerificationKind" `
+        -Evidence $VerifyEvidence
+    Save-State -State $state -Root $ProcessRoot
+    Write-Host "VERIFIED: $VerificationKind evidence recorded for $($attempt.id)." -ForegroundColor Green
+    exit 0
+}
+
+if ($Command -eq 'finding-add') {
+    foreach ($requiredText in @(
+        @{ Value = $Title; Label = 'Title' },
+        @{ Value = $Source; Label = 'Source' },
+        @{ Value = $Location; Label = 'Location' },
+        @{ Value = $Evidence; Label = 'Evidence' }
+    )) {
+        Require-SafeText -Value $requiredText.Value -Label $requiredText.Label
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$Severity)) {
+        throw 'Severity is required.'
+    }
+    $attempt = Get-ActiveWorkAttempt -State $state
+    $finding = [ordered]@{
+        id = 'FIND-{0:D3}' -f (@($attempt.findings).Count + 1)
+        title = $Title
+        severity = $Severity
+        status = 'open'
+        source = $Source
+        location = $Location
+        evidence = $Evidence
+        openedAt = [DateTimeOffset]::Now.ToString('o')
+        resolvedAt = $null
+        resolutionEvidence = $null
+        resolutionVerification = $null
+    }
+    $attempt.findings = @($attempt.findings) + @($finding)
+    $attempt.adversarialReview.status = 'pending'
+    $attempt.adversarialReview.evidence = $null
+    $attempt.adversarialReview.completedAt = $null
+    Add-LifecycleHistoryAction -State $state -Action "finding-add:$($attempt.id):$($finding.id):$Severity" `
+        -Evidence $Evidence
+    Save-State -State $state -Root $ProcessRoot
+    Write-Host "FINDING ADDED: $($finding.id) [$Severity] $Title" -ForegroundColor Yellow
+    exit 0
+}
+
+if ($Command -eq 'finding-resolve') {
+    Require-SafeText -Value $FindingId -Label 'FindingId'
+    Require-SafeText -Value $ResolutionEvidence -Label 'ResolutionEvidence'
+    Require-SafeText -Value $VerifyCommand -Label 'VerifyCommand'
+    Require-SafeText -Value $VerifyEvidence -Label 'VerifyEvidence'
+    if ($null -eq $VerifyExitCode -or [int]$VerifyExitCode -ne 0) {
+        throw 'Resolving a finding requires VerifyExitCode 0.'
+    }
+    $attempt = Get-ActiveWorkAttempt -State $state
+    $matches = @(@($attempt.findings) | Where-Object { [string]$_.id -eq $FindingId })
+    if ($matches.Count -ne 1) {
+        throw "Finding '$FindingId' must match exactly one finding in work attempt $($attempt.id)."
+    }
+    $finding = $matches[0]
+    if ([string]$finding.status -eq 'resolved') {
+        throw "Finding '$FindingId' is already resolved."
+    }
+    $finding.status = 'resolved'
+    $finding.resolvedAt = [DateTimeOffset]::Now.ToString('o')
+    $finding.resolutionEvidence = $ResolutionEvidence
+    $finding.resolutionVerification = [ordered]@{
+        kind = 'command'
+        command = $VerifyCommand
+        exitCode = [int]$VerifyExitCode
+        status = 'passed'
+        evidence = $VerifyEvidence
+        at = [DateTimeOffset]::Now.ToString('o')
+    }
+    Add-LifecycleHistoryAction -State $state -Action "finding-resolve:$($attempt.id):$FindingId" `
+        -Evidence $ResolutionEvidence
+    Save-State -State $state -Root $ProcessRoot
+    Write-Host "FINDING RESOLVED: $FindingId." -ForegroundColor Green
+    exit 0
+}
+
+if ($Command -eq 'finding-gate') {
+    $attempt = Get-ActiveWorkAttempt -State $state
+    $blockingFindings = @(
+        @($attempt.findings) |
+            Where-Object { [string]$_.status -in @('open', 'blocked') }
+    )
+    if ($blockingFindings.Count -gt 0) {
+        Write-Host "FAIL: $($blockingFindings.Count) open or blocked finding(s)." -ForegroundColor Red
+        foreach ($finding in $blockingFindings) {
+            Write-Host " - $($finding.id) [$($finding.severity)] $($finding.title)"
+        }
+        exit 1
+    }
+    Write-Host "PASS: no open or blocked findings in $($attempt.id)." -ForegroundColor Green
+    exit 0
+}
+
+if ($Command -eq 'closeout') {
+    Require-SafeText -Value $Evidence -Label 'Evidence'
+    Require-SafeText -Value $ReviewEvidence -Label 'ReviewEvidence'
+    if ([string]::IsNullOrWhiteSpace([string]$VerificationKind)) {
+        throw 'VerificationKind is required.'
+    }
+    $attempt = Get-ActiveWorkAttempt -State $state
+    $blockedGoals = @(@($attempt.goals) | Where-Object { [string]$_.status -eq 'blocked' })
+    if ($blockedGoals.Count -gt 0) {
+        throw "closeout cannot overwrite blocked goals: $($blockedGoals.id -join ', '). Resolve and checkpoint them explicitly."
+    }
+    foreach ($goalItem in @($attempt.goals)) {
+        if ([string]$goalItem.status -ne 'completed') {
+            $goalItem.status = 'completed'
+            $goalItem.evidence = $Evidence
+            $goalItem.updatedAt = [DateTimeOffset]::Now.ToString('o')
+        }
+    }
+    $alreadyVerified = @(
+        @($attempt.verification) |
+            Where-Object {
+                [string]$_.status -eq 'passed' -and
+                [string]$_.kind -eq $VerificationKind -and
+                [string]$_.evidence -eq [string]$VerifyEvidence
+            }
+    ).Count -gt 0
+    if (-not $alreadyVerified) {
+        Add-WorkVerification -Attempt $attempt -Kind $VerificationKind -CommandText $VerifyCommand `
+            -ExitCode $VerifyExitCode -Evidence $VerifyEvidence
+    }
+    $attempt.adversarialReview.type = 'self_adversarial'
+    $attempt.adversarialReview.status = 'completed'
+    $attempt.adversarialReview.evidence = $ReviewEvidence
+    $attempt.adversarialReview.completedAt = [DateTimeOffset]::Now.ToString('o')
+    Assert-WorkAttemptCanComplete -Attempt $attempt
+    Add-LifecycleHistoryAction -State $state -Action "closeout:$($attempt.id)" -Evidence $Evidence
+    Save-State -State $state -Root $ProcessRoot
+    Write-Host "CLOSEOUT PASS: $($attempt.id) is ready to record." -ForegroundColor Green
+    exit 0
+}
+
 if ($Command -eq 'status') {
     $allPrompts = @($state.prompts.PSObject.Properties)
     $required = @($allPrompts | Where-Object { $_.Value.applicability -eq 'required' })
@@ -1752,6 +2298,17 @@ if ($Command -eq 'status') {
     Write-Host "Current-stage applicable progress: $stageDone/$($stageApplicable.Count)"
     Write-Host "Blocked prompts: $blocked"
     Write-Host "Vertical slices recorded: $(@($state.slices).Count)"
+    $activeAttempt = Get-ActiveWorkAttempt -State $state -AllowMissing
+    if ($null -ne $activeAttempt) {
+        $completedGoals = @(@($activeAttempt.goals) | Where-Object { $_.status -eq 'completed' }).Count
+        $openFindings = @(@($activeAttempt.findings) | Where-Object { $_.status -in @('open', 'blocked') }).Count
+        $passingVerification = @(@($activeAttempt.verification) | Where-Object { $_.status -eq 'passed' }).Count
+        Write-Host "Active work attempt: $($activeAttempt.id)"
+        Write-Host " - Goals: $completedGoals/$(@($activeAttempt.goals).Count) completed"
+        Write-Host " - Passing verification records: $passingVerification"
+        Write-Host " - Open/blocked findings: $openFindings"
+        Write-Host " - Adversarial review: $($activeAttempt.adversarialReview.status)"
+    }
     if ($null -ne $state.activeSlice) {
         Write-Host "Active/latest slice: $($state.activeSlice.id) [$($state.activeSlice.kind)/$($state.activeSlice.surface)] $($state.activeSlice.status)"
         Write-Host " - Requirements: $($state.activeSlice.requirements)"
@@ -2132,12 +2689,27 @@ if ($Command -eq 'record') {
         throw "Required prompt $PromptId cannot be marked not_applicable."
     }
 
-    $attempt = [ordered]@{
-        at = [DateTimeOffset]::Now.ToString('o')
-        result = $Result
-        evidence = $Evidence
+    if (Test-TaskLedgerRequired -Manifest $manifest) {
+        $attempt = Get-ActiveWorkAttempt -State $state
+        if ([string]$attempt.promptId -ne $PromptId) {
+            throw "Active work attempt $($attempt.id) belongs to prompt $($attempt.promptId), not $PromptId."
+        }
+        if ($Result -eq 'completed') {
+            Assert-WorkAttemptCanComplete -Attempt $attempt
+        }
+        $attempt.result = $Result
+        $attempt.evidence = $Evidence
+        $attempt.finishedAt = [DateTimeOffset]::Now.ToString('o')
+        $state.activeWorkAttemptId = $null
     }
-    $promptState.attempts = @($promptState.attempts) + @($attempt)
+    else {
+        $attempt = [ordered]@{
+            at = [DateTimeOffset]::Now.ToString('o')
+            result = $Result
+            evidence = $Evidence
+        }
+        $promptState.attempts = @($promptState.attempts) + @($attempt)
+    }
     $promptState.status = $Result
     $promptState.evidence = $Evidence
     if ($PromptId -in @('26', '28') -and $Result -eq 'completed' -and $null -ne $state.activeSlice) {
