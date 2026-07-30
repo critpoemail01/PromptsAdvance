@@ -3,8 +3,10 @@
 ## Objetivo
 
 Transforma a definição aprovada nos prompts 01 e 02 numa especificação
-versionada, detalhada por jornada, aplicação, página/ecrã e funcionalidade, e
-numa segunda vista simples para o programador interpretar e validar. Usa fontes de produto,
+versionada, detalhada por jornada, aplicação, página/ecrã e funcionalidade, numa
+vista simples para o programador interpretar/validar e num ficheiro único de
+todas as funcionalidades no formato `Aplicação -> Página -> Funcionalidade`.
+Usa fontes de produto,
 o comportamento observado no `BoilerPlateAdvance` e pesquisa online atual de
 produtos comparáveis, padrões maduros e layouts premium para descobrir lacunas e
 alternativas — nunca para inventar necessidades ou copiar soluções.
@@ -59,6 +61,7 @@ Cria ou atualiza, sem duplicar equivalentes:
 - `requirements/REQUIREMENTS_SPECIFICATION.md`;
 - `requirements/REQUIREMENTS_TRACEABILITY.md`;
 - `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md`;
+- `requirements/ALL_FUNCTIONALITIES.md`;
 - `requirements/APPLICATION_CATALOG.md`;
 - `requirements/PAGE_CATALOG.md`;
 - `requirements/applications/APP-<slug>.md`, um por aplicação de produto ativa;
@@ -82,6 +85,8 @@ QST pergunta/bloqueio      ACT ator                     OBJ objetivo
 CAP capacidade             JRN jornada                  STP-<JRN>-## passo
 APP aplicação lógica       PAGE página/ecrã lógico     BPP projeto boilerplate
 BPR rota/página/endpoint   BPC capacidade boilerplate  FR requisito funcional
+FNC-<PAGE>-## funcionalidade nomeada
+RF-P<NNN>-<NN>-<NN> obrigação atómica da funcionalidade na página
 BR regra de negócio        DATA contrato de dados      PERM autorização
 INT integração             NFR qualidade mensurável    SEC segurança/privacidade
 AC-<REQ>-## aceitação      SLICE fatia candidata
@@ -169,10 +174,12 @@ método (`review`, `unit`, `integration`, `contract`, `browser`, `native`,
 `accessibility`, `security`, `performance` ou `operation`), artefacto e owner.
 
 `REQUIREMENTS_SPECIFICATION.md` e os contratos `PAGE` são a fonte canónica
-detalhada para desenvolver. `DEVELOPER_REQUIREMENTS_CHECKLIST.md` é uma vista
-derivada, curta e operacional: não cria, altera, aprova nem omite requisitos.
-Começa por versão, fonte canónica, legenda de estados, bloqueios e ordem de
-implementação. Depois contém uma secção por `APP/PAGE`, sempre com:
+detalhada para desenvolver. Cada vista derivada indicada a seguir não cria,
+altera, aprova nem omite requisitos.
+
+`DEVELOPER_REQUIREMENTS_CHECKLIST.md` é a vista operacional para implementar e
+validar. Começa por versão, fonte canónica, legenda de estados, bloqueios e
+ordem de implementação. Depois contém uma secção por `APP/PAGE`, sempre com:
 
 | Grupo | Conteúdo de leitura/validação do programador |
 |---|---|
@@ -190,6 +197,41 @@ outras páginas consumidoras. O programador marca `não iniciado`, `bloqueado`,
 `implementado` ou `validado com evidência`; `[x]` exige prova e não equivale a
 aprovação de produto. Divergência entre a checklist e a fonte canónica bloqueia
 a implementação e é corrigida primeiro nos artefactos detalhados.
+
+`ALL_FUNCTIONALITIES.md` é o ficheiro único, completo e compacto para navegar
+por todas as funcionalidades. Usa o nome técnico real do projeto/superfície
+observado no inventário `BPP`, associado ao `APP` lógico, e repete exatamente:
+
+```text
+# <Projeto visível real> — <APP-ID> <nome lógico>
+## <Projeto visível real> — <PAGE-ID> — <nome da página>
+### <Projeto visível real> — <PAGE-ID> — FUNCIONALIDADE NN (<FNC-ID>) — <nome>
+| ID | Quem | Onde | Quando | O quê |
+|---|---|---|---|---|
+| RF-P... | <ator/papel> | <superfície/fronteira> | <evento/condição> | <obrigação observável atómica> |
+```
+
+Aplica estas regras sem exceção:
+
+- uma tabela por funcionalidade e apenas as cinco colunas indicadas;
+- uma linha por obrigação, interação, passo ou ramo observável; não existe
+  número fixo de linhas por funcionalidade;
+- separa confirmação, validação, cada condição `se`, leitura, mutação ordenada,
+  processamento múltiplo, sucesso parcial, atualização da página, notificação,
+  repetição, concorrência, falha e recuperação quando forem distintos;
+- `O quê` contém a ação e o efeito/pós-condição necessários para eliminar
+  ambiguidade; não usa linhas genéricas repetidas como “validar entradas”,
+  “processar funcionalidade” ou “apresentar resultado” sem valores e regras;
+- `Quem`, `Onde` e `Quando` são concretos; “Sistema”, “Página”, “API”, “Depois”
+  ou equivalentes só são suficientes quando o contexto e o evento exatos ficam
+  inequívocos na própria linha;
+- cada `RF-P` é único, estável e liga ao `FNC`, requisito canónico, `AC` e prova;
+- uma aplicação técnica sem página usa uma secção
+  `OPERAÇÃO-NÃO-VISUAL`, não uma `PAGE` fictícia;
+- projetos ausentes, bibliotecas, testes e superfícies excluídas aparecem numa
+  tabela final com estado/razão, sem funcionalidades inventadas;
+- a contagem de `APP/PAGE/FNC/RF-P` e os IDs coincidem mecanicamente com a
+  especificação, contratos PAGE, checklist e rastreabilidade.
 
 `REQUIREMENTS_TRACEABILITY.md` contém as vistas bidirecionais `SRC/DEC -> OBJ/CAP/JRN -> requisito`, `REF -> INS -> HYP -> decisão`, `JRN/STP -> APP -> PAGE/operação -> requisito -> AC`, `APP/PAGE -> BPP/BPR/BPC`, contratos transversais e requisito -> `SLICE`, além de órfãos, conflitos e bloqueios.
 Cada `SLICE` liga resultado, jornada, aplicação/página, requisitos mínimos, dados, permissões, erros, observabilidade, provas, dependências, exclusões e prompts downstream.
@@ -297,6 +339,10 @@ e porquê.
   semântica HTTP quando pública; critérios e prova.
 - Agrupa os `FR` da página em funcionalidades nomeadas e ordenadas, sem esconder
   requisitos transversais nem duplicar a responsabilidade primária.
+- Atribui `FNC` estável a cada funcionalidade e decompõe a sequência completa em
+  `RF-P`, incluindo todas as ações do utilizador, respostas do sistema, ramos e
+  efeitos observáveis; não uses uma decomposição fixa ou linhas de categoria
+  sem comportamento específico.
 - Modela variantes como estados da mesma página quando partilham objetivo,
   rota e contrato; cria páginas distintas quando mudam objetivo, navegação,
   autorização ou responsabilidade.
@@ -317,7 +363,8 @@ e porquê.
   concorrência, falha parcial e recuperação quando materiais. Given/When/Then é
   opcional; observabilidade e ausência de efeitos indevidos são obrigatórias.
 - Gera a especificação detalhada primeiro e só depois deriva a checklist do
-  programador, preservando IDs, significado, prioridade e bloqueios.
+  programador e `ALL_FUNCTIONALITIES.md`, preservando IDs, significado,
+  prioridade, bloqueios e responsabilidade primária.
 
 ### 6. Fechar rastreabilidade e entrega
 
@@ -327,7 +374,8 @@ e porquê.
   catálogos, contratos, especificação, checklist do programador e
   rastreabilidade; uma identidade não pode apontar para destinos diferentes.
 - Compara todos os `Must`, páginas, funcionalidades e `AC` entre a fonte
-  detalhada e a checklist; falha perante omissão, duplicação ou resumo ambíguo.
+  detalhada, a checklist e `ALL_FUNCTIONALITIES.md`; falha perante omissão,
+  duplicação, ID divergente, ramo agregado ou resumo ambíguo.
 - Executa a revisão adversarial e o relatório de cobertura do contrato. Procura
   requisitos vagos/compostos; tenta escrever duas implementações semanticamente
   incompatíveis que satisfaçam o mesmo requisito; procura ainda órfãos,
@@ -339,11 +387,14 @@ e porquê.
 
 ## Critério de conclusão e entrega
 
-Usa `concluído` apenas quando todos os `Must` têm fonte e aprovação, jornadas críticas são inequívocas, cada `APP/PAGE` em âmbito tem contrato completo, a checklist do programador tem paridade comprovada, a rastreabilidade é íntegra e o relatório não tem falhas bloqueantes.
+Usa `concluído` apenas quando todos os `Must` têm fonte e aprovação, jornadas
+críticas são inequívocas, cada `APP/PAGE` em âmbito tem contrato completo, a
+checklist e o ficheiro único têm paridade comprovada com a fonte canónica, a
+rastreabilidade é íntegra e o relatório não tem falhas bloqueantes.
 Usa `parcial` para trabalho útil com lacunas não bloqueantes e `bloqueado` quando uma decisão/fonte material impede aprovar um `Must`.
 
 Começa a resposta pela conclusão. Indica versões e caminhos dos artefactos
-detalhados e da checklist do programador, aplicações, páginas, funcionalidades,
+detalhados, da checklist e de `ALL_FUNCTIONALITIES.md`, aplicações, páginas, funcionalidades,
 jornadas e `Must`, principais descobertas da pesquisa, diferenças
 face ao boilerplate, fatias candidatas, cobertura, bloqueios/owners, fontes,
 limitações e validações executadas. Confirma que o Gate A permanece `PENDENTE`.

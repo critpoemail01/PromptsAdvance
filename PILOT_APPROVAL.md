@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-30.4 |
+| Catalog version | 2026-07-30.5 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -69,3 +69,10 @@ adversarial e findings. `record completed` deve falhar sem closeout da mesma
 tentativa ou enquanto existir um finding aberto/bloqueado. EVAL-04, EVAL-11 e a
 suite completa têm de ser repetidos numa cópia descartável; avaliação humana e
 revisão separada continuam obrigatórias. O estado permanece `pending`.
+A versão 2026-07-30.5 acrescenta `ALL_FUNCTIONALITIES.md`, com o formato
+obrigatório `Projeto/APP -> PAGE -> FUNCIONALIDADE ->
+ID | Quem | Onde | Quando | O quê`, decomposição sem quota fixa de todos os
+ramos/interações/efeitos e paridade mecânica com a especificação, contratos
+PAGE, checklist e rastreabilidade. O prompt 04 passa a bloquear o Gate A perante
+omissões, IDs divergentes ou linhas genéricas. Esta alteração material exige
+nova execução de EVAL-15 e da suite completa.

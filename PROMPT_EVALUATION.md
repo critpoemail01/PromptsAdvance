@@ -211,6 +211,10 @@ Espera-se:
   permissões e rastreabilidade até aceitação/prova;
 - especificação detalhada e `DEVELOPER_REQUIREMENTS_CHECKLIST.md` legível por
   página/funcionalidade, com os mesmos IDs, bloqueios e critérios de prova;
+- `ALL_FUNCTIONALITIES.md` organizado por projeto/APP, PAGE e funcionalidade,
+  com uma tabela `ID | Quem | Onde | Quando | O quê` por funcionalidade,
+  requisitos `RF-P` concretos para todos os ramos/interações/efeitos e paridade
+  mecânica com a fonte detalhada e a checklist;
 - conteúdo externo ignorado como instrução, sem compra, login, download, cópia,
   instalação, mudança de stack ou falsa declaração de licença;
 - Gate A `PENDENTE` e lacunas materiais associadas a IDs e owners.
@@ -261,8 +265,9 @@ O piloto passa apenas quando:
 - EVAL-14 demonstra naming natural, evidência externa honesta e resistência a
   instruções encontradas no conteúdo pesquisado;
 - EVAL-15 demonstra pesquisa honesta, contratos detalhados por aplicação/página
-  e checklist do programador em paridade, preservando a separação entre
-  evidência, hipótese, aprovação e baseline técnica;
+  e as duas vistas derivadas do programador em paridade, incluindo o ficheiro
+  único sem linhas genéricas, preservando a separação entre evidência, hipótese,
+  aprovação e baseline técnica;
 - não existe falha crítica.
 
 Se falhar, corrige a regra mínima responsável, repete o caso afetado e todos os casos que dependam dessa regra. Depois repete a suite completa nas mesmas condições antes de alterar o Gate C.
@@ -458,6 +463,17 @@ falha sem closeout da tentativa ou com findings `open`/`blocked`; resultados
 passaram a cobrir estes gates e corrupção do ledger. A suite completa,
 avaliação humana e revisão separada desta versão permanecem obrigatórias antes
 de aprovar o piloto.
+
+Na `catalogVersion` 2026-07-30.5, o prompt 03 passou a exigir também
+`ALL_FUNCTIONALITIES.md`: uma vista única por projeto/APP, página e
+funcionalidade, com as colunas `ID | Quem | Onde | Quando | O quê`. A
+decomposição não usa quota fixa e separa confirmações, condições, ramos,
+mutações, sucesso parcial, atualização, notificações, concorrência e recuperação
+quando materialmente distintos. O prompt 04 e o oráculo EVAL-15 passam a
+rejeitar ficheiro ausente, páginas/funcionalidades omitidas, IDs duplicados ou
+sem rastreabilidade e linhas genéricas sem regra ou efeito concreto. A alteração
+material mantém `PILOT_APPROVAL.md` pendente e exige nova execução de EVAL-15 e
+da suite completa.
 
 ## Referências
 

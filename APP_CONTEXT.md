@@ -210,6 +210,7 @@ Estes campos definem o destino esperado, mas não autorizam a ação externa. A 
 | Fontes de requisitos | A preencher | pendente | — |
 | Especificação detalhada para desenvolvimento | A preencher | pendente | `requirements/REQUIREMENTS_SPECIFICATION.md` |
 | Checklist legível do programador | A preencher | pendente | `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md` |
+| Ficheiro único de todas as funcionalidades | A preencher | pendente | `requirements/ALL_FUNCTIONALITIES.md` |
 | Matriz de requisitos | A preencher | pendente | — |
 | Catálogo de aplicações | A preencher | pendente | `requirements/APPLICATION_CATALOG.md` |
 | Contratos por aplicação | A preencher | pendente | `requirements/applications/` |
@@ -234,6 +235,7 @@ Aliases:
 - `[FONTES_DE_REQUISITOS]`
 - `[ESPECIFICAÇÃO_OU_BACKLOG]`, `[ESPECIFICACAO_DETALHADA]`
 - `[CHECKLIST_REQUISITOS_PROGRAMADOR]`, `[DEVELOPER_REQUIREMENTS_CHECKLIST]`
+- `[FICHEIRO_UNICO_FUNCIONALIDADES]`, `[ALL_FUNCTIONALITIES]`
 - `[MATRIZ_DE_REQUISITOS]`
 - `[CATALOGO_DE_APLICACOES]`, `[CONTRATOS_POR_APLICACAO]`
 - `[CATALOGO_DE_PAGINAS]`, `[CONTRATOS_POR_PAGINA]`

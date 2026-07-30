@@ -12,8 +12,9 @@ Validador: `scripts/Test-ProductDefinitionGate.ps1`.
 - procura, alternativas, acesso ao público e diferenciação sustentados;
 - MVP, exclusões, orçamento, prazo e métrica de decisão;
 - requisitos `Must` aprovados, singulares e verificáveis;
-- especificação detalhada e checklist legível do programador em paridade por
-  página, funcionalidade, requisito e critério de aceitação;
+- especificação detalhada, checklist legível do programador e
+  `ALL_FUNCTIONALITIES.md` em paridade por página, funcionalidade, requisito,
+  ramo/efeito e critério de aceitação;
 - aprovação explícita da versão pelo responsável de produto.
 
 ## G02 — Arquitetura e fundação

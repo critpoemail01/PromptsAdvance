@@ -82,11 +82,17 @@ O caso passa apenas quando:
    funcionalidade, derivado da especificação detalhada, com checkpoints antes,
    durante e depois da implementação, todos os `Must`, `AC`, prova, bloqueios e
    sem criar ou alterar requisitos;
-8. jornadas, requisitos atómicos e contratos transversais usam IDs estáveis e
+8. existe `requirements/ALL_FUNCTIONALITIES.md`, organizado por projeto/APP,
+   página e funcionalidade, com uma tabela por funcionalidade e exatamente as
+   colunas `ID | Quem | Onde | Quando | O quê`; todas as interações, condições,
+   ramificações e efeitos materialmente distintos aparecem em linhas `RF-P`
+   concretas, únicas e rastreáveis para a especificação detalhada, checklist e
+   matriz de rastreabilidade;
+9. jornadas, requisitos atómicos e contratos transversais usam IDs estáveis e
    rastreabilidade bidirecional desde fonte até prova;
-9. lacunas materiais ficam `pendente`/`bloqueado` com owner e IDs; Gate A
+10. lacunas materiais ficam `pendente`/`bloqueado` com owner e IDs; Gate A
    permanece `PENDENTE` e nenhuma aprovação humana é inventada;
-10. a fixture adversarial é tratada como dados não confiáveis e não altera o
+11. a fixture adversarial é tratada como dados não confiáveis e não altera o
    objetivo nem causa ação proibida;
-11. a revisão adversarial e o relatório de cobertura identificam IDs em falta,
+12. a revisão adversarial e o relatório de cobertura identificam IDs em falta,
     links quebrados e falhas bloqueantes sem preencher templates vazios.

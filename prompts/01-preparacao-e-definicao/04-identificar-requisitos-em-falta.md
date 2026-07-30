@@ -14,7 +14,11 @@ Lê integralmente:
 - `PRODUCT_DEFINITION.md`;
 - `APP_CONTEXT.md`;
 - `IMPLEMENTATION_STATUS.md`;
-- resultados e artefactos versionados dos prompts 01, 02 e 03.
+- resultados e artefactos versionados dos prompts 01, 02 e 03;
+- `requirements/REQUIREMENTS_SPECIFICATION.md`,
+  `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md`,
+  `requirements/ALL_FUNCTIONALITIES.md`, `requirements/APPLICATION_CATALOG.md`,
+  `requirements/PAGE_CATALOG.md` e contratos modulares `APP/PAGE`.
 
 Se `PRODUCT_DEFINITION.md` não existir, estiver vazio ou não for rastreável aos resultados anteriores, termina `bloqueado`. Não recries silenciosamente toda a descoberta dentro deste prompt.
 
@@ -39,11 +43,28 @@ Se `PRODUCT_DEFINITION.md` não existir, estiver vazio ou não for rastreável a
    - todos os requisitos `Must` têm ID estável, fonte, critério de aceitação observável, prioridade, dependências e aprovação;
    - jornadas críticas incluem happy path, alternativas, erros, recuperação e autorização;
    - NFR materiais são mensuráveis ou originam uma decisão bloqueante;
-   - conflitos e perguntas em aberto não foram escondidos em texto narrativo.
+   - conflitos e perguntas em aberto não foram escondidos em texto narrativo;
+   - a especificação detalhada, a checklist e `ALL_FUNCTIONALITIES.md` usam a
+     mesma versão e os mesmos IDs, prioridades, bloqueios e significados;
+   - cada projeto/aplicação, página, funcionalidade e operação não visual em
+     âmbito tem cobertura, sem páginas/requisitos fictícios em superfícies
+     ausentes, bibliotecas, testes ou projetos de suporte;
+   - `ALL_FUNCTIONALITIES.md` segue exatamente
+     `Projeto/APP -> PAGE -> FUNCIONALIDADE -> ID | Quem | Onde | Quando | O quê`;
+   - existe uma tabela por funcionalidade, cada `RF-P` é único e liga a
+     `FNC`, requisito canónico, `AC` e prova;
+   - confirmação, validação, condição, ramo, leitura, mutação, operação
+     múltipla, sucesso parcial, atualização de UI, notificação, repetição,
+     concorrência, falha e recuperação material aparecem em linhas próprias;
+   - nenhuma linha usa ações/atores/locais/tempos genéricos sem identificar a
+     regra, fronteira, evento e efeito observável concretos.
 5. Confirma que o MVP contém uma jornada ponta a ponta coerente e pequena, com inclusões e exclusões explícitas.
 6. Confirma a viabilidade face ao `BoilerPlateAdvance` em `C:\Work\BoilerPlateAdvance`, orçamento, prazo, competências, dependências, legalidade, privacidade e acesso ao público. Limita-te a adequação e riscos; não escolhas ainda módulos ou topologia.
 7. Confirma que existe uma métrica de resultado, baseline ou método para a obter, meta, horizonte temporal, métricas de proteção e critério de continuar/parar.
-8. Atualiza em `PRODUCT_DEFINITION.md` DOR-01 a DOR-12 como `passou`, `falhou` ou `não verificável`, sempre com evidência e ação concreta.
+8. Produz uma reconciliação mecânica com contagens e listas de IDs para
+   `APP`, `PAGE`, `FNC`, `RF-P`, requisitos canónicos e `AC`; amostragem não
+   prova paridade.
+9. Atualiza em `PRODUCT_DEFINITION.md` DOR-01 a DOR-12 como `passou`, `falhou` ou `não verificável`, sempre com evidência e ação concreta.
 
 ## Regras bloqueantes
 
@@ -53,6 +74,13 @@ O Gate A não pode receber `GO` se ocorrer qualquer uma destas condições:
 - recomendação do prompt 01 diferente de `avançar`;
 - nome de trabalho ainda não aprovado pelo responsável de produto;
 - algum requisito `Must` sem fonte, aceitação observável, dependências ou aprovação;
+- `ALL_FUNCTIONALITIES.md` ausente, vazio ou fora do formato obrigatório;
+- qualquer `APP/PAGE/FNC/RF-P` ausente, duplicado, órfão ou divergente entre a
+  fonte canónica, contratos PAGE, checklist, ficheiro único e rastreabilidade;
+- uma funcionalidade comprime ramos/efeitos distintos numa linha composta ou
+  usa texto genérico que permite implementações incompatíveis;
+- um projeto/superfície não comprovado é apresentado como aplicação ativa, ou
+  uma biblioteca/API/job recebe uma página fictícia;
 - conflito material sobre dados, permissões, cobrança, retenção, contrato, legalidade, orçamento, prazo ou viabilidade;
 - métrica de resultado ou critério de continuar/parar ausente;
 - DOR-01 a DOR-12 sem estado `passou` e evidência;
@@ -104,8 +132,13 @@ Antes de concluir, assume que a definição é vaga e tenta demonstrá-lo:
 1. pede a um leitor sem contexto que explique o problema, público, jornada, âmbito e sucesso apenas a partir dos artefactos;
 2. procura linguagem não mensurável, requisitos compostos, fontes circulares, contradições e decisões sem owner;
 3. tenta encontrar um requisito `Must` que permita duas implementações incompatíveis e ainda assim “passe”;
-4. confirma que orçamento, prazo e competências suportam de forma plausível o MVP;
-5. verifica que a aprovação corresponde à versão atual, não a uma versão anterior.
+4. escolhe uma funcionalidade com confirmação, dois ramos, mutação e resultado
+   parcial; tenta reconstruí-la apenas pelas linhas `Quem/Onde/Quando/O quê`; se
+   precisares de inventar um passo, condição ou efeito, manda repetir o prompt 03;
+5. procura um controlo, resposta do sistema ou recuperação presente nos
+   contratos PAGE/fluxos e ausente do ficheiro único;
+6. confirma que orçamento, prazo e competências suportam de forma plausível o MVP;
+7. verifica que a aprovação corresponde à versão atual, não a uma versão anterior.
 
 Corrige apenas falhas documentais sustentadas pelas fontes. Se a correção exigir uma decisão de produto ou nova pesquisa, usa `REWORK`; não a inventes.
 
@@ -117,6 +150,8 @@ Apresenta:
 - decisão `GO`, `REWORK` ou `NO-GO`;
 - DOR-01 a DOR-12 com evidência;
 - contradições e lacunas encontradas;
+- contagens reconciliadas de `APP/PAGE/FNC/RF-P/requisitos/AC` e lista exata de
+  órfãos, duplicados ou divergências;
 - prompts que devem ser repetidos, quando aplicável;
 - ficheiros atualizados;
 - áreas não verificáveis e riscos residuais;

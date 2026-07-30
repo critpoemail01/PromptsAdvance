@@ -87,6 +87,7 @@ $traceabilityPath = Join-Path $Worktree 'requirements/REQUIREMENTS_TRACEABILITY.
 $applicationCatalogPath = Join-Path $Worktree 'requirements/APPLICATION_CATALOG.md'
 $pageCatalogPath = Join-Path $Worktree 'requirements/PAGE_CATALOG.md'
 $developerChecklistPath = Join-Path $Worktree 'requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md'
+$allFunctionalitiesPath = Join-Path $Worktree 'requirements/ALL_FUNCTIONALITIES.md'
 
 $requiredPaths = @(
     $metaPath,
@@ -101,7 +102,8 @@ $requiredPaths = @(
     $traceabilityPath,
     $applicationCatalogPath,
     $pageCatalogPath,
-    $developerChecklistPath
+    $developerChecklistPath,
+    $allFunctionalitiesPath
 )
 $allFilesPresent = $true
 foreach ($path in $requiredPaths) {
@@ -125,6 +127,7 @@ $traceability = Get-Content -Raw -Encoding UTF8 -LiteralPath $traceabilityPath
 $applicationCatalog = Get-Content -Raw -Encoding UTF8 -LiteralPath $applicationCatalogPath
 $pageCatalog = Get-Content -Raw -Encoding UTF8 -LiteralPath $pageCatalogPath
 $developerChecklist = Get-Content -Raw -Encoding UTF8 -LiteralPath $developerChecklistPath
+$allFunctionalities = Get-Content -Raw -Encoding UTF8 -LiteralPath $allFunctionalitiesPath
 $implementation = Get-Content -Raw -Encoding UTF8 -LiteralPath $implementationPath
 $productDefinition = Get-Content -Raw -Encoding UTF8 -LiteralPath $productDefinitionPath
 
@@ -198,7 +201,8 @@ $allRequirements = @(
     $pageCatalog,
     $applicationContracts,
     $pageContracts,
-    $developerChecklist
+    $developerChecklist,
+    $allFunctionalities
 ) -join "`n"
 
 Require-Pattern -Content $research -Pattern '(?is)compar.vel direto.*compar.vel direto' `
@@ -292,6 +296,55 @@ $catalogPageIds = @(
 foreach ($pageId in $catalogPageIds) {
     if ($developerChecklist -notmatch [regex]::Escape($pageId)) {
         Add-Issue "The developer checklist omits catalog page '$pageId'."
+    }
+    if ($allFunctionalities -notmatch [regex]::Escape($pageId)) {
+        Add-Issue "The single functionality file omits catalog page '$pageId'."
+    }
+}
+
+Require-Pattern -Content $allFunctionalities -Pattern '(?im)^#\s+[^\r\n|]+Client\.(?:Ssr|Web|Maui)[^\r\n]*APP-\d{3}' `
+    -Message 'The single functionality file does not group requirements by a real visible project and logical APP.'
+Require-Pattern -Content $allFunctionalities -Pattern '(?im)^##\s+[^\r\n]+PAGE-\d{3}\s+—\s+[^\r\n]+' `
+    -Message 'The single functionality file does not group requirements by PAGE.'
+Require-Pattern -Content $allFunctionalities -Pattern '(?im)^###\s+[^\r\n]+PAGE-\d{3}\s+—\s+FUNCIONALIDADE\s+\d{2}\s+\(FNC-[^)]+\)' `
+    -Message 'The single functionality file lacks named, numbered functionality sections.'
+Require-Pattern -Content $allFunctionalities -Pattern '(?im)^\|\s*ID\s*\|\s*Quem\s*\|\s*Onde\s*\|\s*Quando\s*\|\s*O qu.\s*\|$' `
+    -Message 'The single functionality file does not use the exact five-column table.'
+Require-Pattern -Content $allFunctionalities -Pattern '(?im)^\|\s*RF-P\d{3}-\d{2}-\d{2}\s*\|[^|\r\n]+\|[^|\r\n]+\|[^|\r\n]+\|[^|\r\n]+\|$' `
+    -Message 'The single functionality file has no valid atomic RF-P rows.'
+if ($allFunctionalities -match '(?im)^\|\s*RF-P[^|\r\n]*\|(?:[^|\r\n]*\|){3}\s*(?:validar (?:todas as )?entradas|processar (?:a )?funcionalidade|apresentar (?:o )?resultado)\s*[.;]?\s*\|$') {
+    Add-Issue 'The single functionality file contains a generic atomic row without a concrete rule or effect.'
+}
+
+$functionalityHeadingCount = [regex]::Matches(
+    $allFunctionalities,
+    '(?im)^###\s+[^\r\n]+PAGE-\d{3}\s+—\s+FUNCIONALIDADE\s+\d{2}\s+\(FNC-[^)]+\)'
+).Count
+$functionalityTableCount = [regex]::Matches(
+    $allFunctionalities,
+    '(?im)^\|\s*ID\s*\|\s*Quem\s*\|\s*Onde\s*\|\s*Quando\s*\|\s*O qu.\s*\|$'
+).Count
+if ($functionalityHeadingCount -ne $functionalityTableCount) {
+    Add-Issue "The single functionality file has $functionalityHeadingCount functionality headings but $functionalityTableCount five-column tables."
+}
+
+$atomicIds = @(
+    [regex]::Matches($allFunctionalities, '(?im)^\|\s*(RF-P\d{3}-\d{2}-\d{2})\s*\|') |
+        ForEach-Object { $_.Groups[1].Value }
+)
+$uniqueAtomicIds = @($atomicIds | Sort-Object -Unique)
+if ($atomicIds.Count -ne $uniqueAtomicIds.Count) {
+    Add-Issue 'The single functionality file contains duplicate RF-P identifiers.'
+}
+foreach ($atomicId in $uniqueAtomicIds) {
+    if (($specification + "`n" + $pageContracts) -notmatch [regex]::Escape($atomicId)) {
+        Add-Issue "Atomic requirement '$atomicId' is absent from the canonical detailed specification/PAGE contracts."
+    }
+    if ($traceability -notmatch [regex]::Escape($atomicId)) {
+        Add-Issue "Atomic requirement '$atomicId' is absent from traceability."
+    }
+    if ($developerChecklist -notmatch [regex]::Escape($atomicId)) {
+        Add-Issue "Atomic requirement '$atomicId' is absent from the developer checklist."
     }
 }
 

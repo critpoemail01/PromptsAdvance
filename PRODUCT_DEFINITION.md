@@ -117,9 +117,11 @@ Cada requisito `Must` deve ter ID estável, fonte, critério de aceitação
 observável, prioridade, dependências, `APP/PAGE` ou operação não visual e estado
 aprovado. Todas as aplicações e páginas/ecrãs do MVP devem ter contrato,
 estados aplicáveis, rastreabilidade e fatia downstream. A checklist do
-programador deve representar todos os `Must` sem alterar ou omitir a
-especificação detalhada. Uma lista de funcionalidades ou ecrãs sem estes
-elementos não satisfaz o gate.
+programador e `requirements/ALL_FUNCTIONALITIES.md` devem representar todos os
+`Must` sem alterar ou omitir a especificação detalhada. O ficheiro único deve
+decompor cada funcionalidade em linhas concretas `ID | Quem | Onde | Quando |
+O quê`, sem comprimir ramos ou efeitos materialmente distintos. Uma lista de
+funcionalidades ou ecrãs sem estes elementos não satisfaz o gate.
 
 ## 7. Métricas e validação
 
@@ -149,7 +151,7 @@ Decisões em aberto sobre problema, público, jornada principal, requisitos `Mus
 | DOR-03 | Alternativas, procura, acesso ao público e diferenciação foram validados sem confundir pressupostos com factos | pendente | A preencher | A preencher |
 | DOR-04 | Existe um nome de trabalho aprovado e a triagem realizada não encontrou conflito material | pendente | A preencher | A preencher |
 | DOR-05 | A jornada principal, o resultado, as aplicações, páginas/operações, o âmbito do MVP e as exclusões são inequívocos | pendente | A preencher | A preencher |
-| DOR-06 | Todos os requisitos `Must` e contratos `APP/PAGE` têm ID, fonte, critérios observáveis, estados, dependências, fatia downstream e aprovação; a checklist do programador tem paridade comprovada | pendente | A preencher | A preencher |
+| DOR-06 | Todos os requisitos `Must` e contratos `APP/PAGE` têm ID, fonte, critérios observáveis, estados, dependências, fatia downstream e aprovação; a checklist e `ALL_FUNCTIONALITIES.md` têm paridade comprovada, sem funcionalidades, ramos ou efeitos omitidos | pendente | A preencher | A preencher |
 | DOR-07 | Segurança, privacidade, acessibilidade, desempenho, operação e outras NFR materiais têm requisitos mensuráveis ou decisão bloqueante | pendente | A preencher | A preencher |
 | DOR-08 | Métrica de resultado, baseline/método, meta, horizonte e critério de continuar/parar estão definidos | pendente | A preencher | A preencher |
 | DOR-09 | Orçamento, prazo, competências e adequação ao `BoilerPlateAdvance` tornam o primeiro corte plausível | pendente | A preencher | A preencher |
