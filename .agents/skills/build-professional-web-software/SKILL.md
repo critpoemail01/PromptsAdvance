@@ -52,8 +52,9 @@ directory, then run the catalog entry point:
 ```
 
 Pass `-Owner` when the user supplied the product owner. Do not invent it; a
-brownfield lifecycle may start with the owner pending and prompt 01 must resolve
-that material input before Gate G01.
+brownfield lifecycle may start with the owner pending. Prompt 01 performs
+zero-input market discovery without asking for that owner; the owner must be
+resolved by prompt 04 before Gate G01.
 
 The command must:
 

@@ -17,6 +17,13 @@ Executa este piloto antes de concluir o Gate C e sempre que mudarem regras comun
 
 ### EVAL-01 — entrada material em falta
 
+Executa primeiro o prompt 01 numa iniciativa sem mercado, público, orçamento,
+prazo, equipa, modelo de receita ou restrições fornecidos pelo utilizador.
+Espera-se que não faça um questionário nem termine `blocked`: deve pesquisar
+online, explorar 12–20 espaços de problema, usar sinais atuais de procura,
+adoção, queixas e fragmentação, e entregar ranking, top 3 e recomendação com
+fontes e confiança. Não pode inventar métricas nem estimar orçamento/prazo.
+
 Executa o prompt 7 em `greenfield` sem nome técnico ou pasta de destino
 confirmada. Executa também `continue` com um `ProjectPath` inexistente e o
 prompt 7 em `brownfield` sem `[RAIZ_APLICACAO_EXISTENTE]`.
@@ -371,6 +378,17 @@ descartável que removeu o novo artefacto obrigatório falhou na regressão
 específica da checklist. `Test-ImplementationReadinessGate.ps1` bloqueou como
 esperado com sete lacunas de piloto/aprovação. Esta evidência valida estrutura e
 orquestração, não substitui a nova execução de EVAL-15 nem aprova G03.
+
+Na `catalogVersion` 2026-07-30.1`, o prompt 01 passou a executar descoberta
+zero-input: não pede mercado, público, orçamento, prazo, equipa, monetização ou
+restrições antes de começar. Pesquisa obrigatoriamente sinais atuais de procura,
+adoção, queixas, fragilidades e fragmentação; explora 12–20 espaços, compara as
+cinco melhores oportunidades e aprofunda três. Orçamento e prazo permanecem
+pendentes até existirem uma oportunidade concreta e requisitos suficientes,
+sendo validados no DOR-09 antes do Gate A. EVAL-01 deve confirmar que a ausência
+de preferências não bloqueia nem produz um questionário, métricas inventadas ou
+estimativas prematuras. A suite completa e a aprovação humana/independente
+permanecem pendentes.
 
 ## Referências
 

@@ -31,7 +31,8 @@ Não transformes todos os campos pendentes em bloqueio antecipado. Resolve apena
 
 | Gate/condição | Antes de | Campos mínimos confirmados |
 |---|---|---|
-| Entrada da descoberta | Prompts 1–4 | responsável, origem do boilerplate, mercados/limites relevantes, público ou hipóteses a validar e fontes de pesquisa |
+| Entrada autónoma da descoberta | Prompt 01 | origem do boilerplate e acesso a pesquisa online; mercado, público, modelo, equipa, orçamento, prazo e restrições podem permanecer pendentes |
+| Fecho da definição | Prompts 02–04 | oportunidade selecionada, responsável, mercados/limites relevantes, público, requisitos, orçamento, prazo, competências e decisões materiais exigidas pelo Gate A |
 | A — definição do produto | Prompts 5–6 | `PRODUCT_DEFINITION.md` aprovado, decisão `GO`, DOR-01 a DOR-12 passados com evidência e prompts 01–04 concluídos |
 | B — criação/adoção | Prompts 7–8 | Gate A válido, modo greenfield/brownfield, nomes técnico/público, requisitos `Must`, arquitetura, plataformas, módulos, threat model, origem/destino ou raiz existente, identificadores aplicáveis e destino GitHub quando autorizado |
 | C — implementação | Prompts 9–54 | repositório/commit-base, comandos reais, piloto aprovado, baseline profissional, ambientes, vertical slice atual e critérios de aceitação |

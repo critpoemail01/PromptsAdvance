@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-29.11 |
+| Catalog version | 2026-07-30.1 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -39,3 +39,9 @@ EVAL-15 e a suite completa. A versão 2026-07-29.11 acrescentou a vista derivada
 `DEVELOPER_REQUIREMENTS_CHECKLIST.md`, com requisitos organizados por página e
 funcionalidade e paridade obrigatória com a especificação detalhada. A nova
 saída e o oráculo associado exigem nova execução de EVAL-15 e dos 15 casos.
+A versão 2026-07-30.1 tornou o prompt 01 uma descoberta zero-input orientada a
+pesquisa online atual de procura, adoção, queixas, fragilidades e fragmentação.
+Mercado, público, equipa, monetização, restrições, orçamento e prazo deixaram de
+bloquear o arranque; orçamento e prazo transitam para o DOR-09 antes do Gate A.
+Esta alteração do comportamento de descoberta exige repetir EVAL-01 e a suite
+completa.
