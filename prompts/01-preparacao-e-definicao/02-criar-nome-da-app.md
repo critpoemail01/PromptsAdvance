@@ -18,6 +18,13 @@ Trata disponibilidade, preço, associações e sonoridade como observações dat
 
 ## Entradas e bloqueios
 
+Em `change-cycle`, lê `CHANGE_CONTROL.md` e a proposta aprovada. Se identidade,
+posicionamento, mercados e riscos de marca não estiverem afetados, não geres
+nomes nem repitas consultas voláteis sem necessidade: confirma a decisão
+existente, a ausência de impacto com evidência e regista `nome preservado` para
+este ciclo. Se o delta afetar naming, executa todo o prompt. Uma afirmação de
+“não afetado” sem análise de impacto é bloqueante.
+
 1. Confirma em `PRODUCT_DEFINITION.md` e `IMPLEMENTATION_STATUS.md` que o prompt 01 terminou com decisão `avançar` e deixou uma única oportunidade, problema, público, mercados, MVP preliminar e posicionamento rastreáveis.
 2. Resolve `[DESCRIÇÃO_DA_APP]`, `[PÚBLICO]`, `[MERCADOS]`, `[POSICIONAMENTO]`, idiomas materiais, palavras proibidas e `[CUSTO_MAXIMO_ANUAL_DOMINIO]`.
 3. O limite de custo tem de indicar valor, moeda, período e impostos, por exemplo `25 EUR + IVA por ano`. Não interpretes “barato” ou “não muito caro” como orçamento.

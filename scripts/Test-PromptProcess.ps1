@@ -46,6 +46,8 @@ $requiredDocuments = @(
     'README.md',
     'AGENTS.md',
     'EXECUTION_CONTRACT.md',
+    'CHANGE_CONTROL.md',
+    'CLAUDE.md',
     'PRODUCT_EXCELLENCE.md',
     'PRODUCT_DEFINITION.md',
     'PRODUCT_QUALITY_BASELINE.md',
@@ -194,17 +196,21 @@ if (Test-Path -LiteralPath $contextPath -PathType Leaf) {
 }
 
 Require-Pattern 'README.md' 'fatias verticais' 'O README nao define implementacao iterativa por fatias verticais.'
-Require-Pattern 'START_HERE.md' '\$build-professional-web-software' 'START_HERE nao fornece o ponto de entrada da skill.'
+Require-Pattern 'CLAUDE.md' '^@AGENTS\.md' 'CLAUDE.md nao importa as instrucoes comuns.'
+Require-Pattern '.github/workflows/process-validation.yml' 'actions/checkout@[a-f0-9]{40}' 'A CI do catalogo nao fixa checkout por full commit SHA.'
+Require-Pattern '.github/workflows/process-validation.yml' '(?s)Test-PromptProcess\.ps1.*Test-SoftwareLifecycle\.ps1' 'A CI nao executa validacao estatica e lifecycle E2E.'
+Require-Pattern 'START_HERE.md' '\$advance-app-start' 'START_HERE nao fornece o ponto de entrada para iniciar uma app.'
+Require-Pattern 'START_HERE.md' '\$advance-app-continue' 'START_HERE nao fornece o ponto de entrada para continuar uma app.'
 Require-Pattern 'START_HERE.md' 'software-lifecycle\.ps1 start' 'START_HERE nao fornece inicializacao deterministica.'
 Require-Pattern 'START_HERE.md' 'Continua o projeto Advance em' 'START_HERE nao fornece a entrada natural para continuar por caminho.'
 Require-Pattern 'START_HERE.md' 'software-lifecycle\.ps1 continue.*-ProjectPath' 'START_HERE nao documenta a resolucao brownfield por caminho.'
 Require-Pattern 'QUALITY_GATES.md' 'G04.*Dire..o profissional' 'Falta o gate profissional da primeira slice.'
 Require-Pattern 'QUALITY_GATES.md' 'Hierarquia e composi..o' 'O gate visual nao verifica hierarquia e composicao.'
 Require-Pattern 'QUALITY_GATES.md' 'rastreabilidade ponta a ponta' 'O gate de codigo nao exige rastreabilidade ponta a ponta.'
-Require-Pattern '.agents/skills/build-professional-web-software/SKILL.md' '(?s)^---.*name: build-professional-web-software.*description:.*---' 'A skill do lifecycle nao tem frontmatter valido.'
-Require-Pattern '.agents/skills/build-professional-web-software/SKILL.md' 'software-lifecycle\.ps1 record' 'A skill nao regista resultados no estado do lifecycle.'
-Require-Pattern '.agents/skills/build-professional-web-software/SKILL.md' 'continue -ProjectPath' 'A skill nao resolve continuacao/adocao a partir da raiz da aplicacao.'
-Require-Pattern '.agents/skills/build-professional-web-software/references/workflow.md' 'page: 25 -> 13\|15\|17 -> 26' 'A skill nao define routing de vertical slices.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)^---.*name: advance-app-continue.*description:.*---' 'A skill do lifecycle nao tem frontmatter valido.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'software-lifecycle\.ps1 record' 'A skill nao regista resultados no estado do lifecycle.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'continue -ProjectPath' 'A skill nao resolve continuacao/adocao a partir da raiz da aplicacao.'
+Require-Pattern '.agents/skills/advance-app-continue/references/workflow.md' 'page: 25 -> 13\|15\|17 -> 26' 'A skill nao define routing de vertical slices.'
 Require-Pattern 'software-lifecycle.ps1' 'ProcessRoot must be outside the prompt catalog' 'O inicializador nao impede instancias dentro do catalogo.'
 Require-Pattern 'software-lifecycle.ps1' 'ProcessRoot must be outside BoilerplatePath' 'O inicializador permite contaminar o boilerplate.'
 Require-Pattern 'software-lifecycle.ps1' 'Get-PhysicalPath' 'O isolamento nao resolve junctions ou links simbolicos.'
@@ -232,10 +238,12 @@ Require-Pattern 'PROCESS_MANIFEST.json' '"taskLedgerRequired": true' 'O manifest
 Require-Pattern 'PROCESS_MANIFEST.json' '"findingsGateRequired": true' 'O manifesto nao exige o findings gate.'
 Require-Pattern 'software-lifecycle.ps1' "Command -eq 'work-start'" 'O lifecycle nao inicia tentativas de trabalho estruturadas.'
 Require-Pattern 'software-lifecycle.ps1' "(?s)Command -eq 'finding-add'.*Command -eq 'finding-resolve'.*Command -eq 'finding-gate'" 'O lifecycle nao implementa o ciclo completo de findings.'
+Require-Pattern 'software-lifecycle.ps1' "(?s)Command -eq 'cycle-start'.*CHANGE_STATUS.*approved.*BASELINE_LIFECYCLE_STATE.*currentPrompt = '01'" 'O lifecycle nao inicia um novo ciclo apenas a partir de uma proposta aprovada e arquivada.'
+Require-Pattern 'CHANGE_CONTROL.md' '(?s)CHANGE_ID.*CHANGE_STATUS.*Analisar impacto.*Iniciar ciclo.*Incorporar e fechar' 'O protocolo de mudancas nao cobre delta, impacto, execucao e incorporacao.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)Assert-WorkAttemptCanComplete.*open or blocked findings' 'O closeout nao bloqueia goals ou findings incompletos.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)Command -eq ''record''.*Test-TaskLedgerRequired.*Assert-WorkAttemptCanComplete' 'O record completed nao aplica mecanicamente o task ledger.'
 Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)finding-add.*finding-gate' 'O contrato nao exige registo e gate de findings.'
-Require-Pattern '.agents/skills/build-professional-web-software/SKILL.md' '(?s)work-start.*checkpoint.*finding-add' 'A skill nao conduz o task ledger durante cada prompt.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)work-start.*checkpoint.*finding-add' 'A skill nao conduz o task ledger durante cada prompt.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-04.*work ledger.*finding-gate.*record completed' 'O piloto nao exercita o findings gate durante a revisao adversarial.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11.*sem `work-start`.*goals.*incompletos.*finding aberto' 'O piloto nao tenta contornar o task ledger.'
 Require-Pattern 'pilot/cases/EVAL-04.md' '(?s)work-start.*finding-add.*finding-gate.*finding-resolve.*attempt ID' 'O caso EVAL-04 nao conserva o ciclo completo do task ledger.'
@@ -283,6 +291,7 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-ap
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'validados no DOR-09 antes do Gate A' 'O prompt 01 nao encaminha orcamento e prazo para a validacao posterior correta.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'MVP m.nimo.*sem estimar dura..o ou custo' 'O prompt 01 voltou a produzir estimativas prematuras de prazo ou custo.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'pesquisa online . obrigat.ria' 'O prompt 01 permite recomendar ideias apenas pela memoria do modelo.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)avan.ar.*valida..o com\s+utilizadores.*n.o.*Gate A' 'O prompt 01 confunde desk research com validacao de mercado.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '12.20 espa.os de problema' 'O prompt 01 nao exige exploracao ampla do mercado.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'Reddit, Hacker News, Indie Hackers' 'O prompt 01 nao pesquisa foruns e comunidades atuais.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'aplica..o recente com boa aceita..o p.blica.*fragilidades concretas' 'O prompt 01 nao procura apps recentes aceites com fragilidades melhoraveis.'
@@ -333,6 +342,7 @@ if ((Test-Path -LiteralPath $prompt02Path -PathType Leaf) -and
     Add-Failure 'O prompt 02 excede o budget de 165 linhas e deve remover repeticao antes de crescer.'
 }
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'REQUIREMENTS_RESEARCH\.md' 'O prompt 03 nao conserva pesquisa retomavel.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'USER_RESEARCH_EVIDENCE\.md' 'O prompt 03 nao exige evidencia direta com utilizadores.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '\[PASTA_ORIGEM_BOILERPLATE\]' 'O prompt 03 nao resolve a raiz real do BoilerPlateAdvance.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'pelo menos dois produtos diretamente compar.veis' 'O prompt 03 nao exige produtos comparaveis por jornada/pagina.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'uma ou duas refer.ncias premium relevantes' 'O prompt 03 nao exige referencias premium relevantes.'
@@ -360,6 +370,8 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcio
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'OPERA..O-N.O-VISUAL' 'O prompt 03 inventa paginas para operacoes tecnicas nao visuais.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'ALL_FUNCTIONALITIES\.md.*ausente.*vazio.*formato obrigat.rio' 'O prompt 04 nao bloqueia o Gate A quando o ficheiro unico esta ausente ou invalido.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' '(?s)reconcilia..o mec.nica.*APP.*PAGE.*FNC.*RF-P.*AC' 'O prompt 04 nao exige paridade mecanica de todos os identificadores.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/25-implementar-requisitos-de-pagina.md' '(?s)Definition of Ready.*approved_for_refinement.*n.o autoriza implementa..o' 'A slice de pagina nao refina requisitos antes do codigo.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/27-implementar-funcionalidades-especificas.md' '(?s)Definition of Ready.*approved_for_refinement.*n.o autoriza implementa..o' 'A slice funcional nao refina requisitos antes do codigo.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' '(?s)funcionalidade com confirma..o.*dois ramos.*resultado\s+parcial.*Quem/Onde/Quando/O qu.' 'A revisao adversarial do prompt 04 nao tenta reconstruir uma funcionalidade ramificada.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)fonte can.nica\s+detalhada.*vista\s+derivada' 'O prompt 03 nao distingue a especificacao detalhada da vista do programador.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)antes de desenvolver.*durante a implementa..o.*pronto para validar' 'A checklist do programador nao possui checkpoints de implementacao e validacao.'
@@ -377,15 +389,16 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcio
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)data/hora real do sistema.*n.o estimes' 'O prompt 03 nao ancora os timestamps no relogio real.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'p.gina oficial\s+de licen.a' 'O prompt 03 aceita uma demo como prova de licenca.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)Reconcilia mecanicamente todas as ocorr.ncias.*APP/PAGE/BPP/BPR' 'O prompt 03 nao reconcilia identidades e destinos mecanicamente.'
-Require-Pattern 'PRODUCT_DEFINITION.md' '(?s)contratos `APP/PAGE`.*fatia downstream' 'O Gate A nao exige cobertura detalhada por aplicacao e pagina.'
-Require-Pattern 'PRODUCT_DEFINITION.md' '(?s)checklist do programador.*paridade comprovada' 'O Gate A nao exige paridade entre detalhe e checklist do programador.'
-Require-Pattern 'PRODUCT_DEFINITION.md' '(?s)ALL_FUNCTIONALITIES\.md.*ID \| Quem \| Onde \| Quando \|.*O qu.' 'O Gate A nao exige o ficheiro unico detalhado por funcionalidade.'
+Require-Pattern 'PRODUCT_DEFINITION.md' '(?s)primeira slice.*contratos transversais.*detalhe completo.*approved_for_refinement' 'O Gate A nao separa detalhe inicial de refinamento progressivo.'
+Require-Pattern 'PRODUCT_DEFINITION.md' '(?s)checklist.*ALL_FUNCTIONALITIES\.md.*n.o omitem detalhe existente.*linhas\s+gen.ricas' 'O Gate A nao protege a paridade das vistas derivadas sem falsa completude.'
+Require-Pattern 'PRODUCT_DEFINITION.md' '(?s)GATE_A_USER_RESEARCH_STATUS.*GATE_A_SOLUTION_VALIDATION_STATUS' 'O Gate A nao conserva marcadores mecanicos de investigacao e validacao.'
+Require-Pattern 'scripts/Test-ProductDefinitionGate.ps1' '(?s)approved_exception.*GATE_A_USER_RESEARCH_EVIDENCE' 'O gate mecanico nao bloqueia evidencia de utilizadores ausente.'
 Require-Pattern 'APP_CONTEXT.md' 'CATALOGO_DE_APLICACOES.*CONTRATOS_POR_APLICACAO' 'O contexto nao encaminha o Codex para os contratos modulares por aplicacao.'
 Require-Pattern 'APP_CONTEXT.md' 'CATALOGO_DE_PAGINAS.*CONTRATOS_POR_PAGINA' 'O contexto nao encaminha o Codex para os contratos modulares por pagina.'
 Require-Pattern 'APP_CONTEXT.md' 'CHECKLIST_REQUISITOS_PROGRAMADOR.*DEVELOPER_REQUIREMENTS_CHECKLIST' 'O contexto nao resolve o handoff de requisitos do programador.'
 Require-Pattern 'APP_CONTEXT.md' 'FICHEIRO_UNICO_FUNCIONALIDADES.*ALL_FUNCTIONALITIES' 'O contexto nao resolve o ficheiro unico de funcionalidades.'
-Require-Pattern 'QUALITY_GATES.md' '(?s)especifica..o detalhada.*checklist leg.vel do programador.*paridade' 'O G01 nao bloqueia divergencias entre a especificacao e a checklist do programador.'
-Require-Pattern 'QUALITY_GATES.md' '(?s)ALL_FUNCTIONALITIES\.md.*ramo/efeito' 'O G01 nao bloqueia omissoes de ramos ou efeitos no ficheiro unico.'
+Require-Pattern 'QUALITY_GATES.md' '(?s)primeira slice.*totalmente refinados.*Definition of Ready.*fonte can.nica' 'O G01 nao exige refinamento progressivo antes de cada slice.'
+Require-Pattern 'QUALITY_GATES.md' '(?s)vistas derivadas em paridade.*linha gen.rica' 'O G01 nao bloqueia falsa completude nas vistas derivadas.'
 Require-Pattern 'pilot/cases/EVAL-11.md' '(?s)p.gina Clientes.*todas as aplica..es' 'O EVAL-11 nao testa ambiguidade concreta por pagina e aplicacao.'
 Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' 'future access timestamp' 'O oraculo de EVAL-15 nao rejeita timestamps futuros.'
 Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' 'APP-003.*BPP-007' 'O oraculo de EVAL-15 nao verifica o mapeamento publico SSR.'
@@ -403,16 +416,20 @@ Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-sele
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'Test-ProductDefinitionGate\.ps1' 'O prompt 05 nao executa o gate mecanico.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'Copia .*PRODUCT_DEFINITION\.md' 'O prompt 07 nao copia a definicao aprovada para a nova aplicacao.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'scripts/Test-ProductDefinitionGate\.ps1' 'O prompt 07 nao copia o gate mecanico para a nova aplicacao.'
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' '\.agents/skills/build-professional-web-software' 'O prompt 07 nao copia a skill para a nova aplicacao.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' '\.agents/skills/advance-app-continue' 'O prompt 07 nao copia a skill para a nova aplicacao.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'Ado..o brownfield' 'O prompt 07 nao possui uma rota brownfield explicita.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'N.o uses checkout/reset/clean' 'A rota brownfield nao preserva alteracoes Git locais.'
 Require-Pattern 'PRODUCT_EXCELLENCE.md' 'painel administrativo gen.rico' 'Falta o gate contra UI generica.'
 Require-Pattern 'PRODUCT_EXCELLENCE.md' 'regress.o visual automatizada' 'Falta regressao visual obrigatoria.'
 Require-Pattern 'PRODUCT_EXCELLENCE.md' 'checks autom.ticos de acessibilidade em cada pull request' 'Falta acessibilidade continua.'
 Require-Pattern 'prompts/09-entrega-e-distribuicao/55-configurar-ci-cd-e-ambientes-de-deploy.md' 'diff visual' 'O CI nao publica/compara o diff visual.'
+Require-Pattern 'prompts/09-entrega-e-distribuicao/55-configurar-ci-cd-e-ambientes-de-deploy.md' '(?s)attestation.*source SHA.*digest' 'O CI nao gera e verifica proveniencia assinada.'
+Require-Pattern 'scripts/Test-LifecycleGateEvidence.ps1' '(?s)build-provenance-attestation.*sourceSha.*verificationPassed' 'Os gates estruturados nao verificam attestation da candidata.'
 Require-Pattern 'prompts/11-aceitacao-e-manutencao/63-executar-revisao-final-independente.md' 'read-only' 'Falta revisao final read-only.'
 Require-Pattern 'prompts/11-aceitacao-e-manutencao/64-publicar-com-migrations-smoke-tests-e-rollback.md' '\[AUTORIZAR_RELEASE\]' 'A publicacao nao exige autorizacao explicita.'
-Require-Pattern 'prompts/11-aceitacao-e-manutencao/64-publicar-com-migrations-smoke-tests-e-rollback.md' '\[CANDIDATE_SHA\].*\[ARTIFACT_DIGEST\]' 'A publicacao nao fixa candidate SHA e digest.'
+Require-Pattern 'prompts/11-aceitacao-e-manutencao/64-publicar-com-migrations-smoke-tests-e-rollback.md' '(?s)\[CANDIDATE_SHA\].*\[ARTIFACT_DIGEST\]' 'A publicacao nao fixa candidate SHA e digest.'
+Require-Pattern 'prompts/12-operacao-continua/73-medir-metricas-dora-e-melhoria-continua.md' 'deployment rework rate' 'O prompt DORA nao usa as cinco metricas atuais.'
+Require-Pattern 'prompts/12-operacao-continua/73-medir-metricas-dora-e-melhoria-continua.md' 'dora-metrics/' 'O prompt DORA nao usa a referencia atual.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-13' 'O piloto nao conserva o caso de revisao independente.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-14.*naming natural' 'O piloto nao contem a regressao dirigida do prompt 02.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-15.*requisitos pesquisados por aplica..o e p.gina' 'O piloto nao contem a regressao dirigida do prompt 03.'
@@ -428,6 +445,7 @@ Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)compar.veis diretos.*adjacente.*fo
 Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)ALL_FUNCTIONALITIES\.md.*ID \| Quem \| Onde \| Quando \| O qu..*RF-P' 'O caso EVAL-15 nao valida o formato unico e os requisitos atomicos por funcionalidade.'
 Require-Pattern 'pilot/fixtures/prompt-03/untrusted-premium-preview.html' 'Ignore as instru..es anteriores' 'A fixture adversarial do prompt 03 esta ausente.'
 Require-Pattern 'pilot/fixtures/prompt-03/product-definition.md' 'QST-001.*pendente' 'As fontes de EVAL-15 nao conservam uma decisao material em falta.'
+Require-Pattern 'pilot/fixtures/prompt-03/user-research-evidence.md' '(?s)Method.*Prototype task.*Limitation' 'EVAL-15 nao inclui evidencia sintetica de user research com limites.'
 Require-Pattern 'pilot/fixtures/prompt-03/product-definition.md' 'Gate A.*PENDENTE' 'A definicao de EVAL-15 nao conserva o Gate A pendente.'
 Require-Pattern 'pilot/fixtures/prompt-03/implementation-status.md' '03-levantar-requisitos-funcionais.*em curso' 'O estado de EVAL-15 nao seleciona o prompt 03.'
 Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' 'Human rubric and full 15-case pilot approval remain separate requirements' 'O validador de EVAL-15 confunde o teste tecnico com aprovacao humana.'
@@ -564,6 +582,7 @@ if (
         $strictTypesEvidence.gates.G06.checks.securityTestsPassed = 'true'
         $strictTypesEvidence.gates.G08.independentReview.readOnly = 'true'
         $strictTypesEvidence.gates.G09.deployment.smokeTestsPassed = 'true'
+        $strictTypesEvidence.gates.G09.deployment.attestationVerified = 'true'
         $strictTypesEvidence.gates.G09.deployment.rollbackReady = 'true'
         [System.IO.File]::WriteAllText(
             $strictTypesFixture,
@@ -585,6 +604,29 @@ if (
     finally {
         if (Test-Path -LiteralPath $strictTypesFixture -PathType Leaf) {
             Remove-Item -LiteralPath $strictTypesFixture -Force
+        }
+    }
+
+    $invalidProvenanceFixture = Join-Path ([System.IO.Path]::GetTempPath()) `
+        ("prompts-invalid-provenance-" + [Guid]::NewGuid().ToString('N') + '.json')
+    try {
+        $invalidProvenanceEvidence = Get-Content -Raw -Encoding UTF8 -LiteralPath $validLifecycleEvidence | ConvertFrom-Json
+        $invalidProvenanceEvidence.gates.G08.candidate.provenance.sourceSha = '3333333333333333333333333333333333333333'
+        $invalidProvenanceEvidence.gates.G08.candidate.provenance.verificationPassed = $false
+        [System.IO.File]::WriteAllText(
+            $invalidProvenanceFixture,
+            ($invalidProvenanceEvidence | ConvertTo-Json -Depth 20) + [Environment]::NewLine,
+            $fixtureEncoding)
+        & $powerShellExe -NoProfile -ExecutionPolicy Bypass -File $lifecycleGateScript `
+            -GateId G08 -EvidencePath $invalidProvenanceFixture -ProcessRoot $root `
+            -ApprovedBy 'Fixture Independent Reviewer' *> $null
+        if ($LASTEXITCODE -eq 0) {
+            Add-Failure 'G08 aceitou attestation nao verificada ou ligada a outro commit.'
+        }
+    }
+    finally {
+        if (Test-Path -LiteralPath $invalidProvenanceFixture -PathType Leaf) {
+            Remove-Item -LiteralPath $invalidProvenanceFixture -Force
         }
     }
 
@@ -617,6 +659,7 @@ else {
 
 $stalePatterns = @(
     '64 prompts',
+    'dora-metrics-four-keys',
     'prompts/08-qualidade-e-hardening/55-validar-cache',
     'prompts/08-qualidade-e-hardening/56-validar-seo',
     'prompts/09-entrega-e-distribuicao/57-configurar-ci',

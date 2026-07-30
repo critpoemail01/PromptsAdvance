@@ -10,6 +10,11 @@ Recebe IDs estáveis e `[FORA_DO_AMBITO]`. Se o pedido abranger várias rotas ou
 
 ## Preparação
 
+0. Executa o Definition of Ready da slice: cada ID selecionado tem fonte,
+   aprovação, comportamento/estados, `RF-P`, `AC`, dados, permissões,
+   dependências e prova. Atualiza primeiro a especificação canónica e reconcilia
+   checklist/`ALL_FUNCTIONALITIES.md`. Se exigir decisão de produto, bloqueia
+   antes de código; `approved_for_refinement` não autoriza implementação.
 1. Confirma a superfície: `Client.Ssr`, `Client.Web`/`Client.Core` ou `Client.Maui`.
 2. Reproduz o estado atual e identifica layout, componentes, serviços, endpoint, modelo, policy e testes relacionados.
 3. Aplica o `PRODUCT_EXCELLENCE.md` ao padrão principal da página. Compara jornadas equivalentes de produtos profissionais e referências premium, adaptando apenas o que melhorar os critérios desta rota.

@@ -15,6 +15,8 @@ Não uses este documento como espaço para ideias soltas. Cada afirmação mater
 | Aprovador | A preencher |
 | Data da decisão | A preencher |
 | Evidência da aprovação | A preencher |
+| Investigação direta do problema | pendente |
+| Validação da solução | pendente |
 
 Registo de controlo lido pelo gate automático; mantém-no sincronizado com a tabela:
 
@@ -26,6 +28,10 @@ GATE_A_PRODUCT_OWNER: PENDENTE
 GATE_A_APPROVER: PENDENTE
 GATE_A_DECISION_DATE: PENDENTE
 GATE_A_APPROVAL_EVIDENCE: PENDENTE
+GATE_A_USER_RESEARCH_STATUS: PENDENTE
+GATE_A_USER_RESEARCH_EVIDENCE: PENDENTE
+GATE_A_SOLUTION_VALIDATION_STATUS: PENDENTE
+GATE_A_SOLUTION_VALIDATION_EVIDENCE: PENDENTE
 ```
 
 Estados permitidos para o documento: `rascunho`, `em validação`, `aprovado` ou `rejeitado`.
@@ -57,6 +63,8 @@ Decisões permitidas para o Gate A:
 | Job to be done principal | A preencher | A preencher | pendente |
 | Contexto de utilização | A preencher | A preencher | pendente |
 | Acesso plausível ao público | A preencher | A preencher | pendente |
+| Evidência direta do problema com utilizadores | A preencher | `requirements/USER_RESEARCH_EVIDENCE.md` | pendente |
+| Representatividade, método e limitações | A preencher | `requirements/USER_RESEARCH_EVIDENCE.md` | pendente |
 
 ## 3. Proposta de valor e diferenciação
 
@@ -113,15 +121,15 @@ Liga aqui a especificação e a matriz produzidas pelo prompt 03.
 | Atores e permissões iniciais | A preencher | pendente |
 | Dados sensíveis e obrigações conhecidas | A preencher | pendente |
 
-Cada requisito `Must` deve ter ID estável, fonte, critério de aceitação
-observável, prioridade, dependências, `APP/PAGE` ou operação não visual e estado
-aprovado. Todas as aplicações e páginas/ecrãs do MVP devem ter contrato,
-estados aplicáveis, rastreabilidade e fatia downstream. A checklist do
-programador e `requirements/ALL_FUNCTIONALITIES.md` devem representar todos os
-`Must` sem alterar ou omitir a especificação detalhada. O ficheiro único deve
-decompor cada funcionalidade em linhas concretas `ID | Quem | Onde | Quando |
-O quê`, sem comprimir ramos ou efeitos materialmente distintos. Uma lista de
-funcionalidades ou ecrãs sem estes elementos não satisfaz o gate.
+Cada requisito `Must` da release deve ter ID estável, fonte, resultado,
+critério de aceitação, prioridade, dependências, owner e slice candidata. A
+primeira slice e contratos transversais de alto risco exigem detalhe completo
+por `APP/PAGE`, estados e `RF-P`. Slices posteriores podem permanecer
+`approved_for_refinement`, nunca `implementation_ready`, até o prompt 25/27
+executar o Definition of Ready, atualizar a fonte canónica e reconciliar a
+checklist e `requirements/ALL_FUNCTIONALITIES.md`. Estas vistas representam
+apenas obrigações aprovadas: não omitem detalhe existente nem usam linhas
+genéricas para simular completude.
 
 ## 7. Métricas e validação
 
@@ -132,6 +140,8 @@ funcionalidades ou ecrãs sem estes elementos não satisfaz o gate.
 | Meta e horizonte temporal | A preencher | A preencher | pendente |
 | Métricas de proteção | A preencher | A preencher | pendente |
 | Experimento anterior à implementação | A preencher | A preencher | pendente |
+| Resultado do teste de conceito/protótipo | A preencher | `requirements/USER_RESEARCH_EVIDENCE.md` | pendente |
+| Exceção de investigação, quando aplicável | Risco, owner, prazo, plano e aprovador | A preencher | pendente |
 | Critério para continuar/parar | A preencher | A preencher | pendente |
 
 ## 8. Riscos, pressupostos e decisões
@@ -148,12 +158,12 @@ Decisões em aberto sobre problema, público, jornada principal, requisitos `Mus
 |---|---|---|---|---|
 | DOR-01 | Existe um único problema principal, específico e sustentado por evidência atual | pendente | A preencher | A preencher |
 | DOR-02 | Público, segmento inicial, contexto e job to be done estão concretamente definidos | pendente | A preencher | A preencher |
-| DOR-03 | Alternativas, procura, acesso ao público e diferenciação foram validados sem confundir pressupostos com factos | pendente | A preencher | A preencher |
+| DOR-03 | Alternativas, procura, acesso e diferenciação têm pesquisa atual e evidência direta do problema com utilizadores representativos, ou exceção aprovada com risco, owner, prazo e plano | pendente | A preencher | A preencher |
 | DOR-04 | Existe um nome de trabalho aprovado e a triagem realizada não encontrou conflito material | pendente | A preencher | A preencher |
 | DOR-05 | A jornada principal, o resultado, as aplicações, páginas/operações, o âmbito do MVP e as exclusões são inequívocos | pendente | A preencher | A preencher |
-| DOR-06 | Todos os requisitos `Must` e contratos `APP/PAGE` têm ID, fonte, critérios observáveis, estados, dependências, fatia downstream e aprovação; a checklist e `ALL_FUNCTIONALITIES.md` têm paridade comprovada, sem funcionalidades, ramos ou efeitos omitidos | pendente | A preencher | A preencher |
+| DOR-06 | Todos os `Must` da release têm ID, fonte, resultado, aceitação, owner e slice; primeira slice/alto risco estão detalhados e as vistas derivadas têm paridade; restantes estão explicitamente `approved_for_refinement`, não falsamente prontos | pendente | A preencher | A preencher |
 | DOR-07 | Segurança, privacidade, acessibilidade, desempenho, operação e outras NFR materiais têm requisitos mensuráveis ou decisão bloqueante | pendente | A preencher | A preencher |
-| DOR-08 | Métrica de resultado, baseline/método, meta, horizonte e critério de continuar/parar estão definidos | pendente | A preencher | A preencher |
+| DOR-08 | Métrica, baseline, meta, horizonte e critério de continuar/parar estão definidos e a solução foi testada antes da implementação, ou existe exceção aprovada e limitada | pendente | A preencher | A preencher |
 | DOR-09 | Orçamento, prazo, competências e adequação ao `BoilerPlateAdvance` tornam o primeiro corte plausível | pendente | A preencher | A preencher |
 | DOR-10 | Não existem conflitos ou decisões materiais em aberto; exceções reversíveis têm owner, prazo e teste | pendente | A preencher | A preencher |
 | DOR-11 | Os prompts 01, 02, 03 e 04 têm estado e evidências registados em `IMPLEMENTATION_STATUS.md` | pendente | A preencher | A preencher |

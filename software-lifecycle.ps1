@@ -4,7 +4,8 @@ param(
     [ValidateSet(
         'start', 'adopt', 'continue', 'status', 'next', 'select', 'decide',
         'gate', 'record', 'validate', 'work-start', 'checkpoint', 'verify',
-        'finding-add', 'finding-resolve', 'finding-gate', 'closeout')]
+        'finding-add', 'finding-resolve', 'finding-gate', 'closeout',
+        'cycle-start')]
     [string]$Command,
 
     [string]$Name,
@@ -52,7 +53,9 @@ param(
     [string]$Severity,
     [string]$Source,
     [string]$Location,
-    [string]$ResolutionEvidence
+    [string]$ResolutionEvidence,
+
+    [string]$ChangeId
 )
 
 Set-StrictMode -Version Latest
@@ -705,6 +708,7 @@ function Set-GateSnapshot {
             authorizationSha256 = Get-ObjectSha256 -Value $gateEvidence.authorization
             candidateSha = [string]$gateEvidence.authorization.candidateSha
             artifactDigest = [string]$gateEvidence.authorization.artifactDigest
+            attestationDigest = [string]$gateEvidence.authorization.attestationDigest
             environment = [string]$gateEvidence.authorization.environment
             releaseWindow = [string]$gateEvidence.authorization.releaseWindow
             authorizedByIdentity = [string]$gateEvidence.authorization.authorizedByIdentity
@@ -722,6 +726,7 @@ function Set-GateSnapshot {
         $snapshot['baseSha'] = [string]$gateEvidence.candidate.baseSha
         $snapshot['candidateSha'] = [string]$gateEvidence.candidate.candidateSha
         $snapshot['artifactDigest'] = [string]$gateEvidence.candidate.artifactDigest
+        $snapshot['attestationDigest'] = [string]$gateEvidence.candidate.provenance.attestationDigest
         $snapshot['reviewerIdentity'] = [string]$gateEvidence.independentReview.reviewerIdentity
         $snapshot['independentTaskId'] = [string]$gateEvidence.independentReview.taskId
     }
@@ -762,7 +767,7 @@ function Test-GateSnapshot {
         if ($authorizationHash -ne [string]$gateState.snapshot.authorizationSha256) {
             throw 'G09 release authorization changed after approval.'
         }
-        foreach ($field in @('candidateSha', 'artifactDigest', 'environment', 'releaseWindow', 'authorizedByIdentity', 'authorizedAt')) {
+        foreach ($field in @('candidateSha', 'artifactDigest', 'attestationDigest', 'environment', 'releaseWindow', 'authorizedByIdentity', 'authorizedAt')) {
             if ([string]$gateEvidence.authorization.$field -ne [string]$gateState.snapshot.$field) {
                 throw "G09 immutable authorization field changed: $field."
             }
@@ -1013,7 +1018,7 @@ Source: $relativePrompt
 
 ## Execution contract
 
-Use `$build-professional-web-software`.
+Use `$advance-app-continue`.
 Execute only this prompt in this task.
 Read AGENTS.md and every mandatory document it references before acting.
 Resolve material inputs from APP_CONTEXT.md, approved decisions and repository evidence.
@@ -1151,6 +1156,16 @@ function Test-Lifecycle {
     }
     if ($state.status -notin @('ready', 'partial', 'blocked', 'waiting_decision', 'completed')) {
         $issues.Add("Invalid lifecycle status: $($state.status).")
+    }
+    if ($null -eq $state.PSObject.Properties['cycleNumber'] -or [int]$state.cycleNumber -lt 1) {
+        $issues.Add('State cycleNumber is missing or invalid.')
+    }
+    if ($null -ne $state.PSObject.Properties['activeChange'] -and $null -ne $state.activeChange) {
+        if ([string]$state.activeChange.id -notmatch '^CHG-\d{4,}$' -or
+            [string]::IsNullOrWhiteSpace([string]$state.activeChange.proposal) -or
+            [string]$state.activeChange.status -notin @('in_progress', 'completed')) {
+            $issues.Add('State activeChange is malformed.')
+        }
     }
     foreach ($historyItem in @($state.history)) {
         $historyTime = $(if ($null -eq $historyItem.PSObject.Properties['at']) {
@@ -1723,6 +1738,8 @@ function New-LifecycleInstance {
     foreach ($file in @(
         'AGENTS.md',
         'APP_CONTEXT.md',
+        'CHANGE_CONTROL.md',
+        'CLAUDE.md',
         'EXECUTION_CONTRACT.md',
         'IMPLEMENTATION_STATUS.md',
         'LIFECYCLE_GATE_EVIDENCE.json',
@@ -1828,6 +1845,8 @@ function New-LifecycleInstance {
         createdAt = [DateTimeOffset]::Now.ToString('o')
         updatedAt = [DateTimeOffset]::Now.ToString('o')
         status = 'ready'
+        cycleNumber = 1
+        activeChange = $null
         currentStage = '01'
         currentPrompt = '01'
         nextAction = 'execute_prompt'
@@ -1953,7 +1972,7 @@ if ($Command -in @('start', 'adopt', 'continue')) {
             Write-Host " - Current stage/prompt: $($existingState.currentStage)/$($existingState.currentPrompt)"
             Write-Host " - Status: $($existingState.status)"
             Write-Host " - Next task: $existingPacket"
-            Write-Host " - Prompt: Use `$build-professional-web-software and execute NEXT_TASK.md."
+            Write-Host " - Prompt: Use `$advance-app-continue and execute NEXT_TASK.md."
             exit 0
         }
     }
@@ -2033,7 +2052,7 @@ if ($Command -in @('start', 'adopt', 'continue')) {
     }
     Write-Host " - Process: $($instance.Root)"
     Write-Host " - Next task: $($instance.Packet)"
-    Write-Host " - Prompt: Use `$build-professional-web-software and execute NEXT_TASK.md."
+    Write-Host " - Prompt: Use `$advance-app-continue and execute NEXT_TASK.md."
     exit 0
 }
 
@@ -2057,6 +2076,180 @@ if ($Command -eq 'validate') {
 
 if (-not (Test-Lifecycle -Root $ProcessRoot -Quiet -SkipExternalGateValidators)) {
     throw 'Lifecycle validation failed before command execution; run validate for details. No state was changed.'
+}
+
+if ($Command -eq 'cycle-start') {
+    Require-SafeText -Value $ChangeId -Label 'ChangeId'
+    Require-SafeText -Value $Evidence -Label 'Evidence'
+    if ($ChangeId -notmatch '^CHG-\d{4,}$') {
+        throw 'ChangeId must use CHG- followed by at least four digits.'
+    }
+    if ($state.status -ne 'completed' -or
+        -not [string]::IsNullOrWhiteSpace([string]$state.currentPrompt) -or
+        $null -ne (Get-ActiveWorkAttempt -State $state -AllowMissing)) {
+        throw "cycle-start requires a completed idle lifecycle; found status '$($state.status)'."
+    }
+    $g10 = Get-GateState -State $state -Id 'G10'
+    if ($g10.status -ne 'passed') {
+        throw "cycle-start requires G10 passed; found '$($g10.status)'."
+    }
+    if ([System.IO.Path]::IsPathRooted($Evidence)) {
+        throw 'Evidence must be a path relative to ProcessRoot.'
+    }
+    $proposalPath = [System.IO.Path]::GetFullPath((Join-Path $ProcessRoot $Evidence))
+    $rootPrefix = $ProcessRoot + [System.IO.Path]::DirectorySeparatorChar
+    if (-not $proposalPath.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Change proposal evidence escapes ProcessRoot.'
+    }
+    if (-not (Test-Path -LiteralPath $proposalPath -PathType Leaf)) {
+        throw "Approved change proposal is missing: $Evidence"
+    }
+    $proposal = Get-Content -Raw -Encoding UTF8 -LiteralPath $proposalPath
+    $proposalMarkers = @{}
+    foreach ($markerName in @(
+        'CHANGE_ID', 'CHANGE_STATUS', 'CHANGE_OWNER', 'CHANGE_APPROVER',
+        'CHANGE_BASELINE', 'CHANGE_CREATED_AT', 'CHANGE_APPROVED_AT'
+    )) {
+        $markerMatch = [regex]::Match(
+            $proposal,
+            "(?m)^$([regex]::Escape($markerName)):\s*(\S.*?)\s*$"
+        )
+        if (-not $markerMatch.Success) {
+            throw "Change proposal marker is missing: $markerName"
+        }
+        $proposalMarkers[$markerName] = $markerMatch.Groups[1].Value.Trim()
+    }
+    if ($proposalMarkers.CHANGE_ID -ne $ChangeId) {
+        throw "Change proposal id '$($proposalMarkers.CHANGE_ID)' does not match '$ChangeId'."
+    }
+    if ($proposalMarkers.CHANGE_STATUS -ne 'approved') {
+        throw "Change proposal must be approved; found '$($proposalMarkers.CHANGE_STATUS)'."
+    }
+    foreach ($markerName in @('CHANGE_OWNER', 'CHANGE_APPROVER', 'CHANGE_BASELINE')) {
+        if ($proposalMarkers[$markerName] -match '(?i)^(pending|a preencher|-)$') {
+            throw "Change proposal marker has no material value: $markerName"
+        }
+    }
+    foreach ($markerName in @('CHANGE_CREATED_AT', 'CHANGE_APPROVED_AT')) {
+        if ($null -eq (Convert-ToTimestamp $proposalMarkers[$markerName])) {
+            throw "Change proposal marker is not an ISO timestamp: $markerName"
+        }
+    }
+
+    $changeDirectory = Split-Path $proposalPath -Parent
+    $stateArchivePath = Join-Path $changeDirectory 'BASELINE_LIFECYCLE_STATE.json'
+    $gateArchivePath = Join-Path $changeDirectory 'BASELINE_LIFECYCLE_GATE_EVIDENCE.json'
+    foreach ($archivePath in @($stateArchivePath, $gateArchivePath)) {
+        if (Test-Path -LiteralPath $archivePath) {
+            throw "Change baseline archive already exists; refusing to overwrite: $archivePath"
+        }
+    }
+    $gateEvidencePath = Join-Path $ProcessRoot 'LIFECYCLE_GATE_EVIDENCE.json'
+
+    # Do not reuse the typed -GateEvidence parameter name: PowerShell variable
+    # names are case-insensitive and would coerce this object back to a string.
+    $structuredGateEvidence = Get-Content -Raw -Encoding UTF8 -LiteralPath $gateEvidencePath | ConvertFrom-Json
+    function Reset-GateEvidenceObject {
+        param([Parameter(Mandatory)]$Value)
+        foreach ($property in @($Value.PSObject.Properties)) {
+            if ($property.Value -is [pscustomobject]) {
+                Reset-GateEvidenceObject -Value $property.Value
+            }
+            elseif ($property.Value -is [bool]) {
+                $property.Value = $false
+            }
+            elseif ($property.Value -is [string]) {
+                $property.Value = 'pending'
+            }
+            elseif ($property.Value -is [System.Array]) {
+                $property.Value = @()
+            }
+            elseif ($property.Name -eq 'criticalFindings') {
+                $property.Value = -1
+            }
+        }
+    }
+    foreach ($gateProperty in @($structuredGateEvidence.gates.PSObject.Properties)) {
+        Reset-GateEvidenceObject -Value $gateProperty.Value
+    }
+
+    # Prepare every transformation in memory before creating durable archives.
+    # This keeps validation/type failures from leaving a half-started cycle.
+    [System.IO.File]::WriteAllText(
+        $stateArchivePath,
+        (($state | ConvertTo-Json -Depth 30) + [Environment]::NewLine),
+        $utf8NoBom
+    )
+    Copy-Item -LiteralPath $gateEvidencePath -Destination $gateArchivePath
+    [System.IO.File]::WriteAllText(
+        $gateEvidencePath,
+        (($structuredGateEvidence | ConvertTo-Json -Depth 30) + [Environment]::NewLine),
+        $utf8NoBom
+    )
+
+    $conditionalIds = @(
+        $manifest.stages |
+            ForEach-Object {
+                if ($_.PSObject.Properties.Name -contains 'conditionalPromptIds') {
+                    @($_.conditionalPromptIds)
+                }
+            }
+    )
+    foreach ($promptProperty in @($state.prompts.PSObject.Properties)) {
+        $promptId = [string]$promptProperty.Name
+        $promptState = $promptProperty.Value
+        $promptState.applicability = $(if ($promptId -in $conditionalIds) { 'conditional' } else { 'required' })
+        $promptState.status = $(if ($promptId -eq '01') {
+            'ready'
+        } elseif ($promptId -in $conditionalIds) {
+            'not_selected'
+        } else {
+            'pending'
+        })
+        $promptState.evidence = $null
+    }
+    foreach ($gateProperty in @($state.gates.PSObject.Properties)) {
+        $gateProperty.Value.status = 'pending'
+        $gateProperty.Value.evidence = $null
+        $gateProperty.Value.approvedBy = $null
+        $gateProperty.Value.updatedAt = $null
+        $gateProperty.Value.snapshot = $null
+    }
+    $state.cycleNumber = $(if ($null -eq $state.PSObject.Properties['cycleNumber']) {
+        2
+    } else {
+        [int]$state.cycleNumber + 1
+    })
+    $state.activeChange = [ordered]@{
+        id = $ChangeId
+        proposal = $Evidence.Replace('\', '/')
+        baseline = $proposalMarkers.CHANGE_BASELINE
+        owner = $proposalMarkers.CHANGE_OWNER
+        approver = $proposalMarkers.CHANGE_APPROVER
+        approvedAt = $proposalMarkers.CHANGE_APPROVED_AT
+        startedAt = [DateTimeOffset]::Now.ToString('o')
+        status = 'in_progress'
+    }
+    $state.activeWorkAttemptId = $null
+    $state.activeSlice = $null
+    $state.slices = @()
+    $state.selectedSurfaces = @()
+    $state.selectedOptionalPromptIds = @()
+    $state.currentStage = '01'
+    $state.currentPrompt = '01'
+    $state.status = 'ready'
+    $state.nextAction = 'execute_prompt'
+    $state.blockers = @()
+    Add-LifecycleHistoryAction -State $state -Action "cycle-start:$ChangeId" -Evidence $Evidence
+    Save-State -State $state -Root $ProcessRoot
+    $freshState = Get-State $ProcessRoot
+    $packet = New-TaskPacket -Root $ProcessRoot -State $freshState -Manifest $manifest
+    Write-Host "CYCLE STARTED: $ChangeId -> prompt 01." -ForegroundColor Green
+    Write-Host " - Cycle: $($freshState.cycleNumber)"
+    Write-Host " - Archived state: $stateArchivePath"
+    Write-Host " - Archived gate evidence: $gateArchivePath"
+    Write-Host " - Task packet: $packet"
+    exit 0
 }
 
 if ($Command -eq 'work-start') {
@@ -2385,7 +2578,7 @@ if ($Command -eq 'status') {
 if ($Command -eq 'next') {
     $packet = New-TaskPacket -Root $ProcessRoot -State $state -Manifest $manifest
     Write-Host "PASS: task packet prepared: $packet" -ForegroundColor Green
-    Write-Host "Prompt: Use `$build-professional-web-software and execute NEXT_TASK.md."
+    Write-Host "Prompt: Use `$advance-app-continue and execute NEXT_TASK.md."
     exit 0
 }
 
@@ -2664,6 +2857,11 @@ if ($Command -eq 'gate') {
     if ($GateId -eq 'G10' -and $GateDecision -eq 'passed') {
         $state.status = 'completed'
         $state.nextAction = 'none'
+        if ($null -ne $state.PSObject.Properties['activeChange'] -and $null -ne $state.activeChange) {
+            $state.activeChange.status = 'completed'
+            $state.activeChange | Add-Member -NotePropertyName 'completedAt' `
+                -NotePropertyValue ([DateTimeOffset]::Now.ToString('o')) -Force
+        }
     }
     Save-State -State $state -Root $ProcessRoot
     Write-Host "GATE: $GateId -> $GateDecision." -ForegroundColor Green
@@ -2846,6 +3044,11 @@ if ($Command -eq 'record') {
         if ($PromptId -eq '73' -and $g10.status -eq 'passed') {
             $state.status = 'completed'
             $state.nextAction = 'none'
+            if ($null -ne $state.PSObject.Properties['activeChange'] -and $null -ne $state.activeChange) {
+                $state.activeChange.status = 'completed'
+                $state.activeChange | Add-Member -NotePropertyName 'completedAt' `
+                    -NotePropertyValue ([DateTimeOffset]::Now.ToString('o')) -Force
+            }
         }
         else {
             $state.status = 'waiting_decision'

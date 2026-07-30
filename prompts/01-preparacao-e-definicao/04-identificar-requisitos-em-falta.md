@@ -15,6 +15,8 @@ Lê integralmente:
 - `APP_CONTEXT.md`;
 - `IMPLEMENTATION_STATUS.md`;
 - resultados e artefactos versionados dos prompts 01, 02 e 03;
+- `CHANGE_CONTROL.md` e a proposta ativa quando for `change-cycle`;
+- `requirements/USER_RESEARCH_EVIDENCE.md`;
 - `requirements/REQUIREMENTS_SPECIFICATION.md`,
   `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md`,
   `requirements/ALL_FUNCTIONALITIES.md`, `requirements/APPLICATION_CATALOG.md`,
@@ -39,8 +41,15 @@ Se `PRODUCT_DEFINITION.md` não existir, estiver vazio ou não for rastreável a
 1. Confirma que os prompts 01, 02 e 03 estão registados em `IMPLEMENTATION_STATUS.md`, com estado, fontes, decisões e evidências.
 2. Verifica a consistência entre oportunidade, público, nome de trabalho, posicionamento, requisitos, orçamento, prazo e restrições.
 3. Confirma que factos, inferências, pressupostos e decisões estão separados. Uma repetição da mesma afirmação não conta como segunda evidência.
-4. Audita a especificação:
-   - todos os requisitos `Must` têm ID estável, fonte, critério de aceitação observável, prioridade, dependências e aprovação;
+4. Confirma evidência direta do problema e da solução com utilizadores
+   representativos: método, participantes, comportamento observado,
+   conceito/protótipo ou experiência, resultados, limitações e decisão. Desk
+   research, reviews públicas e opinião do owner não substituem esta evidência.
+   Uma exceção exige risco, owner, prazo, aprovador e plano de validação.
+5. Audita a especificação:
+   - todos os `Must` da release têm ID, fonte, resultado, aceitação, prioridade,
+     owner e slice; a primeira slice/alto risco estão detalhados e os restantes
+     estão explicitamente `approved_for_refinement`;
    - jornadas críticas incluem happy path, alternativas, erros, recuperação e autorização;
    - NFR materiais são mensuráveis ou originam uma decisão bloqueante;
    - conflitos e perguntas em aberto não foram escondidos em texto narrativo;
@@ -58,13 +67,13 @@ Se `PRODUCT_DEFINITION.md` não existir, estiver vazio ou não for rastreável a
      concorrência, falha e recuperação material aparecem em linhas próprias;
    - nenhuma linha usa ações/atores/locais/tempos genéricos sem identificar a
      regra, fronteira, evento e efeito observável concretos.
-5. Confirma que o MVP contém uma jornada ponta a ponta coerente e pequena, com inclusões e exclusões explícitas.
-6. Confirma a viabilidade face ao `BoilerPlateAdvance` em `C:\Work\BoilerPlateAdvance`, orçamento, prazo, competências, dependências, legalidade, privacidade e acesso ao público. Limita-te a adequação e riscos; não escolhas ainda módulos ou topologia.
-7. Confirma que existe uma métrica de resultado, baseline ou método para a obter, meta, horizonte temporal, métricas de proteção e critério de continuar/parar.
-8. Produz uma reconciliação mecânica com contagens e listas de IDs para
+6. Confirma que o MVP contém uma jornada ponta a ponta coerente e pequena, com inclusões e exclusões explícitas.
+7. Confirma a viabilidade face ao `BoilerPlateAdvance` em `C:\Work\BoilerPlateAdvance`, orçamento, prazo, competências, dependências, legalidade, privacidade e acesso ao público. Limita-te a adequação e riscos; não escolhas ainda módulos ou topologia.
+8. Confirma que existe uma métrica de resultado, baseline ou método para a obter, meta, horizonte temporal, métricas de proteção e critério de continuar/parar.
+9. Produz uma reconciliação mecânica com contagens e listas de IDs para
    `APP`, `PAGE`, `FNC`, `RF-P`, requisitos canónicos e `AC`; amostragem não
    prova paridade.
-9. Atualiza em `PRODUCT_DEFINITION.md` DOR-01 a DOR-12 como `passou`, `falhou` ou `não verificável`, sempre com evidência e ação concreta.
+10. Atualiza em `PRODUCT_DEFINITION.md` DOR-01 a DOR-12 como `passou`, `falhou` ou `não verificável`, sempre com evidência e ação concreta.
 
 ## Regras bloqueantes
 
@@ -72,11 +81,16 @@ O Gate A não pode receber `GO` se ocorrer qualquer uma destas condições:
 
 - problema, público, job to be done ou jornada principal definidos apenas com adjetivos ou generalidades;
 - recomendação do prompt 01 diferente de `avançar`;
+- investigação direta do problema/solução ausente ou exceção sem aprovação,
+  risco, owner, prazo e plano;
 - nome de trabalho ainda não aprovado pelo responsável de produto;
-- algum requisito `Must` sem fonte, aceitação observável, dependências ou aprovação;
+- algum `Must` sem fonte, resultado, aceitação, owner ou slice; primeira
+  slice/alto risco incompletos; ou item posterior falsamente marcado pronto em
+  vez de `approved_for_refinement`;
 - `ALL_FUNCTIONALITIES.md` ausente, vazio ou fora do formato obrigatório;
-- qualquer `APP/PAGE/FNC/RF-P` ausente, duplicado, órfão ou divergente entre a
-  fonte canónica, contratos PAGE, checklist, ficheiro único e rastreabilidade;
+- qualquer `APP/PAGE/FNC/RF-P` já aprovado ausente, duplicado, órfão ou
+  divergente entre fonte canónica, contratos, checklist, ficheiro único e
+  rastreabilidade;
 - uma funcionalidade comprime ramos/efeitos distintos numa linha composta ou
   usa texto genérico que permite implementações incompatíveis;
 - um projeto/superfície não comprovado é apresentado como aplicação ativa, ou
@@ -85,6 +99,9 @@ O Gate A não pode receber `GO` se ocorrer qualquer uma destas condições:
 - métrica de resultado ou critério de continuar/parar ausente;
 - DOR-01 a DOR-12 sem estado `passou` e evidência;
 - aprovação do responsável de produto ausente ou não ligada à versão auditada.
+- em `change-cycle`, proposta, baseline, delta, impacto ou invalidação de gates
+  ausentes/divergentes, ou alteração aplicada diretamente à baseline antes da
+  aprovação.
 
 Não transformes uma condição bloqueante em pressuposto para conseguir avançar. Uma questão reversível só transita quando tiver impacto limitado, owner, prazo e teste registados e não afetar nenhuma condição acima.
 
@@ -108,7 +125,9 @@ Nos restantes casos mantém a etapa 2 `bloqueada`. Não executes o prompt 05 com
 ## Atualizações obrigatórias
 
 1. Atualiza `PRODUCT_DEFINITION.md`, incluindo versão, checklist DOR, decisão e histórico.
-   Mantém o bloco `GATE_A_*` sincronizado com a tabela humana; o script usa esse registo para impedir passagens ambíguas.
+   Mantém o bloco `GATE_A_*` sincronizado com a tabela humana, incluindo estados
+   e evidências de user research/solution validation; o script usa esse registo
+   para impedir passagens ambíguas.
 2. Atualiza `APP_CONTEXT.md` apenas com valores confirmados e respetivas fontes.
 3. Atualiza `IMPLEMENTATION_STATUS.md`:
    - estado e evidência dos prompts 01–04;

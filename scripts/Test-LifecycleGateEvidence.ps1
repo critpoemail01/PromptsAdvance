@@ -100,7 +100,7 @@ function Require-ExactTrueChecks {
 }
 
 if (($evidence.schemaVersion -isnot [int] -and $evidence.schemaVersion -isnot [long]) -or
-    $evidence.schemaVersion -ne 1) {
+    $evidence.schemaVersion -ne 2) {
     Add-Issue "Unsupported evidence schemaVersion '$($evidence.schemaVersion)'."
 }
 if ([string]$evidence.catalogVersion -ne [string]$manifest.catalogVersion) {
@@ -179,6 +179,7 @@ if ($issues.Count -eq 0) {
         Require-ExactTrueChecks -Checks $checksObject -RequiredNames @(
             'ciRequiredChecksPassed',
             'sameArtifactPromotionConfigured',
+            'signedBuildProvenanceConfigured',
             'sloAlertsValidated',
             'backupRestoreAndDrTested',
             'migrationAndRollbackTested',
@@ -219,6 +220,39 @@ if ($issues.Count -eq 0) {
                 Add-Issue 'G08 artifactDigest does not match exactly one hashed candidate-artifact.'
             }
         }
+        $provenance = $gate.candidate.provenance
+        $candidateAttestationDigest = ''
+        if ($null -eq $provenance) {
+            Add-Issue 'G08 candidate provenance is missing.'
+        }
+        else {
+            $candidateAttestationDigest = [string]$provenance.attestationDigest
+            if ([string]$provenance.attestationDigest -notmatch '^sha256:[a-fA-F0-9]{64}$') {
+                Add-Issue 'G08 provenance attestationDigest is not a SHA-256 digest.'
+            }
+            else {
+                $attestationHash = ([string]$provenance.attestationDigest).Substring(7)
+                $matchingAttestation = @(
+                    $artifacts |
+                        Where-Object {
+                            [string]$_.kind -eq 'build-provenance-attestation' -and
+                            [string]$_.sha256 -eq $attestationHash
+                        }
+                )
+                if ($matchingAttestation.Count -ne 1) {
+                    Add-Issue 'G08 attestationDigest does not match exactly one hashed build-provenance-attestation.'
+                }
+            }
+            foreach ($field in @('issuer', 'builderIdentity', 'sourceRepository', 'workflowRef', 'predicateType')) {
+                Require-Material -Value ([string]$provenance.$field) -Label "G08 provenance $field"
+            }
+            if ([string]$provenance.sourceSha -ne [string]$gate.candidate.candidateSha) {
+                Add-Issue 'G08 provenance sourceSha does not match candidateSha.'
+            }
+            if ($provenance.verificationPassed -isnot [bool] -or $provenance.verificationPassed -ne $true) {
+                Add-Issue 'G08 provenance verification did not pass.'
+            }
+        }
         if ([string]$gate.candidate.baseSha -eq [string]$gate.candidate.candidateSha) {
             Add-Issue 'G08 baseSha and candidateSha must differ.'
         }
@@ -243,8 +277,9 @@ if ($issues.Count -eq 0) {
         }
         foreach ($candidateCopy in @($gate.acceptance, $gate.independentReview)) {
             if ([string]$candidateCopy.candidateSha -ne [string]$gate.candidate.candidateSha -or
-                [string]$candidateCopy.artifactDigest -ne [string]$gate.candidate.artifactDigest) {
-                Add-Issue 'G08 acceptance/review identifiers do not match the immutable candidate.'
+                [string]$candidateCopy.artifactDigest -ne [string]$gate.candidate.artifactDigest -or
+                [string]$candidateCopy.attestationDigest -ne $candidateAttestationDigest) {
+                Add-Issue 'G08 acceptance/review identifiers do not match the immutable candidate and attestation.'
             }
         }
         if ([string]$gate.approvedBy.identity -ne [string]$gate.independentReview.reviewerIdentity) {
@@ -291,13 +326,16 @@ if ($issues.Count -eq 0) {
             Add-Issue 'G09 authorization identity does not match the evidence approver.'
         }
         if ([string]$gate.authorization.candidateSha -ne [string]$g08.candidate.candidateSha -or
-            [string]$gate.authorization.artifactDigest -ne [string]$g08.candidate.artifactDigest) {
+            [string]$gate.authorization.artifactDigest -ne [string]$g08.candidate.artifactDigest -or
+            [string]$gate.authorization.attestationDigest -ne [string]$g08.candidate.provenance.attestationDigest) {
             Add-Issue 'G09 authorization does not target the G08 candidate.'
         }
         if ($Phase -eq 'release_completed') {
             if ($gate.deployment.status -ne 'passed' -or
                 $gate.deployment.smokeTestsPassed -isnot [bool] -or
                 $gate.deployment.smokeTestsPassed -ne $true -or
+                $gate.deployment.attestationVerified -isnot [bool] -or
+                $gate.deployment.attestationVerified -ne $true -or
                 $gate.deployment.rollbackReady -isnot [bool] -or
                 $gate.deployment.rollbackReady -ne $true) {
                 Add-Issue 'G09 deployment, smoke tests and rollback readiness must pass.'
@@ -305,7 +343,8 @@ if ($issues.Count -eq 0) {
             Require-Material -Value ([string]$gate.deployment.abortCriteria) -Label 'G09 abort criteria'
             if ([string]$gate.deployment.environment -ne [string]$gate.authorization.environment -or
                 [string]$gate.deployment.candidateSha -ne [string]$gate.authorization.candidateSha -or
-                [string]$gate.deployment.artifactDigest -ne [string]$gate.authorization.artifactDigest) {
+                [string]$gate.deployment.artifactDigest -ne [string]$gate.authorization.artifactDigest -or
+                [string]$gate.deployment.attestationDigest -ne [string]$gate.authorization.attestationDigest) {
                 Add-Issue 'G09 deployed target does not match the authorized environment/candidate.'
             }
         }

@@ -10,6 +10,11 @@ Recebe uma única funcionalidade, IDs de requisitos/aceitação, atores/permiss�
 
 ## Descoberta
 
+0. Executa o Definition of Ready da slice: cada ID selecionado tem fonte,
+   aprovação, comportamento/estados, `RF-P`, `AC`, dados, permissões,
+   dependências e prova. Atualiza primeiro a especificação canónica e reconcilia
+   checklist/`ALL_FUNCTIONALITIES.md`. Se exigir decisão de produto, bloqueia
+   antes de código; `approved_for_refinement` não autoriza implementação.
 1. Lê instruções e encontra funcionalidades análogas no projeto.
 2. Quando existir experiência visível, aplica o `PRODUCT_EXCELLENCE.md` e compara a jornada completa com produtos profissionais relevantes; não limites a referência ao screenshot do estado ideal.
 3. Mapeia UI, contratos, API, domínio, persistência, autorização, jobs/integrações e testes.

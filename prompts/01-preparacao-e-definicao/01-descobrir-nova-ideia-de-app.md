@@ -8,6 +8,12 @@ seguintes. Começa a resposta pela recomendação e pela decisão `avançar`,
 `não avançar ainda` ou `não avançar`; sustenta-a depois com evidência,
 alternativas, riscos e um experimento falsificável.
 
+Neste prompt, `avançar` significa exclusivamente **avançar para validação com
+utilizadores e solução**, não “mercado validado”, `GO` do Gate A nem autorização
+para implementar. Pesquisa documental e sinais públicos reduzem incerteza; não
+substituem entrevistas, observação contextual, teste de conceito/protótipo ou
+evidência comportamental com pessoas representativas.
+
 O trabalho só fica `concluído` quando:
 
 - a exploração cobrir 12–20 espaços de problema e justificar a redução a cinco
@@ -85,6 +91,18 @@ tem de persistir os artefactos autorizados antes da entrega.
 Como primeiro passo de produto, parte de uma folha em branco e identifica autonomamente oportunidades de aplicações web/mobile que o mercado atual demonstre necessitar. Pesquisa procura, adoção, queixas, fragmentação e mudanças recentes; recomenda aplicações novas com um problema claro, melhoria defensável e adequação preliminar ao `BoilerPlateAdvance` localizado em `C:\Work\BoilerPlateAdvance`. Não implementes código.
 
 Este prompt inicia, mas não aprova, `PRODUCT_DEFINITION.md`. Mesmo quando a recomendação for `avançar`, o Gate A permanece `PENDENTE` até o prompt 04 validar toda a definição.
+
+## Modo de ciclo de mudança
+
+Quando `LIFECYCLE_STATE.json.activeChange` identificar uma proposta aprovada
+segundo `CHANGE_CONTROL.md`, não repitas a exploração de 12–20 espaços como se
+o produto não existisse. Usa o produto, a release e a proposta como baseline;
+valida a proveniência e representatividade do sinal, procura evidência que o
+contradiga, compara manter/reverter/alterar e decide `avançar`, `não avançar
+ainda` ou `não avançar` para o delta. Conserva evidência anterior apenas quando
+continua atual e liga toda a conclusão a `CHANGE_ID`. Reexecuta a descoberta
+ampla apenas se a proposta questionar o problema, público, mercado ou modelo do
+produto. O restante prompt continua aplicável de forma proporcional.
 
 ## Arranque autónomo sem questionário
 
@@ -184,6 +202,10 @@ Não solicites, estimes nem uses `[ORÇAMENTO]` ou `[PRAZO]` nesta fase. Serão 
    - experimento simples, reversível e falsificável, com métrica observável e
      limiar explícito de decisão definidos agora; não adies a métrica para o
      prompt 02 e não confundas o limiar com orçamento ou prazo;
+   - plano de investigação com utilizadores: perfil e recrutamento, hipótese,
+     método, tarefas/perguntas não indutivas, tamanho/limitações da amostra,
+     métrica/limiar, consentimento e tratamento de dados; não contactes nem
+     recolhas dados sem autorização explícita;
    - ajuste ao boilerplate: SSR/SEO público, área autenticada WASM/PWA, API, jobs, notificações e MAUI apenas se necessários.
 
 ## Condições de paragem da pesquisa
@@ -280,3 +302,5 @@ afirmes que a sandbox é read-only quando a configuração indicar escrita.
 - https://support.google.com/trends/answer/4365533
 - https://developer.apple.com/app-store/review/guidelines/
 - https://play.google.com/about/developer-content-policy/
+- https://www.gov.uk/service-manual/user-research/user-research-in-discovery
+- https://dora.dev/capabilities/customer-feedback/

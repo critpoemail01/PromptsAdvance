@@ -8,6 +8,10 @@ para os gates, mas a implementação do produto é iterativa: depois da fundaç�
 cada lote é uma pequena fatia vertical funcional, não uma fase extensa de
 layout ou backend isolado.
 
+Este catálogo é deliberadamente opinativo para Advance/.NET, Bit, Blazor,
+MAUI, GitHub e o boilerplate indicado. Não é um lifecycle universal para todas
+as stacks; adaptações de plataforma exigem um perfil aprovado e novo piloto.
+
 ## Documentos obrigatórios
 
 Mantém estes ficheiros na raiz deste workspace. No prompt 7, copia-os para o
@@ -19,12 +23,15 @@ adicionando-os à aplicação existente apenas num lote explícito e sem colisõ
 - [QUALITY_GATES.md](QUALITY_GATES.md): critérios profissionais de produto, arquitetura, layout, código, release e operação;
 - [AGENTS.md](AGENTS.md): instruções duradouras carregadas pelo Codex;
 - [EXECUTION_CONTRACT.md](EXECUTION_CONTRACT.md): planeamento, limites, validação adversarial e evidências;
+- [CHANGE_CONTROL.md](CHANGE_CONTROL.md): deltas aprovados, análise de impacto,
+  invalidação de gates e novos ciclos depois da release;
+- [CLAUDE.md](CLAUDE.md): ponte mínima para Claude Code importar `AGENTS.md`;
 - [PRODUCT_EXCELLENCE.md](PRODUCT_EXCELLENCE.md): benchmark, crítica profissional e critérios de produto/UX;
 - [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md): definição aprovada e gate bloqueante entre as etapas 1 e 2;
 - [PRODUCT_QUALITY_BASELINE.md](PRODUCT_QUALITY_BASELINE.md): baseline aprovada, rubrica visual e primeira fatia;
 - [APP_CONTEXT.md](APP_CONTEXT.md): valores da aplicação, fontes, confiança e autorizações por execução;
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md): requisitos, candidata, evidências, bloqueios e operação;
-- [LIFECYCLE_GATE_EVIDENCE.json](LIFECYCLE_GATE_EVIDENCE.json): evidência estruturada, identidades, candidata, autorização e artefactos com SHA-256 para G06–G10;
+- [LIFECYCLE_GATE_EVIDENCE.json](LIFECYCLE_GATE_EVIDENCE.json): evidência estruturada, identidades, candidata, attestation/proveniência, autorização e artefactos com SHA-256 para G06–G10;
 - [PILOT_APPROVAL.md](PILOT_APPROVAL.md): decisão bloqueante do piloto para a versão exata do catálogo;
 - [PROMPT_EVALUATION.md](PROMPT_EVALUATION.md): avaliação piloto executável do próprio processo.
 - [pilot/README.md](pilot/README.md): runner, isolamento e casos reproduzíveis de `PILOT-001`.
@@ -34,7 +41,7 @@ Valores entre `[COLCHETES]` são entradas. Resolve-os por `APP_CONTEXT.md`, cód
 
 ## Como começar uma nova aplicação
 
-Usa preferencialmente [START_HERE.md](START_HERE.md) e a skill `$build-professional-web-software`. A skill inicializa uma instância isolada, cria `LIFECYCLE_STATE.json` e `NEXT_TASK.md`, valida o estado e executa apenas o próximo prompt autorizado.
+Usa preferencialmente [START_HERE.md](START_HERE.md) e as skills `$advance-app-start` e `$advance-app-continue`. A primeira cria uma instância isolada; a segunda valida o estado e executa apenas o próximo prompt autorizado.
 
 Para continuar ou adotar um projeto existente por caminho:
 
@@ -64,7 +71,7 @@ existente só satisfaz requisitos e gates quando houver evidência verificável.
 9. Implementa a fatia com backend mínimo e um dos pares 25/26 ou 27/28; aplica apenas o prompt visual 13, 15 ou 17 da superfície usada.
 10. Faz revisão humana de design e engenharia, valida usabilidade, acessibilidade e regressão visual da primeira fatia antes de propagar padrões.
 11. Repete o ciclo até todas as jornadas `Must` passarem. Só então executa 14, 16 ou 18 para fechar globalmente as superfícies aplicáveis.
-12. Conclui hardening, preparação operacional, documentação, aceitação e revisão independente. O prompt 64 só publica a candidata com o mesmo SHA/digest aprovado e com autorização de release explícita.
+12. Conclui hardening, preparação operacional, documentação, aceitação e revisão independente. O prompt 64 só publica a candidata com o mesmo SHA/digest/attestation aprovado e com autorização de release explícita.
 13. Depois da publicação, executa 65–73 nas respetivas cadências.
 
 Para trabalho complexo ou ambíguo, usa Plan mode para refinar resultado, restrições, etapas e verificação; depois executa o plano. Para trabalho longo suportado pela interface, Goal mode pode manter a execução persistente. Nenhum modo amplia autorização para GitHub, produção, operações destrutivas ou custos.
@@ -72,14 +79,20 @@ Para trabalho complexo ou ambíguo, usa Plan mode para refinar resultado, restri
 Prompt inicial recomendado para uma aplicação nova:
 
 ```text
-Usa $build-professional-web-software. Inicia uma nova iniciativa chamada "nome-da-iniciativa", com o responsável de produto indicado. Usa o BoilerPlateAdvance em C:\Work\BoilerPlateAdvance, inicializa uma instância isolada e executa apenas o primeiro prompt. Não declares o Gate A concluído.
+Usa $advance-app-start. Inicia uma nova iniciativa chamada "nome-da-iniciativa", com o responsável de produto indicado. Usa o BoilerPlateAdvance em C:\Work\BoilerPlateAdvance, inicializa uma instância isolada e executa apenas o primeiro prompt. Não declares o Gate A concluído.
 ```
 
 ## Gates do processo
 
 ### Gate A — definição do produto
 
-Os prompts 1–4 constroem e auditam a definição. O Gate A só permite iniciar o prompt 05 quando `PRODUCT_DEFINITION.md` estiver `aprovado`, a decisão for `GO`, DOR-01 a DOR-12 tiverem `passou` com evidência e os prompts 01–04 estiverem concluídos em `IMPLEMENTATION_STATUS.md`. Se faltar qualquer critério, o prompt 04 decide `REWORK`, identifica o prompt a repetir e mantém a etapa 2 bloqueada.
+Os prompts 1–4 constroem e auditam a definição. O Gate A só permite iniciar o
+prompt 05 quando `PRODUCT_DEFINITION.md` estiver `aprovado`, a decisão for `GO`,
+DOR-01 a DOR-12 tiverem `passou`, existir evidência direta do problema e teste
+da solução com utilizadores representativos — ou exceção aprovada e limitada —
+e os prompts 01–04 estiverem concluídos em `IMPLEMENTATION_STATUS.md`. Se faltar
+qualquer critério, o prompt 04 decide `REWORK`, identifica o prompt a repetir e
+mantém a etapa 2 bloqueada.
 
 A passagem é também validada mecanicamente:
 
@@ -113,19 +126,37 @@ O primeiro padrão visual só pode propagar depois de
 
 ### Gate D — candidata e release
 
-Permite 55–63 quando CI/CD, SLI/SLO, observabilidade, backup/restore, rollback, runbooks, documentação e owners estão comprovados. A candidata deve ter base SHA, candidate SHA e digest imutáveis. O prompt 62 executa aceitação e o 63 executa revisão separada, read-only.
+Permite 55–63 quando CI/CD, SLI/SLO, observabilidade, backup/restore, rollback,
+runbooks, documentação e owners estão comprovados. A candidata deve ter base
+SHA, candidate SHA, digest e attestation de proveniência imutáveis. O prompt 62
+executa aceitação e o 63 executa revisão separada, read-only, verificando issuer,
+builder, source SHA e subject digest.
 
 ### Gate E — operação contínua
 
 Permite o prompt 64 apenas quando os prompts 62 e 63 produziram `GO` para os mesmos identificadores e existe `[AUTORIZAR_RELEASE]`. Depois da publicação, permite 65–73 apenas sobre o ambiente exato, com acessos read-only e owners. Correções externas continuam a exigir `[AUTORIZAR_ACOES_CORRETIVAS_OPERACIONAIS]` ou outra autorização específica.
 
 G08–G10 são validados por `scripts/Test-LifecycleGateEvidence.ps1`.
-G09 passa **antes** de selecionar o prompt 64 e fixa ambiente, SHA, digest,
+G09 passa **antes** de selecionar o prompt 64 e fixa ambiente, SHA, digest, attestation,
 janela e identidade autorizadora. A conclusão do prompt 64 volta a validar no
 mesmo ficheiro o ambiente/artefacto implantado, smoke tests, rollback e
 critérios de aborto.
 
 Um gate incompleto termina `bloqueado`; não se transforma silenciosamente num pressuposto ou exceção.
+
+## Mudanças depois de uma release
+
+Feedback, métricas, findings e pedidos não alteram diretamente requisitos ou
+baselines. Cria `changes/CHG-####/PROPOSAL.md` segundo `CHANGE_CONTROL.md`. Numa
+instância concluída, uma proposta aprovada inicia novo ciclo com:
+
+```powershell
+.\software-lifecycle.ps1 cycle-start -ProcessRoot . `
+  -ChangeId CHG-0001 -Evidence changes/CHG-0001/PROPOSAL.md
+```
+
+O estado e a evidência dos gates anteriores são arquivados e nenhum gate é
+herdado automaticamente.
 
 Validação estática do processo:
 
@@ -134,6 +165,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-PromptProcess
 ```
 
 Este comando verifica documentos, numeração, links, placeholders e contratos críticos. Não executa nem aprova `PILOT-001`.
+
+O workflow `.github/workflows/process-validation.yml` executa a validação
+estática e o lifecycle E2E em pull requests/push; a cópia descartável corre fora
+de pull requests e numa cadência semanal.
 
 O teste E2E do orquestrador verifica arranque, Gate A, transições automáticas,
 bloqueio de `NextPrompt` arbitrário, G02/G03, seleção contextual de fatia e G04:
@@ -323,4 +358,4 @@ Se a arquitetura aprovar outro módulo, cria um prompt `Optional` na etapa propr
 - [W3C — avaliar acessibilidade](https://www.w3.org/WAI/test-evaluate/)
 - [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/)
 - [Google — Core Web Vitals e RUM](https://web.dev/articles/vitals)
-- [DORA — métricas de desempenho de entrega](https://dora.dev/guides/dora-metrics-four-keys/)
+- [DORA — métricas de desempenho de entrega](https://dora.dev/guides/dora-metrics/)

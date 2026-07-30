@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "catalogVersion": "2026-07-30.5",
+  "schemaVersion": 2,
+  "catalogVersion": "2026-07-30.7",
   "gates": {
     "G06": {
       "status": "pending",
@@ -25,6 +25,7 @@
       "checks": {
         "ciRequiredChecksPassed": false,
         "sameArtifactPromotionConfigured": false,
+        "signedBuildProvenanceConfigured": false,
         "sloAlertsValidated": false,
         "backupRestoreAndDrTested": false,
         "migrationAndRollbackTested": false,
@@ -39,9 +40,19 @@
       "candidate": {
         "baseSha": "pending",
         "candidateSha": "pending",
-        "artifactDigest": "pending"
+        "artifactDigest": "pending",
+        "provenance": {
+          "attestationDigest": "pending",
+          "issuer": "pending",
+          "builderIdentity": "pending",
+          "sourceRepository": "pending",
+          "sourceSha": "pending",
+          "workflowRef": "pending",
+          "predicateType": "pending",
+          "verificationPassed": false
+        }
       },
-      "acceptance": { "decision": "pending", "candidateSha": "pending", "artifactDigest": "pending" },
+      "acceptance": { "decision": "pending", "candidateSha": "pending", "artifactDigest": "pending", "attestationDigest": "pending" },
       "independentReview": {
         "decision": "pending",
         "implementerIdentity": "pending",
@@ -50,6 +61,7 @@
         "readOnly": false,
         "candidateSha": "pending",
         "artifactDigest": "pending",
+        "attestationDigest": "pending",
         "criticalFindings": -1
       }
     },
@@ -64,6 +76,7 @@
         "releaseWindow": "pending",
         "candidateSha": "pending",
         "artifactDigest": "pending",
+        "attestationDigest": "pending",
         "authorizedByIdentity": "pending",
         "authorizedAt": "pending"
       },
@@ -72,6 +85,8 @@
         "environment": "pending",
         "candidateSha": "pending",
         "artifactDigest": "pending",
+        "attestationDigest": "pending",
+        "attestationVerified": false,
         "smokeTestsPassed": false,
         "rollbackReady": false,
         "abortCriteria": "pending"

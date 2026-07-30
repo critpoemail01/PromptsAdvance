@@ -15,6 +15,10 @@ GATE_A_PRODUCT_OWNER: owner-fixture
 GATE_A_APPROVER: approver-fixture
 GATE_A_DECISION_DATE: 2026-07-28
 GATE_A_APPROVAL_EVIDENCE: fixture://approval-v1
+GATE_A_USER_RESEARCH_STATUS: completed
+GATE_A_USER_RESEARCH_EVIDENCE: fixture://user-research-v1
+GATE_A_SOLUTION_VALIDATION_STATUS: completed
+GATE_A_SOLUTION_VALIDATION_EVIDENCE: fixture://prototype-test-v1
 ```
 
 | ID | Critério | Estado | Evidência | Bloqueio/ação |

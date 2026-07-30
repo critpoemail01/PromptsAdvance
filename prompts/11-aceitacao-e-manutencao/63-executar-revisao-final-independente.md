@@ -3,7 +3,8 @@
 ## Objetivo
 
 Avalia a candidata identificada por `[BASE_SHA]`, `[CANDIDATE_SHA]`,
-`[ARTIFACT_PATH]` e `[ARTIFACT_DIGEST]` numa tarefa/revisor separado,
+`[ARTIFACT_PATH]`, `[ARTIFACT_DIGEST]`, `[ATTESTATION_PATH]` e
+`[ATTESTATION_DIGEST]` numa tarefa/revisor separado,
 read-only e sem contexto de implementação. Confirma primeiro que o artefacto
 está realmente acessível, calcula o digest no próprio ambiente de revisão e
 compara-o com o valor congelado. Tenta demonstrar que a candidata não cumpre os
@@ -36,7 +37,10 @@ executável, decide `NO-GO`.
 
 ## Processo read-only
 
-1. Verifica base/candidate SHA, assinatura/digest do artefacto, estado limpo e proveniência dos relatórios.
+1. Verifica base/candidate SHA, digest do artefacto e attestation assinada com a
+   ferramenta do provider ou verificador versionado. Confirma issuer e builder
+   autorizados, repositório, workflow ref, source SHA, predicate e subject
+   digest; um ficheiro de proveniência não verificado produz `NO-GO`.
 2. Revê todas as alterações, ficheiros inesperados, segredos, código morto, permissões, dados, migrations, contratos e configuração.
 3. Reexecuta o menor conjunto suficiente de restore, build, análise estática, testes unitários/integração/E2E e verificações de supply chain.
 4. Para UI, exercita jornadas críticas, permissões, casos limite, mobile/desktop, acessibilidade, snapshots/diffs, consola e rede.
@@ -56,10 +60,15 @@ Não reutilizes uma aprovação antiga nem permitas que o revisor “corrija e a
 
 ## Entrega
 
-Apresenta identidade/método de separação, base/candidate SHA, digest, confirmação read-only, âmbito, comandos/resultados, findings priorizados, áreas não validadas, riscos e decisão `GO`/`NO-GO`. Regista tudo no manifesto de evidência de `IMPLEMENTATION_STATUS.md`.
+Apresenta identidade/método de separação, base/candidate SHA, digest,
+attestation/issuer/builder e comando de verificação, confirmação read-only,
+âmbito, comandos/resultados, findings priorizados, áreas não validadas, riscos e
+decisão `GO`/`NO-GO`. Regista tudo no manifesto de evidência de
+`IMPLEMENTATION_STATUS.md`.
 
 ## Referências oficiais
 
 - https://learn.chatgpt.com/docs/code-review
 - https://learn.chatgpt.com/docs/agent-configuration/subagents
 - https://google.github.io/eng-practices/review/
+- https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations

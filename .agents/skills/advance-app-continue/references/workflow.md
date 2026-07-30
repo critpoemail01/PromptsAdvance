@@ -25,6 +25,11 @@ For every task:
 10. record the honest result;
 11. cross a gate only with its required evidence and approval.
 
+After a completed lifecycle, a material product, architecture, security or
+operation change starts from an approved `CHG` proposal through `cycle-start`.
+The previous state and structured gate evidence are archived; no gate is
+inherited.
+
 Keep related work in the same initiative, but use one Codex task per coherent prompt/slice result. Use isolated worktrees for concurrent changes.
 
 For `brownfield`, the lifecycle process remains outside the existing
@@ -135,6 +140,8 @@ After release, run 65–67 immediately/as scheduled, then establish 68–73 with
   goal instead of creating a competing attempt.
 - gate failure: return to the smallest upstream prompt that owns the missing evidence.
 - changed requirement: update traceability and invalidate downstream approvals affected by the change.
+- completed lifecycle change: follow `CHANGE_CONTROL.md`, approve the delta and
+  use `cycle-start`; never edit completed state directly.
 - changed SHA, digest, environment or visual baseline: re-run the relevant acceptance/review gate.
 - process/catalog change: mark the pilot stale and revalidate before G03.
 - existing application without lifecycle: use path-based `continue`; do not run

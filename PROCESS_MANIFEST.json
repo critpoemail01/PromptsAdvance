@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-07-30.5",
-  "name": "Professional Web Software Lifecycle",
+  "catalogVersion": "2026-07-30.7",
+  "name": "Professional Advance .NET Software Lifecycle",
   "promptCount": 73,
   "executionPolicy": {
     "onePromptPerTask": true,
@@ -11,6 +11,8 @@
     "adversarialReviewRequired": true,
     "externalActionsRequireExplicitAuthorization": true,
     "brownfieldIsolationRequired": true,
+    "changeControlRequired": true,
+    "signedBuildProvenanceRequired": true,
     "productionRequiresImmutableCandidate": true,
     "independentReleaseReviewRequired": true
   },
@@ -262,7 +264,7 @@
     },
     {
       "id": "G07",
-      "name": "Operational Readiness",
+      "name": "Operational Readiness and Verified Build Provenance",
       "afterPrompt": "60",
       "requiresGates": [
         "G06"
@@ -280,7 +282,7 @@
     },
     {
       "id": "G08",
-      "name": "Immutable Candidate Accepted and Independently Reviewed",
+      "name": "Immutable Attested Candidate Accepted and Independently Reviewed",
       "afterPrompt": "63",
       "requiresGates": [
         "G07"
@@ -352,6 +354,7 @@
   "authoritativeReferences": [
     "AGENTS.md",
     "EXECUTION_CONTRACT.md",
+    "CHANGE_CONTROL.md",
     "PRODUCT_EXCELLENCE.md",
     "PRODUCT_DEFINITION.md",
     "PRODUCT_QUALITY_BASELINE.md",

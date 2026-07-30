@@ -12,7 +12,10 @@ Transforma sinais de `[CANAIS_DE_BUGS_E_FEEDBACK]` em problemas reproduzíveis, 
 4. Tenta reproduzir num ambiente seguro com dados sintéticos e regista passos, resultado esperado/real, frequência e impacto.
 5. Classifica severidade, alcance, regressão, workaround, requisito afetado e owner.
 6. Liga findings de UX à `PRODUCT_QUALITY_BASELINE.md` e defeitos técnicos ao teste de regressão necessário.
-7. Não responde a utilizadores, fecha tickets ou publica roadmaps sem autorização.
+7. Para um sinal que proponha alterar produto, requisito, contrato, arquitetura
+   ou operação, cria/deduplica uma proposta `CHG` segundo `CHANGE_CONTROL.md`;
+   feedback não é promovido diretamente a requisito.
+8. Não responde a utilizadores, fecha tickets ou publica roadmaps sem autorização.
 
 ## Critérios de sucesso
 
@@ -29,4 +32,3 @@ Apresenta clusters, bugs reproduzidos/não reproduzidos, feedback UX/produto, se
 
 - https://learn.microsoft.com/azure/well-architected/operational-excellence/observability
 - https://sre.google/workbook/postmortem-culture/
-

@@ -442,7 +442,9 @@ try {
         'NEXT_TASK.md',
         'PROCESS_MANIFEST.json',
         'QUALITY_GATES.md',
-        '.agents\skills\build-professional-web-software\SKILL.md'
+        'CHANGE_CONTROL.md',
+        'CLAUDE.md',
+        '.agents\skills\advance-app-continue\SKILL.md'
     )) {
         if (-not (Test-Path -LiteralPath (Join-Path $fixtureRoot $required))) {
             throw "Start did not create required path: $required"
@@ -695,7 +697,7 @@ try {
     $next = Invoke-Lifecycle @('next', '-ProcessRoot', $fixtureRoot)
     Require-ExitCode -Execution $next -Expected 0 -Label 'next'
     $task = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'NEXT_TASK.md')
-    if ($task -notmatch 'Prompt:\s*05' -or $task -notmatch '\$build-professional-web-software') {
+    if ($task -notmatch 'Prompt:\s*05' -or $task -notmatch '\$advance-app-continue') {
         throw 'NEXT_TASK.md does not target prompt 05 through the lifecycle skill.'
     }
     $results.Add('NEXT_TASK -> prompt 05')
@@ -1240,6 +1242,69 @@ try {
 
     $validateComplete = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
     Require-ExitCode -Execution $validateComplete -Expected 0 -Label 'completed validate'
+
+    $changeRoot = Join-Path $fixtureRoot 'changes\CHG-0001'
+    New-Item -ItemType Directory -Path $changeRoot | Out-Null
+    $changeProposalPath = Join-Path $changeRoot 'PROPOSAL.md'
+    $changeProposal = @"
+# Fixture change proposal
+
+CHANGE_ID: CHG-0001
+CHANGE_STATUS: pending
+CHANGE_OWNER: fixture-owner
+CHANGE_APPROVER: fixture-approver
+CHANGE_BASELINE: fixture-release-v1
+CHANGE_CREATED_AT: 2026-07-30T16:00:00+01:00
+CHANGE_APPROVED_AT: 2026-07-30T16:30:00+01:00
+"@
+    [System.IO.File]::WriteAllText($changeProposalPath, $changeProposal, $utf8NoBom)
+    $beforeRejectedCycle = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json')
+    $rejectedCycle = Invoke-Lifecycle @(
+        'cycle-start', '-ProcessRoot', $fixtureRoot, '-ChangeId', 'CHG-0001',
+        '-Evidence', 'changes/CHG-0001/PROPOSAL.md'
+    )
+    Require-ExitCode -Execution $rejectedCycle -Expected 1 -Label 'cycle-start pending proposal'
+    $afterRejectedCycle = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json')
+    if ($afterRejectedCycle -ne $beforeRejectedCycle) {
+        throw 'Rejected cycle-start changed lifecycle state.'
+    }
+
+    $approvedChangeProposal = $changeProposal.Replace('CHANGE_STATUS: pending', 'CHANGE_STATUS: approved')
+    [System.IO.File]::WriteAllText($changeProposalPath, $approvedChangeProposal, $utf8NoBom)
+    $startCycle = Invoke-Lifecycle @(
+        'cycle-start', '-ProcessRoot', $fixtureRoot, '-ChangeId', 'CHG-0001',
+        '-Evidence', 'changes/CHG-0001/PROPOSAL.md'
+    )
+    Require-ExitCode -Execution $startCycle -Expected 0 -Label 'cycle-start approved proposal'
+    $cycleState = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json') | ConvertFrom-Json
+    if ([int]$cycleState.cycleNumber -ne 2 -or
+        [string]$cycleState.currentPrompt -ne '01' -or
+        [string]$cycleState.status -ne 'ready' -or
+        [string]$cycleState.activeChange.id -ne 'CHG-0001' -or
+        [string]$cycleState.gates.G10.status -ne 'pending') {
+        throw 'cycle-start did not deterministically prepare cycle 2 at prompt 01.'
+    }
+    foreach ($archiveName in @(
+        'BASELINE_LIFECYCLE_STATE.json',
+        'BASELINE_LIFECYCLE_GATE_EVIDENCE.json'
+    )) {
+        if (-not (Test-Path -LiteralPath (Join-Path $changeRoot $archiveName) -PathType Leaf)) {
+            throw "cycle-start did not preserve archive: $archiveName"
+        }
+    }
+    $cycleGateEvidence = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_GATE_EVIDENCE.json') | ConvertFrom-Json
+    if ([int]$cycleGateEvidence.schemaVersion -ne 2 -or
+        @($cycleGateEvidence.gates.PSObject.Properties | Where-Object { $_.Value.status -ne 'pending' }).Count -ne 0) {
+        throw 'cycle-start did not reset structured gate evidence.'
+    }
+    $validateCycle = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    Require-ExitCode -Execution $validateCycle -Expected 0 -Label 'cycle 2 validate'
+    $duplicateCycle = Invoke-Lifecycle @(
+        'cycle-start', '-ProcessRoot', $fixtureRoot, '-ChangeId', 'CHG-0001',
+        '-Evidence', 'changes/CHG-0001/PROPOSAL.md'
+    )
+    Require-ExitCode -Execution $duplicateCycle -Expected 1 -Label 'cycle-start while cycle active'
+    $results.Add('completed lifecycle -> approved CHG -> archived cycle 2 at prompt 01')
 
     Write-Host 'PASS: software lifecycle end-to-end test.' -ForegroundColor Green
     $results | ForEach-Object { Write-Host " - $_" }

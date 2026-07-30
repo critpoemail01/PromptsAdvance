@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "catalogVersion": "2026-07-30.5",
+  "schemaVersion": 2,
+  "catalogVersion": "2026-07-30.7",
   "gates": {
     "G06": {
       "status": "approved",
@@ -25,6 +25,7 @@
       "checks": {
         "ciRequiredChecksPassed": true,
         "sameArtifactPromotionConfigured": true,
+        "signedBuildProvenanceConfigured": true,
         "sloAlertsValidated": true,
         "backupRestoreAndDrTested": true,
         "migrationAndRollbackTested": true,
@@ -35,16 +36,30 @@
       "status": "approved",
       "approvedBy": { "name": "Fixture Independent Reviewer", "identity": "reviewer@example.test", "role": "Independent reviewer" },
       "approvedAt": "2026-07-28T23:47:00+01:00",
-      "artifacts": [{ "path": "pilot/fixtures/lifecycle-gates/gate-artifact.txt", "sha256": "a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31", "kind": "candidate-artifact" }],
+      "artifacts": [
+        { "path": "pilot/fixtures/lifecycle-gates/gate-artifact.txt", "sha256": "a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31", "kind": "candidate-artifact" },
+        { "path": "pilot/fixtures/lifecycle-gates/gate-artifact.txt", "sha256": "a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31", "kind": "build-provenance-attestation" }
+      ],
       "candidate": {
         "baseSha": "1111111111111111111111111111111111111111",
         "candidateSha": "2222222222222222222222222222222222222222",
-        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31"
+        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "provenance": {
+          "attestationDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+          "issuer": "https://token.actions.githubusercontent.com",
+          "builderIdentity": "https://github.com/example/repository/.github/workflows/build.yml@refs/heads/main",
+          "sourceRepository": "https://github.com/example/repository",
+          "sourceSha": "2222222222222222222222222222222222222222",
+          "workflowRef": ".github/workflows/build.yml@refs/heads/main",
+          "predicateType": "https://slsa.dev/provenance/v1",
+          "verificationPassed": true
+        }
       },
       "acceptance": {
         "decision": "GO",
         "candidateSha": "2222222222222222222222222222222222222222",
-        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31"
+        "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "attestationDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31"
       },
       "independentReview": {
         "decision": "GO",
@@ -54,6 +69,7 @@
         "readOnly": true,
         "candidateSha": "2222222222222222222222222222222222222222",
         "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "attestationDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
         "criticalFindings": 0
       }
     },
@@ -68,6 +84,7 @@
         "releaseWindow": "2026-07-28T23:50:00+01:00/2026-07-29T00:20:00+01:00",
         "candidateSha": "2222222222222222222222222222222222222222",
         "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "attestationDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
         "authorizedByIdentity": "release.approver@example.test",
         "authorizedAt": "2026-07-28T23:48:00+01:00"
       },
@@ -76,6 +93,8 @@
         "environment": "fixture-production",
         "candidateSha": "2222222222222222222222222222222222222222",
         "artifactDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "attestationDigest": "sha256:a3cf09b9907426c019749f396c1bf626e8e9243bb53966ab742a2f7000a09b31",
+        "attestationVerified": true,
         "smokeTestsPassed": true,
         "rollbackReady": true,
         "abortCriteria": "rollback on failed smoke, migration health or SLO burn"

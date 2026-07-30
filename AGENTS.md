@@ -4,7 +4,7 @@
 
 Antes de executar qualquer tarefa:
 
-1. Quando `LIFECYCLE_STATE.json` existir, usa a skill `build-professional-web-software`, executa `software-lifecycle.ps1 status` e `validate`, e trabalha apenas no prompt atual preparado em `NEXT_TASK.md`.
+1. Quando `LIFECYCLE_STATE.json` existir, usa a skill `advance-app-continue`, executa `software-lifecycle.ps1 status` e `validate`, e trabalha apenas no prompt atual preparado em `NEXT_TASK.md`.
    Quando o pedido for `Continua o projeto Advance em <caminho>` e o caminho
    ainda não tiver lifecycle, usa `software-lifecycle.ps1 continue
    -ProjectPath <caminho>` para criar uma instância brownfield isolada; não
@@ -19,6 +19,10 @@ Antes de executar qualquer tarefa:
 8. Lê o `IMPLEMENTATION_STATUS.md` quando existir para conhecer decisões, evidências, bloqueios e trabalho já concluído.
 9. Antes de concluir o Gate G03 ou depois de alterar materialmente este processo, lê e executa o `PROMPT_EVALUATION.md` numa cópia descartável. Exige `PILOT_APPROVAL.md` aprovado para a mesma `catalogVersion` e executa `scripts/Test-ImplementationReadinessGate.ps1`; uma revisão estática não aprova o piloto.
 10. Lê os `AGENTS.md` ou `AGENTS.override.md` mais próximos dos ficheiros afetados. Regras locais mais específicas complementam estas instruções.
+11. Depois de existir uma definição aprovada, lê `CHANGE_CONTROL.md` antes de
+    alterar requisitos, arquitetura, contratos, baselines, segurança, operação
+    ou comportamento lançado. Numa instância concluída, inicia um novo ciclo
+    apenas com `software-lifecycle.ps1 cycle-start` e proposta `CHG` aprovada.
 
 Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações: limita-te a identificar a falta e termina como `bloqueado`. Aplica o mesmo comportamento a uma tarefa de produto/experiência se `PRODUCT_EXCELLENCE.md` estiver ausente. A etapa 2 e todas as posteriores ficam bloqueadas se `PRODUCT_DEFINITION.md` estiver ausente, incompleto ou sem `GO`. Depois da descoberta, uma tarefa que altere uma experiência crítica fica igualmente bloqueada se `PRODUCT_QUALITY_BASELINE.md` estiver ausente ou sem critérios aprovados para essa superfície. Se outro ficheiro referenciado estiver ausente, não inventes o seu conteúdo; prossegue apenas quando a tarefa continuar segura e verificável.
 
@@ -39,6 +43,8 @@ Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações: limita-te
 - Criar repositórios remotos, adicionar ou substituir `origin`, fazer commit/push e alterar regras do GitHub são ações externas: exige alvo exato e autorização explícita, verifica conflitos e nunca uses `force push`.
 - A candidata de produção exige revisão final independente, read-only e sobre commit/artefacto imutável. O revisor não corrige a própria candidata; findings regressam ao implementador e uma nova candidata exige nova revisão.
 - Quando existir uma instância do lifecycle, não alteres `currentPrompt`, gates ou estados diretamente para contornar validações. Regista cada resultado com `software-lifecycle.ps1 record` e evidência durável. Deixa as transições determinísticas ao orquestrador e usa `select` apenas nas decisões permitidas por `status`.
+- Feedback, métricas e findings não alteram diretamente a fonte canónica:
+  captura o delta e aplica o workflow de `CHANGE_CONTROL.md`.
 - Em cada prompt de uma instância, inicia o task ledger com
   `software-lifecycle.ps1 work-start`, checkpointa goals e verificações, regista
   findings aceites e fecha-os com evidência. `record completed` só é válido

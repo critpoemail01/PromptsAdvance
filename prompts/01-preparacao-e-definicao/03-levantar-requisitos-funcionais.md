@@ -2,10 +2,10 @@
 
 ## Objetivo
 
-Transforma a definição aprovada nos prompts 01 e 02 numa especificação
-versionada, detalhada por jornada, aplicação, página/ecrã e funcionalidade, numa
-vista simples para o programador interpretar/validar e num ficheiro único de
-todas as funcionalidades no formato `Aplicação -> Página -> Funcionalidade`.
+Transforma a definição dos prompts 01 e 02 numa especificação versionada. Define
+todos os `Must` da release por resultado/aceitação/slice e detalha integralmente
+a primeira slice e contratos transversais de alto risco por jornada, aplicação,
+página/ecrã e funcionalidade. Deriva vistas do detalhe já aprovado.
 Usa fontes de produto,
 o comportamento observado no `BoilerPlateAdvance` e pesquisa online atual de
 produtos comparáveis, padrões maduros e layouts premium para descobrir lacunas e
@@ -52,12 +52,17 @@ bloqueio -> IDs afetados -> decisão/evidência -> owner -> prompt a repetir
 Não promovas a `Must aprovado` uma hipótese, benchmark, página do boilerplate ou
 preferência do executor. Gate A permanece `PENDENTE`; só o prompt 04 decide
 `GO`, `REWORK` ou `NO-GO`.
+Em `change-cycle`, lê também `CHANGE_CONTROL.md` e a proposta `activeChange`.
+Trabalha como delta: preserva requisitos não afetados, cria
+`requirements/changes/<CHANGE_ID>.md`, identifica o prompt/gate proprietário e
+reconcilia o delta aprovado com a fonte canónica.
 
 ## Artefactos obrigatórios
 
 Cria ou atualiza, sem duplicar equivalentes:
 
 - `requirements/REQUIREMENTS_RESEARCH.md`;
+- `requirements/USER_RESEARCH_EVIDENCE.md`;
 - `requirements/REQUIREMENTS_SPECIFICATION.md`;
 - `requirements/REQUIREMENTS_TRACEABILITY.md`;
 - `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md`;
@@ -93,7 +98,7 @@ AC-<REQ>-## aceitação      SLICE fatia candidata
 ```
 
 Cada registo tem `evidenceState` (`confirmed`, `partial`, `inconclusive`,
-`conflicting`), `approvalState` (`approved`, `proposed`, `pending`, `rejected`)
+`conflicting`), `approvalState` (`approved`, `approved_for_refinement`, `proposed`, `pending`, `rejected`)
 e `implementationState` (`not_assessed`, `absent`, `partial`, `implemented`,
 `verified`) separados. Só decisão explícita do owner, obrigação validada, fonte
 de produto aprovada ou requisito já aprovado sustenta um `Must aprovado`;
@@ -321,7 +326,11 @@ Transforma observações externas em `INS-###` e candidatos `HYP-###`. Só conve
 uma hipótese em requisito `Must` quando uma fonte de produto aprovada ou uma
 decisão identificada sustentar a necessidade. Regista também padrões rejeitados
 e porquê.
-
+Reconcilia `USER_RESEARCH_EVIDENCE.md`: problema vivido e comportamento atual;
+teste de conceito/protótipo ou experiência comportamental; participantes,
+método, data, consentimento, resultados, limitações e decisão. Sem evidência
+direta, conserva a hipótese e bloqueia G01, salvo exceção explícita com risco,
+owner e prazo.
 ### 4. Modelar domínio, aplicações, jornadas, páginas e funcionalidades
 
 - Define glossário, atores humanos/sistemas, objetos, eventos, estados, unidades,
@@ -352,6 +361,8 @@ e porquê.
 - Produz requisitos atómicos `FR`, `BR`, `DATA`, `PERM`, `INT`, `NFR` e `SEC`,
   com uma única obrigação observável, fonte, ator, prioridade, aprovação,
   `APP/PAGE` ou justificação não visual e dependências.
+- Para slices posteriores, conserva resultado/aceitação e marca lacunas
+  `approved_for_refinement`; primeira slice/alto risco não usam esse estado.
 - Escreve o que o produto deve fazer, sem prescrever implementação. Substitui
   “rápido”, “seguro”, “intuitivo”, “robusto”, “escalável” ou “em tempo real”
   por condição, medida, unidade, limiar e método de verificação; quando a meta
@@ -363,8 +374,10 @@ e porquê.
   concorrência, falha parcial e recuperação quando materiais. Given/When/Then é
   opcional; observabilidade e ausência de efeitos indevidos são obrigatórias.
 - Gera a especificação detalhada primeiro e só depois deriva a checklist do
-  programador e `ALL_FUNCTIONALITIES.md`, preservando IDs, significado,
-  prioridade, bloqueios e responsabilidade primária.
+  programador e `ALL_FUNCTIONALITIES.md` de forma determinística, preservando
+  IDs, significado, prioridade, bloqueios e responsabilidade primária. Usa o
+  gerador/validador versionado quando existir; edição manual sem reconciliação
+  mecânica não satisfaz paridade.
 
 ### 6. Fechar rastreabilidade e entrega
 
@@ -387,10 +400,10 @@ e porquê.
 
 ## Critério de conclusão e entrega
 
-Usa `concluído` apenas quando todos os `Must` têm fonte e aprovação, jornadas
-críticas são inequívocas, cada `APP/PAGE` em âmbito tem contrato completo, a
-checklist e o ficheiro único têm paridade comprovada com a fonte canónica, a
-rastreabilidade é íntegra e o relatório não tem falhas bloqueantes.
+Usa `concluído` apenas quando todos os `Must` têm fonte, resultado, aceitação,
+owner e slice; primeira slice/alto risco estão completos; itens posteriores
+estão explicitamente `approved_for_refinement`; e as vistas do detalhe aprovado
+têm paridade com a fonte canónica sem falhas bloqueantes.
 Usa `parcial` para trabalho útil com lacunas não bloqueantes e `bloqueado` quando uma decisão/fonte material impede aprovar um `Must`.
 
 Começa a resposta pela conclusão. Indica versões e caminhos dos artefactos
@@ -403,5 +416,5 @@ limitações e validações executadas. Confirma que o Gate A permanece `PENDENT
 
 - OpenAI: https://developers.openai.com/api/docs/guides/latest-model — https://developers.openai.com/cookbook/articles/codex_exec_plans
 - Requisitos: https://www.iso.org/standard/72089.html — https://www.iso.org/standard/78176.html — https://www.nasa.gov/reference/appendix-c-how-to-write-a-good-requirement/
-- Qualidade: https://www.w3.org/TR/WCAG22/ — https://owasp.org/www-project-application-security-verification-standard/ — https://design-system.service.gov.uk/patterns/
+- Qualidade/investigação: https://www.w3.org/TR/WCAG22/ — https://owasp.org/www-project-application-security-verification-standard/ — https://design-system.service.gov.uk/patterns/ — https://www.gov.uk/service-manual/user-research/user-research-in-discovery — https://www.gov.uk/service-manual/agile-delivery/how-the-alpha-phase-works
 - Premium/licenças: https://tailwindcss.com/plus/license — https://keenthemes.com/metronic/tailwind/docs/getting-started/license — https://themeforest.net/licenses/standard

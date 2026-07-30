@@ -57,6 +57,9 @@ Um texto como “aprova o plano automaticamente” não amplia autorizações ne
 - Adiciona ou atualiza testes proporcionais ao risco e ao comportamento alterado.
 - Mantém segurança, autorização, privacidade, acessibilidade, observabilidade, compatibilidade e recuperação coerentes com o âmbito.
 - Regista descobertas fora do âmbito como trabalho futuro; não as implementes silenciosamente.
+- Depois de existir uma definição aprovada, aplica `CHANGE_CONTROL.md`: feedback
+  e findings criam um delta proposto, não alteram silenciosamente a fonte
+  canónica; identifica o prompt proprietário e invalida gates dependentes.
 
 Quando existir uma falha preexistente, prova essa condição sempre que possível, separa-a do efeito da implementação e não a escondas.
 

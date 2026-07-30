@@ -264,6 +264,8 @@ Aliases:
 | Estratégia mobile Web/PWA | A preencher | pendente | Produto/UX |
 | Catálogo de componentes e estados | A preencher | pendente | Design system |
 | Plano/resultados de usabilidade | A preencher | pendente | Investigação com utilizadores |
+| Evidência direta do problema e solução | A preencher | pendente | `requirements/USER_RESEARCH_EVIDENCE.md` |
+| Exceção de investigação aprovada | A preencher | pendente | Gate A/owner de produto |
 | Baselines de regressão visual | A preencher | pendente | Testes/CI |
 | Revisor Product Design/UX | A preencher | pendente | Aprovação |
 | Revisor de engenharia/frontend | A preencher | pendente | Aprovação |
@@ -290,6 +292,8 @@ Aliases:
 - `[ESTRATEGIA_MOBILE_WEB]`
 - `[CATALOGO_DE_COMPONENTES_E_ESTADOS]`
 - `[PLANO_E_RESULTADOS_DE_USABILIDADE]`
+- `[EVIDENCIA_DE_INVESTIGACAO_COM_UTILIZADORES]`
+- `[EXCECAO_DE_INVESTIGACAO_APROVADA]`
 - `[BASELINES_DE_REGRESSAO_VISUAL]`
 - `[REVISOR_PRODUCT_DESIGN]`, `[REVISOR_ENGENHARIA_FRONTEND]`
 
@@ -443,6 +447,8 @@ Aliases:
 | Base SHA da candidata | A preencher | pendente | Git |
 | Candidate SHA | A preencher | pendente | Git |
 | Digest do artefacto | A preencher | pendente | Pipeline |
+| Attestation/proveniência da build | A preencher | pendente | Pipeline de build |
+| Issuer e builder identity da attestation | A preencher | pendente | Verificação da attestation |
 | Revisor/tarefa independente | A preencher | pendente | Revisão final |
 | Evidência de separação da revisão | A preencher | pendente | Revisão final |
 | Decisão da revisão independente | A preencher | pendente | Revisão final |
@@ -457,6 +463,7 @@ Aliases:
 - `[VERSAO_CANDIDATA]`
 - `[BUILD_ID]`
 - `[BASE_SHA]`, `[CANDIDATE_SHA]`, `[ARTIFACT_PATH]`, `[ARTIFACT_DIGEST]`
+- `[ATTESTATION_PATH]`, `[ATTESTATION_DIGEST]`, `[ATTESTATION_ISSUER]`, `[BUILDER_IDENTITY]`
 - `[REVISOR_INDEPENDENTE]`, `[EVIDENCIA_DE_SEPARACAO]`, `[DECISAO_REVISAO_INDEPENDENTE]`
 - `[POLITICA_DE_COMPATIBILIDADE]`
 - `[POLITICA_DE_ATUALIZACAO]`

@@ -10,11 +10,16 @@ Validador: `scripts/Test-ProductDefinitionGate.ps1`.
 
 - problema, público, job to be done e jornada principal concretos;
 - procura, alternativas, acesso ao público e diferenciação sustentados;
+- evidência direta do problema e teste da solução com utilizadores
+  representativos, ou exceção aprovada com risco, owner, prazo e plano;
 - MVP, exclusões, orçamento, prazo e métrica de decisão;
-- requisitos `Must` aprovados, singulares e verificáveis;
-- especificação detalhada, checklist legível do programador e
-  `ALL_FUNCTIONALITIES.md` em paridade por página, funcionalidade, requisito,
-  ramo/efeito e critério de aceitação;
+- requisitos `Must` da release com resultado, fonte, prioridade, aceitação,
+  owner e slice candidata; a primeira slice e contratos transversais de alto
+  risco estão totalmente refinados;
+- especificação canónica e vistas derivadas em paridade para o detalhe já
+  aprovado; nenhuma linha genérica finge que uma slice futura está pronta;
+- cada slice posterior passa um Definition of Ready no prompt 25/27, atualiza a
+  fonte canónica e reconcilia checklist e `ALL_FUNCTIONALITIES.md` antes de código;
 - aprovação explícita da versão pelo responsável de produto.
 
 ## G02 — Arquitetura e fundação
@@ -136,6 +141,8 @@ Critérios:
 
 - CI reprodutível com build, testes, segurança, acessibilidade e diffs visuais aplicáveis;
 - estratégia de ambientes e promoção do mesmo artefacto;
+- SBOM e attestation de proveniência assinada gerados pela build, ligados ao
+  repositório, workflow, commit e digest, e verificados antes da promoção;
 - SLI/SLO, error budget e alertas ligados a jornadas;
 - dashboards e owners;
 - backup, restore e disaster recovery testados contra RPO/RTO;
@@ -146,11 +153,11 @@ Critérios:
 ## G08/G09 — Aceitação, revisão independente e release
 
 - documentação e manutenção concluídas;
-- base SHA, candidate SHA, artefacto e digest imutáveis;
+- base SHA, candidate SHA, artefacto, digest e attestation imutáveis;
 - aceitação sobre a candidata exata;
 - revisão separada, read-only e sem transcript da implementação;
 - `NO-GO` regressa ao implementador e gera nova candidata;
-- autorização de release identifica ambiente, SHA, digest e janela;
+- autorização de release identifica ambiente, SHA, digest, attestation e janela;
 - deploy executa migrations seguras, smoke tests e confirmação de observabilidade;
 - rollback testável e critérios de abort definidos;
 - nenhuma afirmação “sem bugs” ou “100% conforme” sem cobertura que a sustente.
@@ -170,6 +177,8 @@ SHA e digest autorizados e exige smoke tests, rollback e critérios de aborto.
 - custos e anomalias com owners;
 - vulnerabilidades e dependências revistas continuamente;
 - métricas DORA usadas para aprendizagem, sem transformar métricas em quotas individuais;
+- deployment rework rate medido separadamente e reliability tratada como
+  resultado operacional/SLO, não como substituto de uma métrica de entrega;
 - backlog de melhorias priorizado por impacto, risco, evidência e esforço.
 
 ## Integridade

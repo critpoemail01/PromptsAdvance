@@ -6,9 +6,11 @@ Prepara ou executa uma publicação controlada para `[AMBIENTE_ALVO]`, usando ex
 
 ## Entradas e autoridade
 
-- Sempre: `[AMBIENTE_ALVO]`, `[BASE_SHA]`, `[CANDIDATE_SHA]`, `[ARTIFACT_DIGEST]`, janela, runbook e responsáveis.
+- Sempre: `[AMBIENTE_ALVO]`, `[BASE_SHA]`, `[CANDIDATE_SHA]`,
+  `[ARTIFACT_DIGEST]`, `[ATTESTATION_DIGEST]`, issuer/builder autorizados,
+  janela, runbook e responsáveis.
 - Para executar: `[MODO]=executar`, decisão `GO` do prompt 62, decisão `[DECISAO_REVISAO_INDEPENDENTE]=GO` do prompt 63 para o mesmo SHA/digest, identificador inequívoco do ambiente e `[AUTORIZAR_RELEASE]` explícito imediatamente antes da primeira ação externa.
-- Se qualquer commit, artefacto, configuração material ou migration mudar depois das aprovações, termina `NO-GO` e regressa aos prompts 62 e 63.
+- Se qualquer commit, artefacto, attestation, configuração material ou migration mudar depois das aprovações, termina `NO-GO` e regressa aos prompts 62 e 63.
 - A autorização para deploy não autoriza automaticamente rollback destrutivo, restauro, limpeza de dados, alteração de DNS ou rotação de segredos.
 - No modo `preparar`, podes ler, validar localmente, gerar checklist/scripts e apresentar um go/no-go; não contactes o ambiente nem alteres estado externo.
 - Se o ambiente real não corresponder ao identificador autorizado, para sem tentar corrigir o alvo.
@@ -33,12 +35,16 @@ Prepara ou executa uma publicação controlada para `[AMBIENTE_ALVO]`, usando ex
 ## Fase 1 — Preparação e go/no-go
 
 1. Completa a checklist e executa validações locais/não mutáveis disponíveis.
-2. Verifica identidade SHA/digest, compatibilidade expand/contract, rollback técnico, backup exigido, observabilidade, SLI/SLO/error budget e smoke tests.
+2. Verifica identidade SHA/digest e a attestation assinada para o mesmo subject,
+   source SHA, issuer e builder; verifica ainda compatibilidade expand/contract,
+   rollback técnico, backup, observabilidade, SLI/SLO/error budget e smoke tests.
 3. Produz um go/no-go com bloqueios. No modo `preparar`, termina aqui.
 
 ## Fase 2 — Execução autorizada
 
 - Confirma ambiente e artefacto por identificadores, não por nomes ambíguos.
+- Volta a verificar a attestation no ambiente/pipeline de promoção antes de
+  executar qualquer migration ou deploy.
 - Verifica backup recente/restaurável conforme o runbook.
 - Coloca alterações incompatíveis em sequência expand/contract quando possível.
 - Executa migration e deployment apenas no ambiente autorizado.

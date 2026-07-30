@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-30.5 |
+| Catalog version | 2026-07-30.7 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -76,3 +76,17 @@ ramos/interações/efeitos e paridade mecânica com a especificação, contratos
 PAGE, checklist e rastreabilidade. O prompt 04 passa a bloquear o Gate A perante
 omissões, IDs divergentes ou linhas genéricas. Esta alteração material exige
 nova execução de EVAL-15 e da suite completa.
+
+A versão 2026-07-30.6 separa os pontos de entrada em `$advance-app-start` para
+criar uma aplicação e `$advance-app-continue` para continuar ou adotar uma
+instância. O inicializador, o orquestrador, a documentação e os testes passam a
+copiar e exigir `.agents/skills/advance-app-continue`. A validação estrutural
+numa cópia descartável não substitui a suite piloto completa, a avaliação
+humana nem a revisão separada; o estado permanece `pending`.
+
+A versão 2026-07-30.7 acrescenta investigação direta de problema/solução ao
+Gate A, change control com ciclos arquivados, attestations assinadas nos gates
+G07–G09, as cinco métricas DORA atuais, CI do próprio catálogo e ponte
+`CLAUDE.md`. Estas alterações são materiais: exigem repetir EVAL-01, EVAL-03,
+EVAL-04, EVAL-11, EVAL-13, EVAL-15 e depois a suite completa. Avaliação humana
+e revisão separada continuam obrigatórias; o estado permanece `pending`.

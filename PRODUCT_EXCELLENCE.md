@@ -6,6 +6,11 @@ Este protocolo aplica-se a tarefas que definam ou alterem a ideia do produto, re
 
 O objetivo não é produzir uma interface apenas funcional nem copiar uma aplicação conhecida. O objetivo é compreender porque é que produtos maduros resolvem bem problemas comparáveis e adaptar esses padrões ao público, domínio, identidade e arquitetura desta aplicação.
 
+Benchmark e desk research não validam o problema nem a solução. Antes de G01,
+exige evidência direta com utilizadores representativos segundo
+`PRODUCT_DEFINITION.md`; antes de propagar a primeira slice, exige o teste de
+usabilidade deste protocolo.
+
 Uma aplicação de excelência deve parecer coerente e intencional, não uma colagem de componentes, tendências ou marcas. Cada decisão relevante deve estar ligada a um problema do utilizador, a uma referência observada, a evidência de usabilidade ou a um princípio aprovado.
 
 ## 2. Pesquisa obrigatória de referências

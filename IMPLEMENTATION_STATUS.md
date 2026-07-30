@@ -13,6 +13,7 @@ Este ficheiro é a fonte de verdade operacional entre tarefas do Codex. Copia-o 
 | Commit-base | A preencher |
 | Candidate SHA | A preencher |
 | Digest do artefacto | A preencher |
+| Attestation/proveniência | A preencher |
 | Etapa atual | 01 — preparação e definição |
 | Último prompt concluído | Nenhum |
 | Estado global | bloqueado |
@@ -42,12 +43,12 @@ Esta tabela replica o estado resumido de `PRODUCT_DEFINITION.md`; esse documento
 |---|---|---|
 | DOR-01 — problema específico e comprovado | pendente | — |
 | DOR-02 — público, segmento, contexto e job to be done | pendente | — |
-| DOR-03 — procura, alternativas, acesso e diferenciação | pendente | — |
+| DOR-03 — pesquisa de mercado e evidência direta do problema | pendente | — |
 | DOR-04 — nome de trabalho aprovado e triado | pendente | — |
 | DOR-05 — jornada, aplicações/páginas, MVP e exclusões | pendente | — |
 | DOR-06 — detalhe e checklist do programador em paridade | pendente | — |
 | DOR-07 — NFR materiais mensuráveis | pendente | — |
-| DOR-08 — métricas, meta e critério de continuar/parar | pendente | — |
+| DOR-08 — métricas e validação prévia da solução | pendente | — |
 | DOR-09 — orçamento, prazo, competências e viabilidade | pendente | — |
 | DOR-10 — nenhuma decisão material em aberto | pendente | — |
 | DOR-11 — prompts 01–04 concluídos com evidência | pendente | — |
@@ -120,6 +121,7 @@ Regista comandos exatos e resultados observados. Nunca declares uma plataforma v
 | Base SHA | A preencher | pendente |
 | Candidate SHA | A preencher | pendente |
 | Artefacto e digest | A preencher | pendente |
+| Attestation, issuer, builder e verificação | A preencher | pendente |
 | Pipeline/run e timestamps | A preencher | pendente |
 | Ambiente e dados de teste | A preencher | pendente |
 | Comandos e exit codes | A preencher | pendente |

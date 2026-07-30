@@ -72,6 +72,10 @@ if ($failures.Count -eq 0) {
         GATE_A_APPROVER = Get-Marker -Content $definition -Name 'GATE_A_APPROVER'
         GATE_A_DECISION_DATE = Get-Marker -Content $definition -Name 'GATE_A_DECISION_DATE'
         GATE_A_APPROVAL_EVIDENCE = Get-Marker -Content $definition -Name 'GATE_A_APPROVAL_EVIDENCE'
+        GATE_A_USER_RESEARCH_STATUS = Get-Marker -Content $definition -Name 'GATE_A_USER_RESEARCH_STATUS'
+        GATE_A_USER_RESEARCH_EVIDENCE = Get-Marker -Content $definition -Name 'GATE_A_USER_RESEARCH_EVIDENCE'
+        GATE_A_SOLUTION_VALIDATION_STATUS = Get-Marker -Content $definition -Name 'GATE_A_SOLUTION_VALIDATION_STATUS'
+        GATE_A_SOLUTION_VALIDATION_EVIDENCE = Get-Marker -Content $definition -Name 'GATE_A_SOLUTION_VALIDATION_EVIDENCE'
     }
 
     if ($markers.GATE_A_DOCUMENT_STATUS -ne 'aprovado') {
@@ -90,6 +94,23 @@ if ($failures.Count -eq 0) {
     )) {
         if (-not (Test-UsefulEvidence -Value $markers[$name])) {
             Add-Failure "Required marker has no useful value: $name."
+        }
+    }
+
+    foreach ($statusName in @(
+        'GATE_A_USER_RESEARCH_STATUS',
+        'GATE_A_SOLUTION_VALIDATION_STATUS'
+    )) {
+        if ($markers[$statusName] -notin @('completed', 'approved_exception')) {
+            Add-Failure "$statusName must be 'completed' or 'approved_exception'; found '$($markers[$statusName])'."
+        }
+    }
+    foreach ($evidenceName in @(
+        'GATE_A_USER_RESEARCH_EVIDENCE',
+        'GATE_A_SOLUTION_VALIDATION_EVIDENCE'
+    )) {
+        if (-not (Test-UsefulEvidence -Value $markers[$evidenceName])) {
+            Add-Failure "Required marker has no useful value: $evidenceName."
         }
     }
 
@@ -196,5 +217,7 @@ Write-Host 'PASS: Gate A is valid; stage 2 may start.' -ForegroundColor Green
 Write-Host " - Definition: $([System.IO.Path]::GetFullPath($DefinitionPath))"
 Write-Host " - Status: $([System.IO.Path]::GetFullPath($StatusPath))"
 Write-Host ' - DOR-01 through DOR-12 passed with evidence.'
+Write-Host " - User research: $($markers.GATE_A_USER_RESEARCH_STATUS)."
+Write-Host " - Solution validation: $($markers.GATE_A_SOLUTION_VALIDATION_STATUS)."
 Write-Host ' - Prompts 01 through 04 completed with evidence.'
 exit 0

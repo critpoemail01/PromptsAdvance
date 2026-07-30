@@ -1,9 +1,9 @@
 ---
-name: build-professional-web-software
-description: Start, adopt, continue, validate, or recover the repository's complete gated lifecycle for greenfield or existing brownfield professional web software, from idea/product discovery through architecture, UX/UI, vertical-slice implementation, security, delivery, release, monitoring, ROI, bugs, and continuous improvement. Use when Codex is asked to create a new app from BoilerPlateAdvance, continue or adopt an Advance project from a filesystem path, determine or execute the next lifecycle prompt, automate the 73-prompt process, assess stage readiness, or produce professional layout, architecture, and engineering evidence without skipping gates.
+name: advance-app-continue
+description: Continue, adopt, validate, or recover an Advance application's complete gated lifecycle for greenfield or existing brownfield professional web software, from idea/product discovery through architecture, UX/UI, vertical-slice implementation, security, delivery, release, monitoring, ROI, bugs, and continuous improvement. Use when Codex is asked to continue or adopt an Advance project from a filesystem path, determine or execute the next lifecycle prompt, automate the 73-prompt process, assess stage readiness, or produce professional layout, architecture, and engineering evidence without skipping gates.
 ---
 
-# Build Professional Web Software
+# Advance App Continue
 
 Operate the prompt catalog as a controlled software team workflow. Keep one task per prompt, use small complete vertical slices, and fail closed when a gate, decision, evidence, authorization, or independent review is missing.
 
@@ -11,7 +11,9 @@ Operate the prompt catalog as a controlled software team workflow. Keep one task
 
 1. Find the nearest `PROCESS_MANIFEST.json` and `software-lifecycle.ps1`.
 2. Treat that directory as the lifecycle root.
-3. Read `AGENTS.md`, `EXECUTION_CONTRACT.md`, `APP_CONTEXT.md`, `IMPLEMENTATION_STATUS.md`, `LIFECYCLE_STATE.json` when present, and the current prompt.
+3. Read `AGENTS.md`, `EXECUTION_CONTRACT.md`, `CHANGE_CONTROL.md`,
+   `APP_CONTEXT.md`, `IMPLEMENTATION_STATUS.md`, `LIFECYCLE_STATE.json` when
+   present, and the current prompt.
 4. Read [workflow.md](references/workflow.md) completely before selecting a prompt or crossing a stage.
 5. Read [quality-gates.md](references/quality-gates.md) and the root `QUALITY_GATES.md` before architecture, UI/UX, implementation, hardening, acceptance, release, or operations work.
 
@@ -40,6 +42,19 @@ From the instance root:
 ```
 
 If validation fails, repair lifecycle metadata only when evidence supports it. Do not bypass a failed product, architecture, design, security, release, or production gate.
+
+For an already completed lifecycle, do not edit state or silently patch the
+released baseline. Create and approve `changes/CHG-####/PROPOSAL.md` according
+to `CHANGE_CONTROL.md`, then run:
+
+```powershell
+.\software-lifecycle.ps1 cycle-start `
+  -ProcessRoot . `
+  -ChangeId CHG-0001 `
+  -Evidence changes/CHG-0001/PROPOSAL.md
+```
+
+This archives the previous state and returns to prompt 01 in `change-cycle`.
 
 ## Continue or adopt from an application path
 

@@ -11,6 +11,8 @@ concluídos e o prompt 03 é o prompt atual. Copia:
   `IMPLEMENTATION_STATUS.md`;
 - `pilot/fixtures/prompt-03/product-sources.md` →
   `requirements/PRODUCT_SOURCES.md`;
+- `pilot/fixtures/prompt-03/user-research-evidence.md` →
+  `requirements/USER_RESEARCH_EVIDENCE.md`;
 - `pilot/fixtures/prompt-03/untrusted-premium-preview.html` para o mesmo caminho
   relativo;
 - o prompt 03 autocontido da `catalogVersion` em avaliação.
@@ -78,16 +80,15 @@ O caso passa apenas quando:
    detalhados por informação, ações, formulários, dados, autorização, estados,
    recuperação, responsive/adaptive, acessibilidade, conteúdo, telemetria,
    SEO/HTTP quando aplicável, aceitação e prova;
-7. existe `DEVELOPER_REQUIREMENTS_CHECKLIST.md`, legível por página e
-   funcionalidade, derivado da especificação detalhada, com checkpoints antes,
-   durante e depois da implementação, todos os `Must`, `AC`, prova, bloqueios e
-   sem criar ou alterar requisitos;
+7. existe `DEVELOPER_REQUIREMENTS_CHECKLIST.md`, derivado da especificação, com
+   checkpoints antes/durante/depois, todos os `Must` ligados a resultado,
+   aceitação, owner e slice; primeira slice/alto risco estão detalhados e os
+   restantes marcados `approved_for_refinement`;
 8. existe `requirements/ALL_FUNCTIONALITIES.md`, organizado por projeto/APP,
    página e funcionalidade, com uma tabela por funcionalidade e exatamente as
-   colunas `ID | Quem | Onde | Quando | O quê`; todas as interações, condições,
-   ramificações e efeitos materialmente distintos aparecem em linhas `RF-P`
-   concretas, únicas e rastreáveis para a especificação detalhada, checklist e
-   matriz de rastreabilidade;
+   colunas `ID | Quem | Onde | Quando | O quê`; para o detalhe já aprovado,
+   interações, condições, ramificações e efeitos distintos aparecem em `RF-P`
+   concretos e rastreáveis; não existem linhas genéricas para slices futuras;
 9. jornadas, requisitos atómicos e contratos transversais usam IDs estáveis e
    rastreabilidade bidirecional desde fonte até prova;
 10. lacunas materiais ficam `pendente`/`bloqueado` com owner e IDs; Gate A

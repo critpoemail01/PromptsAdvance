@@ -43,7 +43,7 @@ no prompt 01 antes do Gate G01.
 Abre esta pasta no Codex e envia:
 
 ```text
-Usa $build-professional-web-software.
+Usa $advance-app-start.
 Inicia uma nova iniciativa chamada "nome-da-iniciativa".
 O responsável de produto é "nome-do-responsável".
 Usa o `BoilerPlateAdvance` em `C:\Work\BoilerPlateAdvance`.
@@ -55,9 +55,13 @@ O Codex cria uma instância isolada do processo, apresenta o caminho, prepara `N
 Para continuar mais tarde:
 
 ```text
-Usa $build-professional-web-software e continua a iniciativa em "CAMINHO_DA_INSTANCIA".
+Usa $advance-app-continue e continua a iniciativa em "CAMINHO_DA_INSTANCIA".
 Valida o estado, executa apenas o próximo trabalho autorizado e apresenta evidências.
 ```
+
+Se a instância já terminou e existe uma mudança material, cria e aprova primeiro
+`changes/CHG-####/PROPOSAL.md` segundo `CHANGE_CONTROL.md`; depois usa
+`software-lifecycle.ps1 cycle-start`. Não edites o estado concluído diretamente.
 
 ## Opção por PowerShell
 
@@ -92,7 +96,7 @@ Comandos seguintes:
 O comando `next` cria ou atualiza `NEXT_TASK.md`. Abre uma tarefa Codex na instância e envia:
 
 ```text
-Usa $build-professional-web-software e executa integralmente NEXT_TASK.md.
+Usa $advance-app-continue e executa integralmente NEXT_TASK.md.
 ```
 
 `NEXT_TASK.md` exige uma tentativa estruturada antes da execução. O Codex usa:

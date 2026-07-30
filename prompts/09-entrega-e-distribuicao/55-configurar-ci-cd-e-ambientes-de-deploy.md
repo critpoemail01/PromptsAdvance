@@ -9,6 +9,8 @@ Adapta os workflows existentes (`ci.yml`, `ci-maui.yml`, `cd-test.yml`, `cd-prod
 - CI valida restore locked, build, testes e artefactos relevantes.
 - Pull requests executam checks automáticos de acessibilidade, regressão visual dos estados estáveis e análise de segurança aplicáveis.
 - O mesmo artefacto aprovado progride entre ambientes quando a plataforma o permite.
+- A build produz SBOM e attestation de proveniência assinada; promoções
+  verificam identidade, source SHA e digest antes de usar o artefacto.
 - Ambientes têm proteção, responsáveis, approvals e secrets separados.
 - Workflows usam permissões mínimas, actions imutáveis e OIDC quando suportado.
 - Falha impede promoção e deixa evidência diagnosticável.
@@ -31,6 +33,9 @@ Adapta os workflows existentes (`ci.yml`, `ci-maui.yml`, `cd-test.yml`, `cd-prod
 - Usa environment secrets/variables e OIDC; não imprime credenciais.
 - Mantém produção protegida por regras e aprovação proporcionais ao risco.
 - Publica resultados/artefactos úteis sem dados sensíveis.
+- Gera a attestation apenas depois de fixar o artefacto final. Regista issuer,
+  builder identity, workflow ref, source repository/SHA, predicate e digest;
+  conserva a verificação como evidência de G07.
 - Evita executar CD de produção em forks ou inputs não confiáveis.
 - Inclui concurrency/cancelamento sem interromper deployment já iniciado de forma insegura.
 - Executa em cada pull request os checks automáticos de acessibilidade das superfícies alteradas. Mantém a auditoria manual para jornadas críticas.
@@ -41,7 +46,7 @@ Adapta os workflows existentes (`ci.yml`, `ci-maui.yml`, `cd-test.yml`, `cd-prod
 
 ## Validação
 
-Valida sintaxe e referências, executa localmente os comandos equivalentes e dispara CI numa alteração segura quando autorizado. Exercita falha de teste, finding de acessibilidade, regressão visual não aprovada, ausência de secret e promoção a ambiente não produtivo. Verifica que cada falha bloqueia merge/promoção e preserva artefactos de diagnóstico. Não faz deployment real de produção sem autorização explícita.
+Valida sintaxe e referências, executa localmente os comandos equivalentes e dispara CI numa alteração segura quando autorizado. Exercita falha de teste, finding de acessibilidade, regressão visual não aprovada, ausência de secret, attestation ausente/inválida ou de outro commit e promoção a ambiente não produtivo. Verifica que cada falha bloqueia merge/promoção e preserva artefactos de diagnóstico. Não faz deployment real de produção sem autorização explícita.
 
 ## Entrega
 
@@ -52,6 +57,7 @@ Apresenta matriz, workflows alterados, actions com SHA e versão de origem, perm
 - https://docs.github.com/actions/deployment/targeting-different-environments/managing-environments-for-deployment
 - https://docs.github.com/actions/security-guides/security-hardening-for-github-actions
 - https://docs.github.com/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect
+- https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations
 - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
 - https://playwright.dev/docs/test-snapshots
 - https://www.w3.org/WAI/test-evaluate/
