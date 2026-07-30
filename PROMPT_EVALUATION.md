@@ -508,6 +508,24 @@ alterar estado. EVAL-13 deve rejeitar attestation ausente, inválida, de outro
 commit, issuer ou builder. A suite completa, avaliação humana e revisão separada
 permanecem pendentes.
 
+Na `catalogVersion` 2026-07-30.8, a entrada de criação passou a existir como
+skill local `$advance-app-start`, limitada à inicialização greenfield e ao
+prompt 01. `$advance-app-continue` deixou de conter o comando `start` e passou a
+encaminhar novas iniciativas para a skill própria. Os oráculos estruturais
+devem rejeitar a ausência de qualquer skill, metadados de UI incorretos, criação
+sem task ledger ou a reintrodução do arranque na skill de continuação. A
+validação numa cópia descartável deve passar; a suite completa, avaliação
+humana e revisão separada permanecem pendentes.
+
+Na `catalogVersion` 2026-07-30.9`, as duas skills passaram também a ser
+distribuídas pelo plugin `advance-app` do marketplace `promptsadvance`. A
+validação deve confirmar o manifesto, as políticas `AVAILABLE`/`ON_INSTALL`, os
+metadados visíveis, a resolução do catálogo instalado ou configurado e a
+delegação para as skills canónicas. A ausência do catálogo deve falhar sem
+escritas nem pesquisa ampla. A validação estrutural e a cópia descartável não
+substituem a suite completa, a avaliação humana nem a revisão separada, que
+permanecem pendentes.
+
 ## Referências
 
 - https://developers.openai.com/api/docs/guides/evaluation-best-practices

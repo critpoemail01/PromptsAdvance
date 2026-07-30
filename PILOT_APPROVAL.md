@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-30.7 |
+| Catalog version | 2026-07-30.9 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -90,3 +90,20 @@ G07–G09, as cinco métricas DORA atuais, CI do próprio catálogo e ponte
 `CLAUDE.md`. Estas alterações são materiais: exigem repetir EVAL-01, EVAL-03,
 EVAL-04, EVAL-11, EVAL-13, EVAL-15 e depois a suite completa. Avaliação humana
 e revisão separada continuam obrigatórias; o estado permanece `pending`.
+
+A versão 2026-07-30.8 conclui a separação dos pontos de entrada declarada na
+versão 2026-07-30.6: adiciona a skill local `$advance-app-start` para criar uma
+instância greenfield e executar apenas o prompt 01, remove a inicialização da
+skill `$advance-app-continue` e acrescenta oráculos estruturais que exigem as
+duas skills e impedem a regressão de responsabilidades. A validação estrutural
+e a repetição numa cópia descartável não substituem a suite piloto completa,
+a avaliação humana nem a revisão separada; o estado permanece `pending`.
+
+A versão 2026-07-30.9 empacota os dois pontos de entrada no plugin instalável
+`advance-app`, publicado pelo marketplace `promptsadvance`, para que apareçam em
+qualquer projeto Codex. As skills globais resolvem deterministicamente a fonte
+canónica no checkout do marketplace, num clone configurado ou num caminho
+explícito, sem pesquisa ilimitada do filesystem. O manifesto, as políticas de
+instalação, o resolver e a delegação para as skills canónicas têm oráculos
+estruturais próprios. A suite piloto completa, a avaliação humana e a revisão
+separada permanecem obrigatórias; o estado continua `pending`.

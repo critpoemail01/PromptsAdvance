@@ -43,6 +43,19 @@ Valores entre `[COLCHETES]` são entradas. Resolve-os por `APP_CONTEXT.md`, cód
 
 Usa preferencialmente [START_HERE.md](START_HERE.md) e as skills `$advance-app-start` e `$advance-app-continue`. A primeira cria uma instância isolada; a segunda valida o estado e executa apenas o próximo prompt autorizado.
 
+Para que as skills apareçam em todos os projetos, instala o catálogo como um
+plugin Codex, no mesmo modelo de um marketplace Git:
+
+```text
+codex plugin marketplace add critpoemail01/PromptsAdvance
+codex plugin add advance-app@promptsadvance
+```
+
+Também é possível substituir o primeiro argumento pelo caminho absoluto de um
+clone local. Reinicia o Codex e abre uma tarefa nova após a instalação. O
+manifesto está em `plugins/advance-app/.codex-plugin/plugin.json` e o
+marketplace em `.agents/plugins/marketplace.json`.
+
 Para continuar ou adotar um projeto existente por caminho:
 
 ```text

@@ -1,0 +1,20 @@
+{
+  "name": "promptsadvance",
+  "interface": {
+    "displayName": "PromptsAdvance"
+  },
+  "plugins": [
+    {
+      "name": "advance-app",
+      "source": {
+        "source": "local",
+        "path": "./plugins/advance-app"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

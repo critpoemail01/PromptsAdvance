@@ -39,6 +39,25 @@ function Require-Pattern {
     }
 }
 
+function Forbid-Pattern {
+    param(
+        [Parameter(Mandatory)][string]$RelativePath,
+        [Parameter(Mandatory)][string]$Pattern,
+        [Parameter(Mandatory)][string]$Description
+    )
+
+    $path = Join-Path $root $RelativePath
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        Add-Failure "Ficheiro obrigatorio ausente: $RelativePath"
+        return
+    }
+
+    $content = Get-Content -Raw -Encoding UTF8 -LiteralPath $path
+    if ($content -match $Pattern) {
+        Add-Failure "$Description ($RelativePath)"
+    }
+}
+
 $requiredDocuments = @(
     'START_HERE.md',
     'PROCESS_MANIFEST.json',
@@ -133,7 +152,8 @@ if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
 $catalogMarkdownRoots = @(
     (Join-Path $root '.agents'),
     (Join-Path $root 'pilot'),
-    (Join-Path $root 'prompts')
+    (Join-Path $root 'prompts'),
+    (Join-Path $root 'plugins')
 )
 $markdownFiles = @(
     Get-ChildItem -LiteralPath $root -File -Filter '*.md'
@@ -201,16 +221,39 @@ Require-Pattern '.github/workflows/process-validation.yml' 'actions/checkout@[a-
 Require-Pattern '.github/workflows/process-validation.yml' '(?s)Test-PromptProcess\.ps1.*Test-SoftwareLifecycle\.ps1' 'A CI nao executa validacao estatica e lifecycle E2E.'
 Require-Pattern 'START_HERE.md' '\$advance-app-start' 'START_HERE nao fornece o ponto de entrada para iniciar uma app.'
 Require-Pattern 'START_HERE.md' '\$advance-app-continue' 'START_HERE nao fornece o ponto de entrada para continuar uma app.'
+Require-Pattern 'START_HERE.md' 'codex plugin marketplace add critpoemail01/PromptsAdvance' 'START_HERE nao documenta a instalacao global do marketplace.'
+Require-Pattern 'START_HERE.md' 'codex plugin add advance-app@promptsadvance' 'START_HERE nao documenta a instalacao global do plugin.'
 Require-Pattern 'START_HERE.md' 'software-lifecycle\.ps1 start' 'START_HERE nao fornece inicializacao deterministica.'
 Require-Pattern 'START_HERE.md' 'Continua o projeto Advance em' 'START_HERE nao fornece a entrada natural para continuar por caminho.'
 Require-Pattern 'START_HERE.md' 'software-lifecycle\.ps1 continue.*-ProjectPath' 'START_HERE nao documenta a resolucao brownfield por caminho.'
 Require-Pattern 'QUALITY_GATES.md' 'G04.*Dire..o profissional' 'Falta o gate profissional da primeira slice.'
 Require-Pattern 'QUALITY_GATES.md' 'Hierarquia e composi..o' 'O gate visual nao verifica hierarquia e composicao.'
 Require-Pattern 'QUALITY_GATES.md' 'rastreabilidade ponta a ponta' 'O gate de codigo nao exige rastreabilidade ponta a ponta.'
+Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)^---.*name: advance-app-start.*description:.*---' 'A skill de criacao do lifecycle nao tem frontmatter valido.'
+Require-Pattern '.agents/skills/advance-app-start/SKILL.md' 'software-lifecycle\.ps1 start' 'A skill de criacao nao executa o inicializador deterministico.'
+Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)work-start.*finding-add.*finding-gate.*software-lifecycle\.ps1 record' 'A skill de criacao nao executa o prompt 01 com task ledger e findings gate.'
+Require-Pattern '.agents/skills/advance-app-start/SKILL.md' 'Do not execute prompt 02' 'A skill de criacao pode ultrapassar o prompt 01.'
+Require-Pattern '.agents/skills/advance-app-start/agents/openai.yaml' 'display_name: "Advance App Start"' 'A skill de criacao nao tem nome visivel proprio.'
+Require-Pattern '.agents/skills/advance-app-start/agents/openai.yaml' 'default_prompt: "Use \$advance-app-start' 'A skill de criacao nao tem prompt explicito de invocacao.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)^---.*name: advance-app-continue.*description:.*---' 'A skill do lifecycle nao tem frontmatter valido.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'software-lifecycle\.ps1 record' 'A skill nao regista resultados no estado do lifecycle.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'continue -ProjectPath' 'A skill nao resolve continuacao/adocao a partir da raiz da aplicacao.'
+Forbid-Pattern '.agents/skills/advance-app-continue/SKILL.md' '## Start a new initiative|software-lifecycle\.ps1 start -Name' 'A skill de continuacao voltou a acumular a criacao de iniciativas.'
 Require-Pattern '.agents/skills/advance-app-continue/references/workflow.md' 'page: 25 -> 13\|15\|17 -> 26' 'A skill nao define routing de vertical slices.'
+Require-Pattern '.agents/plugins/marketplace.json' '"name": "promptsadvance"' 'O marketplace Advance nao tem identidade estavel.'
+Require-Pattern '.agents/plugins/marketplace.json' '"path": "\./plugins/advance-app"' 'O marketplace Advance nao aponta para o plugin empacotado.'
+Require-Pattern '.agents/plugins/marketplace.json' '(?s)"installation": "AVAILABLE".*"authentication": "ON_INSTALL"' 'O marketplace Advance nao declara as politicas de instalacao.'
+Require-Pattern 'plugins/advance-app/.codex-plugin/plugin.json' '"name": "advance-app"' 'O plugin Advance nao tem nome canonico.'
+Require-Pattern 'plugins/advance-app/.codex-plugin/plugin.json' '"version": "0\.1\.0"' 'O plugin Advance nao tem versao semantica valida.'
+Require-Pattern 'plugins/advance-app/.codex-plugin/plugin.json' '"skills": "\./skills/"' 'O plugin Advance nao expoe as skills empacotadas.'
+Require-Pattern 'plugins/advance-app/.codex-plugin/plugin.json' '"displayName": "Advance App"' 'O plugin Advance nao tem identidade visivel.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-start/SKILL.md' '(?s)^---.*name: advance-app-start.*description:.*---' 'O plugin nao expoe a skill global de criacao.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-start/SKILL.md' 'Resolve-AdvanceCatalog\.ps1' 'A skill global de criacao nao resolve o catalogo instalado.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-start/SKILL.md' '\.agents/skills/advance-app-start/SKILL\.md' 'A skill global de criacao nao delega na fonte canonica.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '(?s)^---.*name: advance-app-continue.*description:.*---' 'O plugin nao expoe a skill global de continuacao.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '\.agents/skills/advance-app-continue/SKILL\.md' 'A skill global de continuacao nao delega na fonte canonica.'
+Require-Pattern 'plugins/advance-app/scripts/Resolve-AdvanceCatalog.ps1' 'PROMPTS_ADVANCE_ROOT' 'O plugin nao suporta configuracao explicita da raiz do catalogo.'
+Require-Pattern 'plugins/advance-app/scripts/Resolve-AdvanceCatalog.ps1' '\.codex/\.tmp/marketplaces/promptsadvance' 'O plugin nao resolve o checkout instalado do marketplace.'
 Require-Pattern 'software-lifecycle.ps1' 'ProcessRoot must be outside the prompt catalog' 'O inicializador nao impede instancias dentro do catalogo.'
 Require-Pattern 'software-lifecycle.ps1' 'ProcessRoot must be outside BoilerplatePath' 'O inicializador permite contaminar o boilerplate.'
 Require-Pattern 'software-lifecycle.ps1' 'Get-PhysicalPath' 'O isolamento nao resolve junctions ou links simbolicos.'
@@ -223,6 +266,17 @@ Require-Pattern 'software-lifecycle.ps1' 'Cannot select prompt.*while prompt.*is
 Require-Pattern 'software-lifecycle.ps1' 'SliceKind is required' 'O lifecycle nao exige metadados da vertical slice.'
 Require-Pattern 'software-lifecycle.ps1' 'Invoke-ManifestGateValidator' 'O lifecycle nao executa validadores mecanicos dos gates.'
 Require-Pattern 'software-lifecycle.ps1' 'Get-AutomaticNextPrompt' 'O lifecycle nao encaminha transicoes deterministicas automaticamente.'
+
+$pluginResolverPath = Join-Path $root 'plugins/advance-app/scripts/Resolve-AdvanceCatalog.ps1'
+if (Test-Path -LiteralPath $pluginResolverPath -PathType Leaf) {
+    $pluginResolverOutput = @(
+        & $powerShellExe -NoProfile -File $pluginResolverPath -CatalogPath $root 2>&1
+    )
+    if ($LASTEXITCODE -ne 0 -or
+        [string]@($pluginResolverOutput)[-1] -ne [System.IO.Path]::GetFullPath($root)) {
+        Add-Failure 'O resolver do plugin nao devolveu a raiz exata do catalogo.'
+    }
+}
 Require-Pattern 'software-lifecycle.ps1' 'Get-AllowedSelectionPromptIds' 'O seletor nao restringe transicoes ao contexto atual.'
 Require-Pattern 'software-lifecycle.ps1' "Command -eq 'decide'" 'O lifecycle nao permite registar exclusoes opcionais com evidencia.'
 Require-Pattern 'software-lifecycle.ps1' "Command -eq 'gate'" 'O lifecycle nao permite decidir gates entre prompts.'

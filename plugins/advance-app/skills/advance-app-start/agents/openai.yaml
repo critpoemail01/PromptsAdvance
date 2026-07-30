@@ -1,0 +1,4 @@
+interface:
+  display_name: "Advance App Start"
+  short_description: "Create a new gated Advance application"
+  default_prompt: "Use $advance-app-start to create a new Advance application and execute only prompt 01."

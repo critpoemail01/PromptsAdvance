@@ -7,6 +7,10 @@ description: Continue, adopt, validate, or recover an Advance application's comp
 
 Operate the prompt catalog as a controlled software team workflow. Keep one task per prompt, use small complete vertical slices, and fail closed when a gate, decision, evidence, authorization, or independent review is missing.
 
+If the user asks to create or start a brand-new initiative without an existing
+application or lifecycle, stop and use `$advance-app-start`. Do not initialize a
+new greenfield lifecycle from this skill.
+
 ## Locate the process
 
 1. Find the nearest `PROCESS_MANIFEST.json` and `software-lifecycle.ps1`.
@@ -16,20 +20,6 @@ Operate the prompt catalog as a controlled software team workflow. Keep one task
    present, and the current prompt.
 4. Read [workflow.md](references/workflow.md) completely before selecting a prompt or crossing a stage.
 5. Read [quality-gates.md](references/quality-gates.md) and the root `QUALITY_GATES.md` before architecture, UI/UX, implementation, hardening, acceptance, release, or operations work.
-
-## Start a new initiative
-
-Require a safe initiative slug and a product owner. Use the sibling `BoilerPlateAdvance` only when it exists; otherwise require its exact path.
-
-Run:
-
-```powershell
-.\software-lifecycle.ps1 start -Name initiative-slug -Owner "Product owner"
-```
-
-Pass `-ProcessRoot` or `-BoilerplatePath` only when needed. Never initialize inside the catalog, overwrite an existing destination, or infer an external repository.
-
-Report the created path and execute only prompt 01 from `NEXT_TASK.md`. Do not mark Gate A complete.
 
 ## Continue an initiative
 

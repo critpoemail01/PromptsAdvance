@@ -40,6 +40,30 @@ no prompt 01 antes do Gate G01.
 
 ## Opção recomendada — Codex
 
+### Instalar globalmente como plugin
+
+Para disponibilizar `Advance App` em todos os projetos Codex, instala este
+repositório como marketplace e depois instala o plugin:
+
+```text
+codex plugin marketplace add critpoemail01/PromptsAdvance
+codex plugin add advance-app@promptsadvance
+```
+
+Para testar um clone local antes de publicar:
+
+```text
+codex plugin marketplace add /caminho/absoluto/PromptsAdvance
+codex plugin add advance-app@promptsadvance
+```
+
+Reinicia o Codex e abre uma tarefa nova. O plugin disponibiliza
+`$advance-app-start` e `$advance-app-continue` em qualquer projeto. O catálogo
+é resolvido a partir do checkout do marketplace, de `PROMPTS_ADVANCE_ROOT`, de
+um clone convencional ou de um caminho explícito.
+
+### Usar a partir do catálogo
+
 Abre esta pasta no Codex e envia:
 
 ```text
