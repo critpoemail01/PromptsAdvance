@@ -15,6 +15,7 @@ O projeto deriva de `BoilerPlateAdvance`: .NET 10/C# 14, Bit Platform, site púb
 - Para tarefas que afetem produto ou experiência, `AGENTS.md` exige a leitura de `PRODUCT_EXCELLENCE.md`.
 - Informação detalhada fica em documentação ligada, sem duplicação contraditória.
 - Workflows repetidos com entradas/saídas estáveis ficam propostos como skills focadas, não como instruções gigantes no `AGENTS.md`.
+- O routing de ferramentas distingue documentação atual, automação local de browser e contexto GitHub, com fallback explícito e sem duplicar conectores já disponíveis.
 - Todos os comandos e caminhos documentados foram confirmados no repositório ou marcados como não verificados.
 - Nenhuma alteração funcional, dependência ou configuração de runtime foi introduzida.
 
@@ -40,6 +41,11 @@ O projeto deriva de `BoilerPlateAdvance`: .NET 10/C# 14, Bit Platform, site púb
    - MAUI apenas quando a tarefa o exigir e o workload existir;
    - testes com Microsoft.Testing.Platform, sem argumentos VSTest `--logger`/`--report-trx` nem `-clp`;
    - migrations explícitas em produção e segredos fora de ficheiros versionados.
+9. Regista no `AGENTS.md` ou num documento técnico ligado o routing mínimo de capacidades, apenas quando a capacidade existir:
+   - documentação de APIs/SDKs/frameworks: documentação oficial da versão em uso ou Context7; preserva biblioteca, versão e URL/ID consultado;
+   - browser e jornadas web: browser existente ou skill `playwright-cli`; usa-a como ferramenta pessoal do Codex, não como package ou dependência de produção da aplicação;
+   - GitHub: connector/plugin oficial ou `gh`, começando por leitura; escrita, settings, criação de recursos e push continuam a exigir alvo e autorização explícitos.
+10. Não configures silenciosamente MCPs, plugins, hooks ou skills globais no repositório derivado. Descobre o que já está instalado, documenta o fallback e, quando a capacidade faltar, propõe a instalação separadamente com proveniência, permissões mínimas e forma de remoção.
 
 ## Limites
 
@@ -49,6 +55,8 @@ O projeto deriva de `BoilerPlateAdvance`: .NET 10/C# 14, Bit Platform, site púb
 - Não copies o conteúdo integral de `EXECUTION_CONTRACT.md` para `AGENTS.md` ou para cada prompt.
 - Não copies o conteúdo integral de `PRODUCT_EXCELLENCE.md` para todos os prompts; mantém neles apenas os critérios específicos.
 - Não copies segredos para documentação.
+- Não graves tokens, headers de autenticação ou configuração privada de connectors/MCP em ficheiros versionados.
+- Não instales um segundo framework de lifecycle ou metodologia que concorra com o processo Advance.
 - Não faças uma refatoração funcional disfarçada de otimização.
 
 ## Validação
@@ -72,3 +80,7 @@ Apresenta diagnóstico, ficheiros alterados, comandos/resultados, validação do
 - https://learn.chatgpt.com/guides/best-practices
 - https://learn.chatgpt.com/docs/agent-configuration/agents-md
 - https://learn.chatgpt.com/docs/build-skills
+- https://learn.chatgpt.com/docs/extend/mcp
+- https://github.com/microsoft/playwright-cli
+- https://github.com/upstash/context7
+- https://github.com/github/github-mcp-server

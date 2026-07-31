@@ -535,6 +535,16 @@ deve executar `Test-PromptProcess.ps1`, `Test-SoftwareLifecycle.ps1` e
 resultados continuam a ser evidência estrutural; os 15 casos, a avaliação
 humana e a revisão separada permanecem obrigatórios.
 
+Na `catalogVersion` `2026-07-31.1`, o contrato comum e o prompt 08 passaram a
+encaminhar documentação volátil para a fonte oficial da versão ou Context7,
+browser/jornadas para a capacidade `playwright-cli` quando instalada e contexto
+GitHub para o connector oficial ou `gh`. Os oráculos exigem também opt-in para
+capacidades globais, proibição de segredos versionados e ausência de um segundo
+lifecycle concorrente. A regressão estrutural deve provar estes contratos numa
+cópia descartável. Como a mudança altera o comportamento transversal de
+preparação e verificação, a suite completa, a avaliação humana e a revisão
+separada permanecem obrigatórias.
+
 ## Referências
 
 - https://developers.openai.com/api/docs/guides/evaluation-best-practices

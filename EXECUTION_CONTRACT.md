@@ -13,6 +13,8 @@ Antes de alterar ficheiros:
 5. Distingue factos comprovados, inferências reversíveis, decisões pendentes e conflitos.
 6. Define o resultado observável, o âmbito e o que fica explicitamente fora dele.
 7. Quando `LIFECYCLE_STATE.json` existir, confirma que o prompt atual coincide com `NEXT_TASK.md` e valida a instância antes de implementar.
+8. Para APIs, SDKs, frameworks e ferramentas com evolução frequente, consulta primeiro a documentação oficial da versão em uso ou um provider de documentação atual como Context7 quando estiver disponível. Regista a biblioteca, versão e fonte consultada; não uses memória do modelo como prova de uma assinatura atual.
+9. Para contexto alojado no GitHub, prefere o connector/plugin oficial ou `gh` já autenticado. Começa por operações read-only e mantém qualquer escrita, alteração de settings, criação de recursos, commit ou push sujeita ao alvo e à autorização explícitos.
 
 Não transformes uma entrada material em pressuposto. Se a ausência alterar arquitetura, dados, permissões, contratos públicos, cobrança, retenção, identidade, publicação ou uma ação irreversível, limita-te ao diagnóstico/proposta e termina como `bloqueado`.
 
@@ -72,7 +74,7 @@ Executa o menor conjunto de validações capaz de produzir confiança proporcion
 | Descoberta, requisitos ou documentação | coerência interna, rastreabilidade às fontes, links/caminhos, conflitos, critérios verificáveis e atualidade das fontes externas relevantes |
 | Arquitetura e configuração | compatibilidade com o repositório, alternativas e trade-offs, contratos, threat model, configuração por ambiente e build/teste quando houver alteração executável |
 | Backend, dados ou integrações | restore/build, análise estática existente, testes unitários e de integração afetados, contratos, migrations, autorização, idempotência, concorrência e falhas de dependências |
-| UI web ou SSR | build/testes, browser ou Playwright quando disponível e útil, consola, rede, estados HTTP/UI, teclado, checks automáticos de acessibilidade, avaliação manual proporcional, viewports, jornadas afetadas e regressão visual para componentes/estados estáveis |
+| UI web ou SSR | build/testes, browser ou Playwright quando disponível e útil — incluindo a skill/CLI instalada sem a transformar numa dependência da aplicação —, consola, rede, estados HTTP/UI, teclado, checks automáticos de acessibilidade, avaliação manual proporcional, viewports, jornadas afetadas e regressão visual para componentes/estados estáveis |
 | MAUI/nativo | build da plataforma disponível, testes afetados, navegação, ciclo de vida, permissões, offline e validação no dispositivo/emulador disponível |
 | Segurança e privacidade | testes negativos, autenticação/autorização por objeto/função, validação de entradas/saídas, segredos, logs, dependências e abuso dentro do ambiente autorizado |
 | Performance ou resiliência | baseline, orçamento de carga/falha autorizado, métricas, repetição controlada, recuperação e comparação antes/depois |

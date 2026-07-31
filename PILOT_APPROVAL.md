@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-30.10 |
+| Catalog version | 2026-07-31.1 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -116,3 +116,13 @@ eliminam apenas fixtures temporárias com prefixos verificados. Esta correção
 faz a validação estática, o lifecycle E2E e a cópia descartável passarem sem
 dependências fora do checkout, mas não executa nem aprova os 15 casos do piloto.
 A avaliação humana e a revisão separada permanecem pendentes.
+
+A versão 2026-07-31.1 integra no contrato comum e no prompt 08 um routing
+explícito para documentação atual de APIs/SDKs, automação de browser e contexto
+GitHub. Context7 ou documentação oficial preservam biblioteca, versão e fonte;
+`playwright-cli` é uma capacidade pessoal do Codex e não uma dependência de
+produção; o connector GitHub ou `gh` começam em read-only e mantêm escritas
+sujeitas a alvo e autorização explícitos. O prompt proíbe configuração
+silenciosa de MCPs/plugins/hooks, segredos versionados e um segundo lifecycle
+concorrente. A validação estrutural desta integração não substitui os 15 casos,
+a avaliação humana nem a revisão separada; o estado permanece `pending`.
