@@ -17,6 +17,8 @@ plataformas/capacidades aprovadas e entrega evidência reproduzível de restore,
 build e testes. Uma adoção não declara o comportamento existente correto nem
 concluído sem o verificar.
 
+Deves validar o boilerplate local com o online https://bitplatform.dev/ para ver se ha alguma funcionalidade nova, que faca sentido acrescentar ao que existe
+
 ## Dados obrigatórios
 
 - Modo da iniciativa: `[MODO_INICIATIVA]` (`greenfield` ou `brownfield`)
