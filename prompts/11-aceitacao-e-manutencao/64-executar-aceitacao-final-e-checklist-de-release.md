@@ -56,7 +56,7 @@ Não baixa critérios, ignora testes, reclassifica `Must` ou aceita vulnerabilid
 
 ## Entrega
 
-Apresenta decisão, base/candidate SHA, digest, classificação dos gates, matriz, UAT/usabilidade, regressão visual, acessibilidade, comandos/resultados, bloqueios, exceções com autoridade/expiração, riscos aceites, condições e próximos passos. Atualiza o manifesto de `IMPLEMENTATION_STATUS.md`. Um `GO` significa apenas “apto para o prompt 63” e não autorização de publicação.
+Apresenta decisão, base/candidate SHA, digest, classificação dos gates, matriz, UAT/usabilidade, regressão visual, acessibilidade, comandos/resultados, bloqueios, exceções com autoridade/expiração, riscos aceites, condições e próximos passos. Atualiza o manifesto de `IMPLEMENTATION_STATUS.md`. Um `GO` significa apenas “apto para o prompt 65” e não autorização de publicação.
 
 ## Referências oficiais
 

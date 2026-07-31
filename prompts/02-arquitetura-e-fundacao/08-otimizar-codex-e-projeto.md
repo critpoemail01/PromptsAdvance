@@ -56,7 +56,7 @@ O projeto deriva de `BoilerPlateAdvance`: .NET 10/C# 14, Bit Platform, site púb
    - Chrome DevTools MCP apenas quando existir uma lacuna concreta de consola, rede, renderização ou performance não coberta pelas capacidades atuais.
 13. Recomenda no máximo três ferramentas, ordenadas por ganho esperado, custo/risco e confiança, e identifica uma opção recomendada. Prefere as capacidades, o design system e a regressão visual existentes. Não uses popularidade, listas genéricas ou uma framework usada pela referência como justificação.
 14. Instala ou configura apenas os candidatos explicitamente nomeados em `[AUTORIZAR_FERRAMENTAS_LAYOUT]`, com origem oficial, versão fixada quando aplicável, permissões mínimas e rollback testado. Autenticação, subscrição paga, connector/MCP/skill/plugin global, envio de dados externo ou dependência de projeto exigem autorização específica para esse alvo. Se não existir autorização, conclui a matriz e entrega a decisão sem instalar.
-15. Faz um smoke test local de cada capacidade configurada, sem a considerar aprovada para o processo visual. Regista o handoff para o prompt 12: hipótese de benefício, superfície/estado da primeira slice, evidência a recolher, critério `manter|remover` e rollback. A aceitação final da ferramenta ocorre apenas com a validação renderizada do prompt 12.
+15. Faz um smoke test local de cada capacidade configurada, sem a considerar aprovada para o processo visual. Regista o handoff para o prompt 13: hipótese de benefício, superfície/estado da primeira slice, evidência a recolher, critério `manter|remover` e rollback. A aceitação final da ferramenta ocorre apenas com a validação renderizada do prompt 13.
 16. Quando existir uma lacuna recorrente de configuração do Codex, propõe uma
     `.codex/config.toml` local ao projeto com apenas chaves suportadas pela
     documentação oficial atual. Não fixa segredos, tokens, identidade pessoal
@@ -97,7 +97,7 @@ Adapta os nomes ao repositório. Se algo não puder ser executado, indica o coma
 
 ## Entrega
 
-Apresenta diagnóstico, ficheiros alterados, comandos/resultados, validação do carregamento de `AGENTS.md` e da leitura dos protocolos aplicáveis, informação obsoleta ou incerta, limitações e a forma concreta como a nova estrutura reduz pesquisas repetidas. Para layout, apresenta a recomendação curta, o estado de `[AUTORIZAR_FERRAMENTAS_LAYOUT]`, o conteúdo de `CODEX_LAYOUT_TOOLING.md`, smoke tests e o handoff verificável para o prompt 12. Não alegues poupanças de tokens nem melhoria visual sem medição.
+Apresenta diagnóstico, ficheiros alterados, comandos/resultados, validação do carregamento de `AGENTS.md` e da leitura dos protocolos aplicáveis, informação obsoleta ou incerta, limitações e a forma concreta como a nova estrutura reduz pesquisas repetidas. Para layout, apresenta a recomendação curta, o estado de `[AUTORIZAR_FERRAMENTAS_LAYOUT]`, o conteúdo de `CODEX_LAYOUT_TOOLING.md`, smoke tests e o handoff verificável para o prompt 13. Não alegues poupanças de tokens nem melhoria visual sem medição.
 
 ## Referências oficiais
 

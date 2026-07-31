@@ -21,7 +21,7 @@ Nesta base, `Client.Ssr` é um site público autónomo em static SSR, separado d
 
 ## Correções
 
-Executa esta secção apenas para itens autorizados e cuja causa esteja demonstrada. Não redesenhes layouts, reescrevas conteúdo legal/SEO nem transformes a arquitetura; encaminha esses trabalhos para os prompts 13, 14, 40, 42 ou 43.
+Executa esta secção apenas para itens autorizados e cuja causa esteja demonstrada. Não redesenhes layouts, reescrevas conteúdo legal/SEO nem transformes a arquitetura; encaminha esses trabalhos para os prompts 14, 15, 42, 44 ou 45.
 
 - Mantém título, heading principal, conteúdo, links e feedback essencial no HTML recebido.
 - Corrige canonical, idioma, robots, sitemap, Open Graph/JSON-LD apenas com dados reais.

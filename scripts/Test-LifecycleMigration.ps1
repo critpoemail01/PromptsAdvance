@@ -74,7 +74,7 @@ try {
         $state.prompts.$id.status = 'completed'
         $state.prompts.$id.evidence = "fixture://prompt-$id"
     }
-    foreach ($id in @('05', '06', '09', '10')) {
+    foreach ($id in @('05', '06', '10', '11')) {
         $state.prompts.$id.applicability = 'required'
         $state.prompts.$id.status = 'pending'
     }
@@ -118,6 +118,21 @@ try {
         throw 'Candidate migration did not require explicit confirmation.'
     }
 
+    $prompt08 = Get-ChildItem -LiteralPath (Join-Path $process 'prompts') `
+        -Recurse -File -Filter '08-*.md'
+    $prompt08OriginalPath = $prompt08.FullName
+    $prompt08ChangedPath = Join-Path $prompt08.DirectoryName '08-reused-identity.md'
+    Move-Item -LiteralPath $prompt08OriginalPath -Destination $prompt08ChangedPath
+    $identityMismatch = Invoke-Lifecycle @(
+        'upgrade', '-ProcessRoot', $process, '-ConfirmMigration', '-AcceptCandidateCatalog',
+        '-Objective', 'Prove that reused prompt identities fail closed'
+    )
+    if ($identityMismatch.ExitCode -eq 0 -or
+        $identityMismatch.Output -notmatch 'prompt 08 identity mapping changed') {
+        throw 'Controlled migration did not reject a reused prompt identity.'
+    }
+    Move-Item -LiteralPath $prompt08ChangedPath -Destination $prompt08OriginalPath
+
     Assert-ExitCode (Invoke-Lifecycle @(
         'upgrade', '-ProcessRoot', $process, '-ConfirmMigration', '-AcceptCandidateCatalog',
         '-Objective', 'Migrate legacy state while preserving evidence'
@@ -133,7 +148,7 @@ try {
     $migratedPromptFiles = @(Get-ChildItem -LiteralPath (Join-Path $process 'prompts') -Recurse -File -Filter '*.md')
     if ($migratedPromptFiles.Count -ne 75 -or
         @($migratedPromptFiles | Where-Object {
-            $_.Name -match '^(05|06|09|10)-' -and $_.Directory.Name -ne 'Optional'
+            $_.Name -match '^(05|06|10|11)-' -and $_.Directory.Name -ne 'Optional'
         }).Count -ne 0) {
         throw 'Controlled migration did not remove stale prompt paths after catalog moves.'
     }
@@ -154,7 +169,7 @@ try {
         (Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $process 'APP_CONTEXT.md')) -ne $contextBefore) {
         throw 'Controlled migration changed prior history, gates or product context.'
     }
-    foreach ($id in @('05', '06', '09', '10')) {
+    foreach ($id in @('05', '06', '10', '11')) {
         if ($migrated.prompts.$id.applicability -ne 'conditional' -or
             $migrated.prompts.$id.status -ne 'not_selected') {
             throw "Untouched prompt $id did not adopt current conditional applicability."

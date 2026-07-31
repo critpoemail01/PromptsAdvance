@@ -393,6 +393,25 @@ function Get-OrderedPromptIds {
     )
 }
 
+function Get-PromptIdentityMap {
+    param([Parameter(Mandatory)][string]$Root)
+
+    $promptRoot = Join-Path $Root 'prompts'
+    $identities = @{}
+    foreach ($file in @(Get-ChildItem -LiteralPath $promptRoot -Recurse -File -Filter '*.md')) {
+        if ($file.Name -notmatch '^(\d{2})-(.+)\.md$') {
+            continue
+        }
+        $id = [string]$Matches[1]
+        $identity = [string]$Matches[2]
+        if ($identities.ContainsKey($id)) {
+            throw "Prompt identity map contains duplicate id $id under $promptRoot."
+        }
+        $identities[$id] = $identity
+    }
+    return $identities
+}
+
 function Get-PromptState {
     param(
         [Parameter(Mandatory)]$State,
@@ -881,7 +900,7 @@ function Test-EntryGate {
         [Parameter(Mandatory)][string]$NextId
     )
 
-    if ((Test-ProgrammerControlledWorkflow -Manifest $Manifest) -and $NextId -ne '64') {
+    if ((Test-ProgrammerControlledWorkflow -Manifest $Manifest) -and $NextId -ne '66') {
         return
     }
 
@@ -896,26 +915,26 @@ function Test-EntryGate {
         throw "Prompt $NextId cannot start because entry gate $entryGate is '$($gate.status)'."
     }
 
-    if (([int]$NextId -ge 13 -and [int]$NextId -le 18) -or $NextId -eq '75') {
+    if (([int]$NextId -ge 14 -and [int]$NextId -le 19) -or $NextId -eq '20') {
         $g03 = Get-GateState -State $State -Id 'G03'
         if ($g03.status -ne 'passed') {
             throw "Prompt $NextId cannot start because implementation gate G03 is '$($g03.status)'."
         }
     }
 
-    if ($NextId -eq '64') {
+    if ($NextId -eq '66') {
         $g08 = Get-GateState -State $State -Id 'G08'
         if ($g08.status -ne 'passed') {
-            throw "Prompt 64 cannot start because candidate/review gate G08 is '$($g08.status)'."
+            throw "Prompt 66 cannot start because candidate/review gate G08 is '$($g08.status)'."
         }
         $g09 = Get-GateState -State $State -Id 'G09'
         if ($g09.status -ne 'passed') {
-            throw "Prompt 64 cannot start because exact release authorization gate G09 is '$($g09.status)'."
+            throw "Prompt 66 cannot start because exact release authorization gate G09 is '$($g09.status)'."
         }
-        foreach ($requiredPrompt in @('61', '62', '63')) {
+        foreach ($requiredPrompt in @('63', '64', '65')) {
             $requiredState = Get-PromptState -State $State -Id $requiredPrompt
             if ($requiredState.status -ne 'completed') {
-                throw "Prompt 64 cannot start because prompt $requiredPrompt is '$($requiredState.status)'."
+                throw "Prompt 66 cannot start because prompt $requiredPrompt is '$($requiredState.status)'."
             }
         }
     }
@@ -1136,60 +1155,60 @@ function Get-AutomaticNextPrompt {
         return '{0:D2}' -f ($numericId + 1)
     }
     if ($CompletedId -eq '08') {
-        return '74'
-    }
-    if ($CompletedId -eq '74') {
         return '09'
     }
-    if ($numericId -ge 9 -and $numericId -le 11) {
+    if ($CompletedId -eq '09') {
+        return '10'
+    }
+    if ($numericId -ge 10 -and $numericId -le 12) {
         return '{0:D2}' -f ($numericId + 1)
     }
-    if ($numericId -ge 19 -and $numericId -le 21) {
+    if ($numericId -ge 21 -and $numericId -le 23) {
         return '{0:D2}' -f ($numericId + 1)
     }
-    if ($CompletedId -eq '23') {
-        return '24'
+    if ($CompletedId -eq '25') {
+        return '26'
     }
-    if ($CompletedId -in @('25', '27')) {
+    if ($CompletedId -in @('27', '29')) {
         if ($null -eq $State.activeSlice -or [string]::IsNullOrWhiteSpace([string]$State.activeSlice.surface)) {
             throw "Prompt $CompletedId cannot route without an active slice surface."
         }
         $surfaceMap = @{
-            ssr = '13'
-            web = '15'
-            maui = '17'
+            ssr = '14'
+            web = '16'
+            maui = '18'
         }
         return $surfaceMap[[string]$State.activeSlice.surface]
     }
-    if ($CompletedId -in @('13', '15', '17')) {
-        return '75'
+    if ($CompletedId -in @('14', '16', '18')) {
+        return '20'
     }
-    if ($CompletedId -eq '75') {
+    if ($CompletedId -eq '20') {
         if ($null -eq $State.activeSlice -or [string]::IsNullOrWhiteSpace([string]$State.activeSlice.kind)) {
-            throw 'Requirements reconciliation prompt 75 cannot route without an active slice kind.'
+            throw 'Requirements reconciliation prompt 20 cannot route without an active slice kind.'
         }
-        return $(if ($State.activeSlice.kind -eq 'page') { '26' } else { '28' })
+        return $(if ($State.activeSlice.kind -eq 'page') { '28' } else { '30' })
     }
-    if ($CompletedId -in @('39', '40', '41', '42', '43')) {
+    if ($CompletedId -in @('41', '42', '43', '44', '45')) {
         return '{0:D2}' -f ($numericId + 1)
     }
-    if ($CompletedId -eq '48') {
-        return '49'
+    if ($CompletedId -eq '50') {
+        return '51'
     }
-    if ($CompletedId -in @('51', '52', '53')) {
+    if ($CompletedId -in @('53', '54', '55')) {
         return '{0:D2}' -f ($numericId + 1)
     }
-    if ($CompletedId -in @('58', '59')) {
+    if ($CompletedId -in @('60', '61')) {
         return '{0:D2}' -f ($numericId + 1)
     }
-    if ($CompletedId -in @('61', '62')) {
+    if ($CompletedId -in @('63', '64')) {
         return '{0:D2}' -f ($numericId + 1)
     }
-    if ($CompletedId -eq '67') {
-        return '68'
+    if ($CompletedId -eq '69') {
+        return '70'
     }
-    if ($CompletedId -eq '72') {
-        return '73'
+    if ($CompletedId -eq '74') {
+        return '75'
     }
     return $null
 }
@@ -1200,46 +1219,46 @@ function Get-DecisionHint {
         [Parameter(Mandatory)][string]$CompletedId
     )
 
-    if ($CompletedId -eq '12') {
-        return 'select_vertical_slice: choose 19 for required foundation, otherwise 25 for a page or 27 for a feature'
+    if ($CompletedId -eq '13') {
+        return 'select_vertical_slice: choose 21 for required foundation, otherwise 27 for a page or 29 for a feature'
     }
-    if ($CompletedId -eq '22') {
-        return 'select_vertical_slice: choose 25 for a page or 27 for a feature'
+    if ($CompletedId -eq '24') {
+        return 'select_vertical_slice: choose 27 for a page or 29 for a feature'
     }
-    if ($CompletedId -in @('26', '28')) {
-        return 'select_next_slice_or_global_completion: choose 25/27 for another Must slice or 23 when Must slices are ready for global completion'
+    if ($CompletedId -in @('28', '30')) {
+        return 'select_next_slice_or_global_completion: choose 27/29 for another Must slice or 25 when Must slices are ready for global completion'
     }
-    if ($CompletedId -in @('14', '16', '18')) {
-        return 'select_next_slice_or_global_completion: close another active surface, choose 25/27 for another Must slice, or choose 23 for global completion'
+    if ($CompletedId -in @('15', '17', '19')) {
+        return 'select_next_slice_or_global_completion: close another active surface, choose 27/29 for another Must slice, or choose 25 for global completion'
     }
-    if ([int]$CompletedId -ge 24 -and [int]$CompletedId -le 38) {
-        return 'select_applicable_capability_or_security: decide 29-38 applicability, then continue with 39'
+    if ([int]$CompletedId -ge 26 -and [int]$CompletedId -le 40) {
+        return 'select_applicable_capability_or_security: decide 31-40 applicability, then continue with 41'
     }
-    if ([int]$CompletedId -ge 44 -and [int]$CompletedId -le 47) {
-        return 'select_growth_or_hardening: decide 45-47 applicability, then continue with 48'
+    if ([int]$CompletedId -ge 46 -and [int]$CompletedId -le 49) {
+        return 'select_growth_or_hardening: decide 47-49 applicability, then continue with 50'
     }
-    if ($CompletedId -in @('49', '50')) {
-        return 'select_pwa_or_continue: decide prompt 50 applicability, then continue with 51'
+    if ($CompletedId -in @('51', '52')) {
+        return 'select_pwa_or_continue: decide prompt 52 applicability, then continue with 53'
     }
-    if ($CompletedId -eq '54') {
-        return 'select_delivery: continue with 55 after G06 passes'
+    if ($CompletedId -eq '56') {
+        return 'select_delivery: continue with 57 after G06 passes'
     }
-    if ($CompletedId -in @('55', '56', '57')) {
-        return 'select_distribution_or_operations: decide 56-57 applicability, then continue with 58'
+    if ($CompletedId -in @('57', '58', '59')) {
+        return 'select_distribution_or_operations: decide 58-59 applicability, then continue with 60'
     }
-    if ($CompletedId -eq '60') {
-        return 'select_acceptance: continue with 61 after G07 passes'
+    if ($CompletedId -eq '62') {
+        return 'select_acceptance: continue with 63 after G07 passes'
     }
-    if ($CompletedId -eq '63') {
-        return 'authorize_release: validate G09 for the exact environment, candidate, digest and window, then select 64'
+    if ($CompletedId -eq '65') {
+        return 'authorize_release: validate G09 for the exact environment, candidate, digest and window, then select 66'
     }
-    if ($CompletedId -in @('64', '65', '66')) {
-        return 'select_continuous_operations: decide 65-66 applicability, then continue with 67'
+    if ($CompletedId -in @('66', '67', '68')) {
+        return 'select_continuous_operations: decide 67-68 applicability, then continue with 69'
     }
-    if ($CompletedId -in @('68', '69', '70', '71')) {
-        return 'select_observability_and_improvement: decide 69, continue with 70, decide 71, then continue with 72'
+    if ($CompletedId -in @('70', '71', '72', '73')) {
+        return 'select_observability_and_improvement: decide 71, continue with 72, decide 73, then continue with 74'
     }
-    if ($CompletedId -eq '73') {
+    if ($CompletedId -eq '75') {
         return 'complete_G10_gate: validate continuous-operation owners, cadences and evidence'
     }
     return 'select_next_prompt_from_workflow'
@@ -1251,37 +1270,37 @@ function Get-AllowedSelectionPromptIds {
     $action = [string]$State.nextAction
     if ($action -match '^select_vertical_slice') {
         $lastPrompt = @($State.history | Where-Object { $_.PSObject.Properties.Name -contains 'promptId' })[-1].promptId
-        return $(if ($lastPrompt -eq '22') { @('25', '27') } else { @('19', '25', '27') })
+        return $(if ($lastPrompt -eq '24') { @('27', '29') } else { @('21', '27', '29') })
     }
     if ($action -match '^select_next_slice_or_global_completion') {
-        return @('14', '16', '18', '23', '25', '27')
+        return @('15', '17', '19', '25', '27', '29')
     }
     if ($action -match '^select_applicable_capability_or_security') {
-        return @(29..39 | ForEach-Object { '{0:D2}' -f $_ })
+        return @(31..41 | ForEach-Object { '{0:D2}' -f $_ })
     }
     if ($action -match '^select_growth_or_hardening') {
-        return @('45', '46', '47', '48')
+        return @('47', '48', '49', '50')
     }
     if ($action -match '^select_pwa_or_continue') {
-        return @('50', '51')
+        return @('52', '53')
     }
     if ($action -match '^select_delivery') {
-        return @('55')
+        return @('57')
     }
     if ($action -match '^select_distribution_or_operations') {
-        return @('56', '57', '58')
+        return @('58', '59', '60')
     }
     if ($action -match '^select_acceptance') {
-        return @('61')
+        return @('63')
     }
     if ($action -match '^authorize_release') {
-        return @('64')
+        return @('66')
     }
     if ($action -match '^select_continuous_operations') {
-        return @('65', '66', '67')
+        return @('67', '68', '69')
     }
     if ($action -match '^select_observability_and_improvement') {
-        return @('69', '70', '71', '72')
+        return @('71', '72', '73', '74')
     }
     return @()
 }
@@ -1291,28 +1310,28 @@ function Get-AllowedDecisionPromptIds {
 
     $action = [string]$State.nextAction
     if ($action -match '^select_vertical_slice') {
-        return @('19', '20', '21', '22')
+        return @('21', '22', '23', '24')
     }
     if ($action -match '^select_next_slice_or_global_completion') {
-        return @('13', '14', '15', '16', '17', '18', '25', '26', '27', '28', '29')
+        return @('14', '15', '16', '17', '18', '19', '27', '28', '29', '30', '31')
     }
     if ($action -match '^select_applicable_capability_or_security') {
-        return @(29..38 | ForEach-Object { '{0:D2}' -f $_ })
+        return @(31..40 | ForEach-Object { '{0:D2}' -f $_ })
     }
     if ($action -match '^select_growth_or_hardening') {
-        return @('45', '46', '47')
+        return @('47', '48', '49')
     }
     if ($action -match '^select_pwa_or_continue') {
-        return @('50')
+        return @('52')
     }
     if ($action -match '^select_distribution_or_operations') {
-        return @('56', '57')
+        return @('58', '59')
     }
     if ($action -match '^select_continuous_operations') {
-        return @('65', '66')
+        return @('67', '68')
     }
     if ($action -match '^select_observability_and_improvement') {
-        return @('69', '71')
+        return @('71', '73')
     }
     return @()
 }
@@ -1931,8 +1950,8 @@ function Test-Lifecycle {
             if ($g10CompletionState.status -ne 'passed') {
                 $issues.Add("Completed lifecycle requires G10 passed; found '$($g10CompletionState.status)'.")
             }
-            if ((Get-PromptState -State $state -Id '73').status -ne 'completed') {
-                $issues.Add('Completed lifecycle requires prompt 73 completed.')
+            if ((Get-PromptState -State $state -Id '75').status -ne 'completed') {
+                $issues.Add('Completed lifecycle requires prompt 75 completed.')
             }
             $unfinishedRequired = @(
                 $state.prompts.PSObject.Properties |
@@ -1978,7 +1997,7 @@ function Test-Lifecycle {
                 }
                 Test-GateSnapshot -State $state -Root $Root -GateId $gateProperty.Name
                 if ($gateProperty.Name -eq 'G09' -and -not $SkipExternalGateValidators) {
-                    $releasePrompt = Get-PromptState -State $state -Id '64'
+                    $releasePrompt = Get-PromptState -State $state -Id '66'
                     if ($releasePrompt.status -eq 'completed') {
                         $releaseValidator = Join-Path $Root 'scripts/Test-LifecycleGateEvidence.ps1'
                         $releaseValidatorOutput = & $powerShellExe -NoProfile -ExecutionPolicy Bypass -File $releaseValidator `
@@ -2655,6 +2674,15 @@ if ($Command -eq 'upgrade') {
     if ($removedPromptIds.Count -gt 0) {
         throw "upgrade refuses to remove prompt state or evidence: $($removedPromptIds -join ', ')."
     }
+    $sourcePromptIdentities = Get-PromptIdentityMap -Root $catalogRoot
+    $targetPromptIdentities = Get-PromptIdentityMap -Root $ProcessRoot
+    foreach ($promptId in $targetPromptIds) {
+        if (-not $sourcePromptIdentities.ContainsKey($promptId) -or
+            -not $targetPromptIdentities.ContainsKey($promptId) -or
+            [string]$sourcePromptIdentities[$promptId] -ne [string]$targetPromptIdentities[$promptId]) {
+            throw "upgrade requires an explicit migration because prompt $promptId identity mapping changed."
+        }
+    }
     $addedPromptIds = @($sourcePromptIds | Where-Object { $_ -notin $targetPromptIds })
     if (($addedPromptIds.Count -gt 0 -or
         [int]$targetManifest.promptCount -ne [int]$sourceManifest.promptCount) -and
@@ -3279,7 +3307,7 @@ if ($Command -eq 'status') {
                         $requiredGateIds += [string]$selectionStage.entryGate
                     }
                 }
-                if ($selection -eq '64') {
+                if ($selection -eq '66') {
                     foreach ($releaseGateId in @('G08', 'G09')) {
                         if ((Get-GateState -State $state -Id $releaseGateId).status -ne 'passed') {
                             $requiredGateIds += $releaseGateId
@@ -3504,37 +3532,37 @@ if ($Command -eq 'select') {
         throw "Prompt $selectedId is already completed and is not repeatable."
     }
     switch ($selectedId) {
-        '23' {
+        '25' {
             Assert-ApplicabilityDecisions -State $state `
-                -PromptIds @('13', '14', '15', '16', '17', '18', '25', '26', '27', '28') `
+                -PromptIds @('14', '15', '16', '17', '18', '19', '27', '28', '29', '30') `
                 -BeforePrompt $selectedId
         }
-        '39' {
+        '41' {
             Assert-ApplicabilityDecisions -State $state `
-                -PromptIds @(29..38 | ForEach-Object { '{0:D2}' -f $_ }) `
+                -PromptIds @(31..40 | ForEach-Object { '{0:D2}' -f $_ }) `
                 -BeforePrompt $selectedId
         }
-        '48' {
-            Assert-ApplicabilityDecisions -State $state -PromptIds @('45', '46', '47') -BeforePrompt $selectedId
+        '50' {
+            Assert-ApplicabilityDecisions -State $state -PromptIds @('47', '48', '49') -BeforePrompt $selectedId
         }
-        '51' {
-            Assert-ApplicabilityDecisions -State $state -PromptIds @('50') -BeforePrompt $selectedId
+        '53' {
+            Assert-ApplicabilityDecisions -State $state -PromptIds @('52') -BeforePrompt $selectedId
         }
-        '58' {
-            Assert-ApplicabilityDecisions -State $state -PromptIds @('56', '57') -BeforePrompt $selectedId
+        '60' {
+            Assert-ApplicabilityDecisions -State $state -PromptIds @('58', '59') -BeforePrompt $selectedId
         }
-        '67' {
-            Assert-ApplicabilityDecisions -State $state -PromptIds @('65', '66') -BeforePrompt $selectedId
-        }
-        '70' {
-            Assert-ApplicabilityDecisions -State $state -PromptIds @('69') -BeforePrompt $selectedId
+        '69' {
+            Assert-ApplicabilityDecisions -State $state -PromptIds @('67', '68') -BeforePrompt $selectedId
         }
         '72' {
-            Assert-ApplicabilityDecisions -State $state -PromptIds @('69', '71') -BeforePrompt $selectedId
+            Assert-ApplicabilityDecisions -State $state -PromptIds @('71') -BeforePrompt $selectedId
+        }
+        '74' {
+            Assert-ApplicabilityDecisions -State $state -PromptIds @('71', '73') -BeforePrompt $selectedId
         }
     }
 
-    if ($selectedId -in @('19', '25', '27')) {
+    if ($selectedId -in @('21', '27', '29')) {
         Require-SafeText -Value $SliceId -Label 'SliceId'
         if ([string]::IsNullOrWhiteSpace($SliceKind)) {
             throw 'SliceKind is required when selecting a vertical-slice prompt.'
@@ -3548,16 +3576,16 @@ if ($Command -eq 'select') {
         $continueActiveSlice = $false
         if ($null -ne $state.activeSlice) {
             if ($state.activeSlice.status -eq 'in_progress' -and
-                $selectedId -eq '19') {
+                $selectedId -eq '21') {
                 throw "Cannot start slice $SliceId while slice $($state.activeSlice.id) is in progress."
             }
             if ($state.activeSlice.status -eq 'in_progress' -and
-                $selectedId -in @('25', '27') -and
+                $selectedId -in @('27', '29') -and
                 [string]$state.activeSlice.id -ne $SliceId) {
                 throw "Foundation belongs to active slice $($state.activeSlice.id); select the same SliceId before starting another slice."
             }
             if ($state.activeSlice.status -eq 'in_progress' -and
-                $selectedId -in @('25', '27') -and
+                $selectedId -in @('27', '29') -and
                 [string]$state.activeSlice.id -eq $SliceId) {
                 foreach ($field in @('kind', 'surface', 'requirements', 'acceptanceCriteria', 'outOfScope')) {
                     $incoming = switch ($field) {
@@ -3610,7 +3638,7 @@ if ($Command -eq 'select') {
         action = 'select'
         promptId = $selectedId
         evidence = $Evidence
-        slice = $(if ($selectedId -in @('19', '25', '27')) {
+        slice = $(if ($selectedId -in @('21', '27', '29')) {
             [ordered]@{
                 id = $state.activeSlice.id
                 kind = $state.activeSlice.kind
@@ -3829,7 +3857,7 @@ if ($Command -eq 'record') {
         $promptState | Add-Member -NotePropertyName 'finishedAt' `
             -NotePropertyValue ([DateTimeOffset]::Now.ToString('o')) -Force
     }
-    if ($PromptId -in @('26', '28') -and $Result -eq 'completed' -and $null -ne $state.activeSlice) {
+    if ($PromptId -in @('28', '30') -and $Result -eq 'completed' -and $null -ne $state.activeSlice) {
         $state.activeSlice.status = 'completed'
         $state.activeSlice | Add-Member -NotePropertyName 'completedAt' `
             -NotePropertyValue ([DateTimeOffset]::Now.ToString('o')) -Force
@@ -3899,10 +3927,10 @@ if ($Command -eq 'record') {
         }
     }
 
-    if ($PromptId -eq '64' -and $Result -eq 'completed') {
+    if ($PromptId -eq '66' -and $Result -eq 'completed') {
         $g09 = Get-GateState -State $state -Id 'G09'
         if ($g09.status -ne 'passed') {
-            throw "Prompt 64 cannot be completed because G09 is '$($g09.status)'."
+            throw "Prompt 66 cannot be completed because G09 is '$($g09.status)'."
         }
         $releaseValidator = Join-Path $ProcessRoot 'scripts/Test-LifecycleGateEvidence.ps1'
         $releaseValidatorOutput = & $powerShellExe -NoProfile -ExecutionPolicy Bypass -File $releaseValidator `
@@ -3910,7 +3938,7 @@ if ($Command -eq 'record') {
         $releaseValidatorExitCode = $LASTEXITCODE
         $releaseValidatorOutput | Out-Host
         if ($releaseValidatorExitCode -ne 0) {
-            throw 'Prompt 64 release-completion evidence failed validation.'
+            throw 'Prompt 66 release-completion evidence failed validation.'
         }
         Set-G09DeploymentSnapshot -State $state -Root $ProcessRoot
     }
@@ -3985,7 +4013,7 @@ if ($Command -eq 'record') {
     if ($null -eq $nextId) {
         $state.currentPrompt = $null
         $g10 = Get-GateState -State $state -Id 'G10'
-        if ($PromptId -eq '73' -and $g10.status -eq 'passed') {
+        if ($PromptId -eq '75' -and $g10.status -eq 'passed') {
             $state.status = 'completed'
             $state.nextAction = 'none'
             if ($null -ne $state.PSObject.Properties['activeChange'] -and $null -ne $state.activeChange) {

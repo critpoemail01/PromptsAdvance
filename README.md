@@ -138,7 +138,7 @@ alvo, autenticação e autorização explícitos; a adoção preserva o Git exis
 
 ### Gate C — implementação
 
-Considera 9–54 prontos quando o repositório novo/adotado está ligado aos documentos
+Considera 9–56 prontos quando o repositório novo/adotado está ligado aos documentos
 obrigatórios, possui baseline Git, comandos reais confirmados, primeira fatia
 selecionada. `PILOT-001` avalia o catálogo e não bloqueia a implementação local
 da aplicação.
@@ -153,19 +153,19 @@ O primeiro padrão visual só pode propagar depois de
 
 ### Gate D — candidata e release
 
-Permite 55–63 quando CI/CD, SLI/SLO, observabilidade, backup/restore, rollback,
+Permite 57–65 quando CI/CD, SLI/SLO, observabilidade, backup/restore, rollback,
 runbooks, documentação e owners estão comprovados. A candidata deve ter base
-SHA, candidate SHA, digest e attestation de proveniência imutáveis. O prompt 62
-executa aceitação e o 63 executa revisão separada, read-only, verificando issuer,
+SHA, candidate SHA, digest e attestation de proveniência imutáveis. O prompt 64
+executa aceitação e o 65 executa revisão separada, read-only, verificando issuer,
 builder, source SHA e subject digest.
 
 ### Gate E — operação contínua
 
-Permite o prompt 64 apenas quando os prompts 62 e 63 produziram `GO` para os mesmos identificadores e existe `[AUTORIZAR_RELEASE]`. Depois da publicação, permite 65–73 apenas sobre o ambiente exato, com acessos read-only e owners. Correções externas continuam a exigir `[AUTORIZAR_ACOES_CORRETIVAS_OPERACIONAIS]` ou outra autorização específica.
+Permite o prompt 66 apenas quando os prompts 64 e 65 produziram `GO` para os mesmos identificadores e existe `[AUTORIZAR_RELEASE]`. Depois da publicação, permite 67–75 apenas sobre o ambiente exato, com acessos read-only e owners. Correções externas continuam a exigir `[AUTORIZAR_ACOES_CORRETIVAS_OPERACIONAIS]` ou outra autorização específica.
 
 G08–G10 são validados por `scripts/Test-LifecycleGateEvidence.ps1`.
-G09 passa **antes** de selecionar o prompt 64 e fixa ambiente, SHA, digest, attestation,
-janela e identidade autorizadora. A conclusão do prompt 64 volta a validar no
+G09 passa **antes** de selecionar o prompt 66 e fixa ambiente, SHA, digest, attestation,
+janela e identidade autorizadora. A conclusão do prompt 66 volta a validar no
 mesmo ficheiro o ambiente/artefacto implantado, smoke tests, rollback e
 critérios de aborto.
 
@@ -246,18 +246,18 @@ o programador ao mesmo prompt.
 
 ## Ciclo de implementação por fatias verticais
 
-Depois dos prompts 9–12:
+Depois dos prompts 9–13:
 
-1. executa 19 para o backend mínimo e 20–22 apenas no âmbito necessário;
+1. executa 21 para o backend mínimo e 22–24 apenas no âmbito necessário;
 2. escolhe um requisito observável pequeno;
-3. executa 25 e 26 para uma página, ou 27 e 28 para uma funcionalidade;
-4. aplica 13, 15 ou 17 apenas à superfície dessa fatia;
+3. executa 27 e 28 para uma página, ou 29 e 30 para uma funcionalidade;
+4. aplica 14, 16 ou 18 apenas à superfície dessa fatia;
 5. valida UI, contrato, backend/dados, autorização, loading/vazio/erro/conteúdo longo, observabilidade, acessibilidade e snapshots;
 6. submete a primeira fatia a crítica de design e engenharia e a validação de usabilidade;
 7. corrige e repete os testes afetados;
 8. atualiza `IMPLEMENTATION_STATUS.md` e seleciona a fatia seguinte.
 
-Os prompts 23/24 tratam requisitos globais quando já existe base funcional suficiente. Os prompts 14/16/18 são gates de conclusão, não atividades iniciais. Não propagues um padrão visual antes de a primeira fatia real satisfazer `PRODUCT_QUALITY_BASELINE.md`.
+Os prompts 25/26 tratam requisitos globais quando já existe base funcional suficiente. Os prompts 15/17/19 são gates de conclusão, não atividades iniciais. Não propagues um padrão visual antes de a primeira fatia real satisfazer `PRODUCT_QUALITY_BASELINE.md`.
 
 ## Regras de qualidade não negociáveis
 
@@ -267,7 +267,7 @@ Os prompts 23/24 tratam requisitos globais quando já existe base funcional sufi
 - Mantém catálogo `componente → variantes → estados → plataformas → acessibilidade → baseline`.
 - Executa acessibilidade desde a primeira fatia: checks automáticos em cada pull request aplicável e avaliação manual das jornadas críticas.
 - Executa regressão visual reproduzível em mobile/desktop, temas suportados e estados normal/loading/vazio/erro/conteúdo longo. Publica o diff na pull request; só altera baselines mediante revisão e autorização explícitas.
-- Não declara “sem bugs”, conformidade total ou sucesso sem evidência. A revisão adversarial do próprio executor é obrigatória, mas só a tarefa/revisor separado do prompt 63 é independente.
+- Não declara “sem bugs”, conformidade total ou sucesso sem evidência. A revisão adversarial do próprio executor é obrigatória, mas só a tarefa/revisor separado do prompt 65 é independente.
 
 ## Ordem global dos prompts
 
@@ -284,97 +284,97 @@ Os prompts 23/24 tratam requisitos globais quando já existe base funcional sufi
 6. [Modelar ameaças e requisitos de segurança (opcional)](prompts/02-arquitetura-e-fundacao/Optional/06-modelar-ameacas-e-requisitos-de-seguranca.md)
 7. [Criar ou adotar o projeto da iniciativa](prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md)
 8. [Otimizar o projeto para Codex](prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md)
-74. [Completar requisitos após observar a fundação técnica](prompts/02-arquitetura-e-fundacao/74-completar-requisitos-apos-fundacao-tecnica.md)
-9. [Configurar ambientes, segredos e configuração (opcional)](prompts/02-arquitetura-e-fundacao/Optional/09-configurar-ambientes-segredos-e-configuracao.md)
-10. [Definir contratos API e compatibilidade (opcional)](prompts/02-arquitetura-e-fundacao/Optional/10-definir-contratos-api-versionamento-e-compatibilidade.md)
+9. [Completar requisitos após observar a fundação técnica](prompts/02-arquitetura-e-fundacao/09-completar-requisitos-apos-fundacao-tecnica.md)
+10. [Configurar ambientes, segredos e configuração (opcional)](prompts/02-arquitetura-e-fundacao/Optional/10-configurar-ambientes-segredos-e-configuracao.md)
+11. [Definir contratos API e compatibilidade (opcional)](prompts/02-arquitetura-e-fundacao/Optional/11-definir-contratos-api-versionamento-e-compatibilidade.md)
 
 ### 3 — Fundação visual e gates de superfície
 
-11. [Criar ícone e marca](prompts/03-marca-e-layout/11-criar-icone-e-marca.md)
-12. [Criar fundação visual mínima](prompts/03-marca-e-layout/12-criar-layout-inicial.md)
-13. [Melhorar a fatia em Client.Ssr](prompts/03-marca-e-layout/13-melhorar-layout-client-ssr.md)
-14. [Concluir Client.Ssr após jornadas Must](prompts/03-marca-e-layout/14-concluir-layout-client-ssr.md)
-15. [Melhorar a fatia em Client.Web](prompts/03-marca-e-layout/15-melhorar-layout-client-web.md)
-16. [Concluir Client.Web após jornadas Must](prompts/03-marca-e-layout/16-concluir-layout-client-web.md)
-17. [Melhorar a fatia em Client.Maui](prompts/03-marca-e-layout/17-melhorar-layout-client-maui.md)
-18. [Concluir Client.Maui após jornadas Must](prompts/03-marca-e-layout/18-concluir-layout-client-maui.md)
-75. [Completar requisitos após o refinamento visual](prompts/03-marca-e-layout/75-completar-requisitos-apos-refinamento-visual.md)
+12. [Criar ícone e marca](prompts/03-marca-e-layout/12-criar-icone-e-marca.md)
+13. [Criar fundação visual mínima](prompts/03-marca-e-layout/13-criar-layout-inicial.md)
+14. [Melhorar a fatia em Client.Ssr](prompts/03-marca-e-layout/14-melhorar-layout-client-ssr.md)
+15. [Concluir Client.Ssr após jornadas Must](prompts/03-marca-e-layout/15-concluir-layout-client-ssr.md)
+16. [Melhorar a fatia em Client.Web](prompts/03-marca-e-layout/16-melhorar-layout-client-web.md)
+17. [Concluir Client.Web após jornadas Must](prompts/03-marca-e-layout/17-concluir-layout-client-web.md)
+18. [Melhorar a fatia em Client.Maui](prompts/03-marca-e-layout/18-melhorar-layout-client-maui.md)
+19. [Concluir Client.Maui após jornadas Must](prompts/03-marca-e-layout/19-concluir-layout-client-maui.md)
+20. [Completar requisitos após o refinamento visual](prompts/03-marca-e-layout/20-completar-requisitos-apos-refinamento-visual.md)
 
 ### 4 — Backend e funcionalidades
 
-19. [Implementar backend inicial](prompts/04-backend-e-funcionalidades/19-criar-backend-inicial.md)
-20. [Validar dados, migrations e integridade](prompts/04-backend-e-funcionalidades/20-validar-base-de-dados-migrations-e-integridade.md)
-21. [Validar autenticação, autorização e MFA](prompts/04-backend-e-funcionalidades/21-validar-autenticacao-autorizacao-e-mfa.md)
-22. [Validar contas e sessões](prompts/04-backend-e-funcionalidades/22-validar-ciclo-de-vida-de-contas-e-sessoes.md)
-23. [Implementar requisitos globais](prompts/04-backend-e-funcionalidades/23-implementar-requisitos-globais.md)
-24. [Testar requisitos globais com Playwright](prompts/04-backend-e-funcionalidades/24-criar-testes-playwright-para-requisitos-globais.md)
-25. [Implementar requisitos de página](prompts/04-backend-e-funcionalidades/25-implementar-requisitos-de-pagina.md)
-26. [Testar a página com Playwright](prompts/04-backend-e-funcionalidades/26-criar-testes-playwright-para-requisitos-de-pagina.md)
-27. [Implementar funcionalidade específica](prompts/04-backend-e-funcionalidades/27-implementar-funcionalidades-especificas.md)
-28. [Testar a funcionalidade com Playwright](prompts/04-backend-e-funcionalidades/28-criar-testes-playwright-para-funcionalidade-especifica.md)
-29. [Criar emails transacionais](prompts/04-backend-e-funcionalidades/29-criar-emails-transacionais.md)
+21. [Implementar backend inicial](prompts/04-backend-e-funcionalidades/21-criar-backend-inicial.md)
+22. [Validar dados, migrations e integridade](prompts/04-backend-e-funcionalidades/22-validar-base-de-dados-migrations-e-integridade.md)
+23. [Validar autenticação, autorização e MFA](prompts/04-backend-e-funcionalidades/23-validar-autenticacao-autorizacao-e-mfa.md)
+24. [Validar contas e sessões](prompts/04-backend-e-funcionalidades/24-validar-ciclo-de-vida-de-contas-e-sessoes.md)
+25. [Implementar requisitos globais](prompts/04-backend-e-funcionalidades/25-implementar-requisitos-globais.md)
+26. [Testar requisitos globais com Playwright](prompts/04-backend-e-funcionalidades/26-criar-testes-playwright-para-requisitos-globais.md)
+27. [Implementar requisitos de página](prompts/04-backend-e-funcionalidades/27-implementar-requisitos-de-pagina.md)
+28. [Testar a página com Playwright](prompts/04-backend-e-funcionalidades/28-criar-testes-playwright-para-requisitos-de-pagina.md)
+29. [Implementar funcionalidade específica](prompts/04-backend-e-funcionalidades/29-implementar-funcionalidades-especificas.md)
+30. [Testar a funcionalidade com Playwright](prompts/04-backend-e-funcionalidades/30-criar-testes-playwright-para-funcionalidade-especifica.md)
+31. [Criar emails transacionais](prompts/04-backend-e-funcionalidades/31-criar-emails-transacionais.md)
 
-Opcionais desta etapa: [30 faturação](prompts/04-backend-e-funcionalidades/Optional/30-implementar-faturacao.md), [31 localização](prompts/04-backend-e-funcionalidades/Optional/31-validar-localizacao-e-formatacao-cultural.md), [32 login externo](prompts/04-backend-e-funcionalidades/Optional/32-validar-login-com-fornecedores-externos.md), [33 passkeys](prompts/04-backend-e-funcionalidades/Optional/33-validar-webauthn-e-passkeys.md), [34 Hangfire](prompts/04-backend-e-funcionalidades/Optional/34-validar-jobs-hangfire.md), [35 SignalR](prompts/04-backend-e-funcionalidades/Optional/35-validar-signalr-e-tempo-real.md), [36 push/deep links](prompts/04-backend-e-funcionalidades/Optional/36-validar-push-notifications-e-deep-links.md) e [37 uploads](prompts/04-backend-e-funcionalidades/Optional/37-validar-uploads-imagens-e-armazenamento.md).
+Opcionais desta etapa: [32 faturação](prompts/04-backend-e-funcionalidades/Optional/32-implementar-faturacao.md), [33 localização](prompts/04-backend-e-funcionalidades/Optional/33-validar-localizacao-e-formatacao-cultural.md), [34 login externo](prompts/04-backend-e-funcionalidades/Optional/34-validar-login-com-fornecedores-externos.md), [35 passkeys](prompts/04-backend-e-funcionalidades/Optional/35-validar-webauthn-e-passkeys.md), [36 Hangfire](prompts/04-backend-e-funcionalidades/Optional/36-validar-jobs-hangfire.md), [37 SignalR](prompts/04-backend-e-funcionalidades/Optional/37-validar-signalr-e-tempo-real.md), [38 push/deep links](prompts/04-backend-e-funcionalidades/Optional/38-validar-push-notifications-e-deep-links.md) e [39 uploads](prompts/04-backend-e-funcionalidades/Optional/39-validar-uploads-imagens-e-armazenamento.md).
 
 ### 5 — Segurança e privacidade
 
-38. [Privacidade operacional e direitos de dados — opcional](prompts/05-seguranca-e-privacidade/Optional/38-implementar-privacidade-operacional-e-direitos-de-dados.md)
-39. [Auditar segurança com OWASP ASVS](prompts/05-seguranca-e-privacidade/39-auditar-seguranca-com-owasp-asvs.md)
+40. [Privacidade operacional e direitos de dados — opcional](prompts/05-seguranca-e-privacidade/Optional/40-implementar-privacidade-operacional-e-direitos-de-dados.md)
+41. [Auditar segurança com OWASP ASVS](prompts/05-seguranca-e-privacidade/41-auditar-seguranca-com-owasp-asvs.md)
 
 ### 6 — Conformidade e presença pública
 
-40. [Implementar área legal](prompts/06-conformidade-e-presenca-publica/40-implementar-area-legal-ssr.md)
-41. [Atualizar footer institucional](prompts/06-conformidade-e-presenca-publica/41-atualizar-footer-institucional-ssr.md)
-42. [Implementar SEO SSR](prompts/06-conformidade-e-presenca-publica/42-implementar-seo-area-publica-ssr.md)
-43. [Auditar acessibilidade WCAG](prompts/06-conformidade-e-presenca-publica/43-auditar-acessibilidade-wcag.md)
-44. [Validar static SSR](prompts/06-conformidade-e-presenca-publica/44-validar-ssr.md)
+42. [Implementar área legal](prompts/06-conformidade-e-presenca-publica/42-implementar-area-legal-ssr.md)
+43. [Atualizar footer institucional](prompts/06-conformidade-e-presenca-publica/43-atualizar-footer-institucional-ssr.md)
+44. [Implementar SEO SSR](prompts/06-conformidade-e-presenca-publica/44-implementar-seo-area-publica-ssr.md)
+45. [Auditar acessibilidade WCAG](prompts/06-conformidade-e-presenca-publica/45-auditar-acessibilidade-wcag.md)
+46. [Validar static SSR](prompts/06-conformidade-e-presenca-publica/46-validar-ssr.md)
 
 ### 7 — Monetização e crescimento — opcionais
 
-45. [Publicidade](prompts/07-monetizacao-e-crescimento/Optional/45-implementar-publicidade.md)
-46. [Retenção](prompts/07-monetizacao-e-crescimento/Optional/46-implementar-retencao-de-utilizadores.md)
-47. [Fidelização](prompts/07-monetizacao-e-crescimento/Optional/47-fidelizar-utilizadores.md)
+47. [Publicidade](prompts/07-monetizacao-e-crescimento/Optional/47-implementar-publicidade.md)
+48. [Retenção](prompts/07-monetizacao-e-crescimento/Optional/48-implementar-retencao-de-utilizadores.md)
+49. [Fidelização](prompts/07-monetizacao-e-crescimento/Optional/49-fidelizar-utilizadores.md)
 
 ### 8 — Qualidade e hardening
 
-48. [Observabilidade e alertas](prompts/08-qualidade-e-hardening/48-implementar-observabilidade-e-alertas.md)
-49. [Performance, carga e estabilidade](prompts/08-qualidade-e-hardening/49-testar-performance-e-carga.md)
-50. [PWA, instalação, offline e atualização](prompts/08-qualidade-e-hardening/50-validar-pwa-instalacao-offline-e-atualizacao.md)
-51. [Resiliência e recuperação de falhas](prompts/08-qualidade-e-hardening/51-testar-resiliencia-e-recuperacao-de-falhas.md)
-52. [Auditoria geral baseada em risco](prompts/08-qualidade-e-hardening/52-testar-aplicacao-geral.md)
-53. [Dependências, licenças e supply chain](prompts/08-qualidade-e-hardening/53-auditar-dependencias-licencas-e-supply-chain.md)
-54. [Preparar estratégia de cache](prompts/08-qualidade-e-hardening/54-evitar-cache-apos-publicacao.md)
+50. [Observabilidade e alertas](prompts/08-qualidade-e-hardening/50-implementar-observabilidade-e-alertas.md)
+51. [Performance, carga e estabilidade](prompts/08-qualidade-e-hardening/51-testar-performance-e-carga.md)
+52. [PWA, instalação, offline e atualização](prompts/08-qualidade-e-hardening/52-validar-pwa-instalacao-offline-e-atualizacao.md)
+53. [Resiliência e recuperação de falhas](prompts/08-qualidade-e-hardening/53-testar-resiliencia-e-recuperacao-de-falhas.md)
+54. [Auditoria geral baseada em risco](prompts/08-qualidade-e-hardening/54-testar-aplicacao-geral.md)
+55. [Dependências, licenças e supply chain](prompts/08-qualidade-e-hardening/55-auditar-dependencias-licencas-e-supply-chain.md)
+56. [Preparar estratégia de cache](prompts/08-qualidade-e-hardening/56-evitar-cache-apos-publicacao.md)
 
 ### 9 — Entrega e distribuição
 
-55. [Configurar CI/CD e ambientes](prompts/09-entrega-e-distribuicao/55-configurar-ci-cd-e-ambientes-de-deploy.md)
-56. [Infraestrutura como código — opcional](prompts/09-entrega-e-distribuicao/Optional/56-provisionar-infraestrutura-como-codigo.md)
-57. [Preparar MAUI para lojas — opcional](prompts/09-entrega-e-distribuicao/Optional/57-preparar-maui-para-distribuicao-nas-stores.md)
+57. [Configurar CI/CD e ambientes](prompts/09-entrega-e-distribuicao/57-configurar-ci-cd-e-ambientes-de-deploy.md)
+58. [Infraestrutura como código — opcional](prompts/09-entrega-e-distribuicao/Optional/58-provisionar-infraestrutura-como-codigo.md)
+59. [Preparar MAUI para lojas — opcional](prompts/09-entrega-e-distribuicao/Optional/59-preparar-maui-para-distribuicao-nas-stores.md)
 
 ### 10 — Operação e recuperação
 
-58. [Definir SLI, SLO e error budget](prompts/10-operacao-e-recuperacao/58-definir-sli-slo-e-error-budget.md)
-59. [Implementar backup, restore e disaster recovery](prompts/10-operacao-e-recuperacao/59-implementar-backup-restore-e-disaster-recovery.md)
-60. [Criar runbook de incidentes e operação](prompts/10-operacao-e-recuperacao/60-criar-runbook-de-incidentes-e-operacao.md)
+60. [Definir SLI, SLO e error budget](prompts/10-operacao-e-recuperacao/60-definir-sli-slo-e-error-budget.md)
+61. [Implementar backup, restore e disaster recovery](prompts/10-operacao-e-recuperacao/61-implementar-backup-restore-e-disaster-recovery.md)
+62. [Criar runbook de incidentes e operação](prompts/10-operacao-e-recuperacao/62-criar-runbook-de-incidentes-e-operacao.md)
 
 ### 11 — Aceitação, revisão e release
 
-61. [Concluir documentação e manutenção](prompts/11-aceitacao-e-manutencao/61-concluir-documentacao-e-plano-de-manutencao.md)
-62. [Executar aceitação final](prompts/11-aceitacao-e-manutencao/62-executar-aceitacao-final-e-checklist-de-release.md)
-63. [Executar revisão final independente](prompts/11-aceitacao-e-manutencao/63-executar-revisao-final-independente.md)
-64. [Publicar com migrations, smoke tests e rollback](prompts/11-aceitacao-e-manutencao/64-publicar-com-migrations-smoke-tests-e-rollback.md)
+63. [Concluir documentação e manutenção](prompts/11-aceitacao-e-manutencao/63-concluir-documentacao-e-plano-de-manutencao.md)
+64. [Executar aceitação final](prompts/11-aceitacao-e-manutencao/64-executar-aceitacao-final-e-checklist-de-release.md)
+65. [Executar revisão final independente](prompts/11-aceitacao-e-manutencao/65-executar-revisao-final-independente.md)
+66. [Publicar com migrations, smoke tests e rollback](prompts/11-aceitacao-e-manutencao/66-publicar-com-migrations-smoke-tests-e-rollback.md)
 
 ### 12 — Operação contínua
 
-65. [Validar cache da versão publicada](prompts/12-operacao-continua/65-validar-cache-da-versao-publicada.md)
-66. [Validar SEO online](prompts/12-operacao-continua/66-validar-seo-online.md)
-67. [Verificar pós-release a 30m, 24h e 7d](prompts/12-operacao-continua/67-verificar-pos-release-30m-24h-7d.md)
-68. [Executar triagem operacional diária](prompts/12-operacao-continua/68-executar-triagem-operacional-diaria.md)
-69. [Monitorizar Core Web Vitals com RUM](prompts/12-operacao-continua/69-monitorizar-core-web-vitals-rum.md)
-70. [Triar bugs e feedback de suporte](prompts/12-operacao-continua/70-triar-bugs-e-feedback-de-suporte.md)
-71. [Monitorizar custos e anomalias](prompts/12-operacao-continua/71-monitorizar-custos-e-anomalias.md)
-72. [Auditar vulnerabilidades continuamente](prompts/12-operacao-continua/72-auditar-vulnerabilidades-continuas.md)
-73. [Medir DORA e melhoria contínua](prompts/12-operacao-continua/73-medir-metricas-dora-e-melhoria-continua.md)
+67. [Validar cache da versão publicada](prompts/12-operacao-continua/67-validar-cache-da-versao-publicada.md)
+68. [Validar SEO online](prompts/12-operacao-continua/68-validar-seo-online.md)
+69. [Verificar pós-release a 30m, 24h e 7d](prompts/12-operacao-continua/69-verificar-pos-release-30m-24h-7d.md)
+70. [Executar triagem operacional diária](prompts/12-operacao-continua/70-executar-triagem-operacional-diaria.md)
+71. [Monitorizar Core Web Vitals com RUM](prompts/12-operacao-continua/71-monitorizar-core-web-vitals-rum.md)
+72. [Triar bugs e feedback de suporte](prompts/12-operacao-continua/72-triar-bugs-e-feedback-de-suporte.md)
+73. [Monitorizar custos e anomalias](prompts/12-operacao-continua/73-monitorizar-custos-e-anomalias.md)
+74. [Auditar vulnerabilidades continuamente](prompts/12-operacao-continua/74-auditar-vulnerabilidades-continuas.md)
+75. [Medir DORA e melhoria contínua](prompts/12-operacao-continua/75-medir-metricas-dora-e-melhoria-continua.md)
 
 ## Módulos não previstos
 

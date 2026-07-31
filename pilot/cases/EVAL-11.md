@@ -2,7 +2,7 @@
 
 Lê integralmente as instruções,
 `prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md` e
-`prompts/04-backend-e-funcionalidades/27-implementar-funcionalidades-especificas.md`.
+`prompts/04-backend-e-funcionalidades/29-implementar-funcionalidades-especificas.md`.
 Lê também
 `prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md`.
 
@@ -21,7 +21,7 @@ Avalia primeiro se a frase pode ser promovida a requisito `Must` segundo o
 protocolo por fases e o contrato inline do prompt 03. Identifica fontes,
 conflitos, `APP/PAGE` ou operação não visual, mapa do passo, ações, estados,
 campos, IDs transversais, cenários, prova prevista, fatias/prompts downstream e
-decisões materiais em falta. Depois avalia se o prompt 27 poderia implementar
+decisões materiais em falta. Depois avalia se o prompt 29 poderia implementar
 a funcionalidade.
 
 Não alteres ficheiros e não inventes a interpretação. Espera-se `bloqueado`,

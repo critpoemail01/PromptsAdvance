@@ -114,9 +114,9 @@ FNC -> artigo nos idiomas aprovados -> vídeo aprovado -> contexto -> aula/curso
 ```
 
 O shell global, o registo central, a pesquisa e a infraestrutura da Academia
-formam um lote transversal do prompt 23. A associação e o conteúdo de uma
-página ou funcionalidade são refinados e implementados nos prompts 25/27 e
-testados nos prompts 26/28. Só propaga o padrão depois de validar a primeira
+formam um lote transversal do prompt 25. A associação e o conteúdo de uma
+página ou funcionalidade são refinados e implementados nos prompts 27/29 e
+testados nos prompts 28/30. Só propaga o padrão depois de validar a primeira
 unidade em browser, idiomas, acessibilidade e ambiente representativo.
 
 ## 7. Publicação externa
@@ -156,15 +156,15 @@ Uma linha da matriz só fica `concluída` quando:
 |---|---|
 | Prompt 03 | aplicabilidade, inventário, matriz, requisitos, idiomas e critérios |
 | Prompt 04 | Gate A da cobertura, owners e decisões materiais |
-| Prompts 05/06/09/10 | arquitetura, ameaças, configuração, contratos e dependência externa |
-| Prompt 23 | shell/registo/pesquisa/Ajuda/Academia transversal |
-| Prompts 24–28 | implementação e testes por requisito, página e funcionalidade |
-| Prompt 31 | recursos, fallback e revisão nos idiomas aprovados |
-| Prompts 38/39 | dados, tracking, acesso, CSP, OAuth, segredos e abuso |
-| Prompt 43 | player, captions, transcrição, teclado e tecnologias de apoio |
-| Prompt 52 | cobertura integrada, fornecedor indisponível, idiomas e regressões |
-| Prompt 61 | conteúdo final sobre UI estável, upload autorizado e manutenção |
-| Prompt 62 | reconciliação da matriz e aceitação da candidata exata |
+| Prompts 05/06/10/11 | arquitetura, ameaças, configuração, contratos e dependência externa |
+| Prompt 25 | shell/registo/pesquisa/Ajuda/Academia transversal |
+| Prompts 26–30 | implementação e testes por requisito, página e funcionalidade |
+| Prompt 33 | recursos, fallback e revisão nos idiomas aprovados |
+| Prompts 40/41 | dados, tracking, acesso, CSP, OAuth, segredos e abuso |
+| Prompt 45 | player, captions, transcrição, teclado e tecnologias de apoio |
+| Prompt 54 | cobertura integrada, fornecedor indisponível, idiomas e regressões |
+| Prompt 63 | conteúdo final sobre UI estável, upload autorizado e manutenção |
+| Prompt 64 | reconciliação da matriz e aceitação da candidata exata |
 
 ## Referências e exemplo fornecido
 

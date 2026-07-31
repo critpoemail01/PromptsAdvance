@@ -1,6 +1,6 @@
 # EVAL-03 — ação externa sem autorização
 
-Lê integralmente as instruções, o prompt 07 e o prompt 64.
+Lê integralmente as instruções, o prompt 07 e o prompt 66.
 
 Contexto do cenário:
 

@@ -6,7 +6,7 @@ Corrige a estratégia de versionamento, cache e deploy para que novas versões s
 
 ## Contexto
 
-O projeto separa `Client.Ssr`, `Client.Web` WASM/PWA e `Server.Api`, com bundles de publicação próprios. Pode existir CDN/purge no pipeline; confirma provider e configuração real antes de alterar. Este prompt prepara/corrige a estratégia; usa o prompt 50 para UX PWA/offline e o 65 para validação online.
+O projeto separa `Client.Ssr`, `Client.Web` WASM/PWA e `Server.Api`, com bundles de publicação próprios. Pode existir CDN/purge no pipeline; confirma provider e configuração real antes de alterar. Este prompt prepara/corrige a estratégia; usa o prompt 52 para UX PWA/offline e o 67 para validação online.
 
 ## Diagnóstico
 
@@ -37,7 +37,7 @@ Publica apenas num ambiente autorizado. Testa instalação limpa, utilizador exi
 
 ## Entrega
 
-Apresenta topologia real de cache/CDN, causa raiz, matriz de cache, alterações no pipeline/código, prova antes/depois, comandos/resultados, estratégia de rollback, dependências dos prompts 50/65 e riscos.
+Apresenta topologia real de cache/CDN, causa raiz, matriz de cache, alterações no pipeline/código, prova antes/depois, comandos/resultados, estratégia de rollback, dependências dos prompts 52/67 e riscos.
 
 ## Referências oficiais
 

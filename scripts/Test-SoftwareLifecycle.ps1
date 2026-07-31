@@ -800,7 +800,7 @@ try {
         $utf8NoBom)
     $forgedCompletedValidate = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
     if ($forgedCompletedValidate.ExitCode -eq 0) {
-        throw 'A forged completed lifecycle without prompt 73 and G10 was accepted.'
+        throw 'A forged completed lifecycle without prompt 75 and G10 was accepted.'
     }
     [System.IO.File]::WriteAllText($statePath, $originalStateJson, $utf8NoBom)
     $results.Add('dead-end waiting state and forged completion -> blocked')
@@ -873,14 +873,14 @@ try {
         '-PromptId', '05',
         '-Result', 'completed',
         '-Evidence', 'fixture://prompt-05-invalid-route',
-        '-NextPrompt', '40'
+        '-NextPrompt', '42'
     )
     if ($invalidOverride.ExitCode -eq 0) {
         throw 'A deterministic transition accepted an arbitrary NextPrompt override.'
     }
     $results.Add('arbitrary NextPrompt -> blocked')
 
-    foreach ($id in @('05', '06', '07', '08', '74', '09')) {
+    foreach ($id in @('05', '06', '07', '08', '09', '10')) {
         $record = Invoke-Lifecycle @(
             'record',
             '-ProcessRoot', $fixtureRoot,
@@ -894,9 +894,9 @@ try {
     $gateG02 = Invoke-Lifecycle @(
         'record',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '10',
+        '-PromptId', '11',
         '-Result', 'completed',
-        '-Evidence', 'fixture://prompt-10',
+        '-Evidence', 'fixture://prompt-11',
         '-GateId', 'G02',
         '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://architecture-approved',
@@ -904,14 +904,14 @@ try {
     )
     Require-ExitCode -Execution $gateG02 -Expected 0 -Label 'G02'
 
-    $record11 = Invoke-Lifecycle @(
+    $record12 = Invoke-Lifecycle @(
         'record',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '11',
+        '-PromptId', '12',
         '-Result', 'completed',
-        '-Evidence', 'fixture://prompt-11'
+        '-Evidence', 'fixture://prompt-12'
     )
-    Require-ExitCode -Execution $record11 -Expected 0 -Label 'record 11'
+    Require-ExitCode -Execution $record12 -Expected 0 -Label 'record 12'
 
     $fixtureManifestPath = Join-Path $fixtureRoot 'PROCESS_MANIFEST.json'
     $candidateFixtureManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $fixtureManifestPath | ConvertFrom-Json
@@ -926,9 +926,9 @@ try {
     $pendingPilot = Invoke-Lifecycle @(
         'record',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '12',
+        '-PromptId', '13',
         '-Result', 'completed',
-        '-Evidence', 'fixture://prompt-12',
+        '-Evidence', 'fixture://prompt-13',
         '-GateId', 'G03',
         '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://pilot-pending',
@@ -951,9 +951,9 @@ try {
     $gateG03 = Invoke-Lifecycle @(
         'record',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '12',
+        '-PromptId', '13',
         '-Result', 'completed',
-        '-Evidence', 'fixture://prompt-12',
+        '-Evidence', 'fixture://prompt-13',
         '-GateId', 'G03',
         '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://pilot-approved',
@@ -964,7 +964,7 @@ try {
     $invalidSelection = Invoke-Lifecycle @(
         'select',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '64',
+        '-PromptId', '66',
         '-Evidence', 'fixture://invalid-selection'
     )
     if ($invalidSelection.ExitCode -eq 0) {
@@ -975,7 +975,7 @@ try {
     $selectFoundation = Invoke-Lifecycle @(
         'select',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '19',
+        '-PromptId', '21',
         '-SliceId', 'SLICE-001',
         '-SliceKind', 'page',
         '-Surface', 'web',
@@ -986,7 +986,7 @@ try {
     )
     Require-ExitCode -Execution $selectFoundation -Expected 0 -Label 'select first slice foundation'
 
-    foreach ($id in @('19', '20', '21', '22')) {
+    foreach ($id in @('21', '22', '23', '24')) {
         $record = Invoke-Lifecycle @(
             'record',
             '-ProcessRoot', $fixtureRoot,
@@ -1000,7 +1000,7 @@ try {
     $selectPage = Invoke-Lifecycle @(
         'select',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '25',
+        '-PromptId', '27',
         '-SliceId', 'SLICE-001',
         '-SliceKind', 'page',
         '-Surface', 'web',
@@ -1012,9 +1012,9 @@ try {
     Require-ExitCode -Execution $selectPage -Expected 0 -Label 'select page slice'
 
     foreach ($transition in @(
-        @{ Id = '25'; Expected = '15' },
-        @{ Id = '15'; Expected = '75' },
-        @{ Id = '75'; Expected = '26' }
+        @{ Id = '27'; Expected = '16' },
+        @{ Id = '16'; Expected = '20' },
+        @{ Id = '20'; Expected = '28' }
     )) {
         $record = Invoke-Lifecycle @(
             'record',
@@ -1033,9 +1033,9 @@ try {
     $invalidG04 = Invoke-Lifecycle @(
         'record',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '26',
+        '-PromptId', '28',
         '-Result', 'completed',
-        '-Evidence', 'fixture://prompt-26',
+        '-Evidence', 'fixture://prompt-28',
         '-GateId', 'G04',
         '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://quality-template',
@@ -1052,9 +1052,9 @@ try {
     $gateG04 = Invoke-Lifecycle @(
         'record',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '26',
+        '-PromptId', '28',
         '-Result', 'completed',
-        '-Evidence', 'fixture://prompt-26',
+        '-Evidence', 'fixture://prompt-28',
         '-GateId', 'G04',
         '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://quality-approved',
@@ -1073,15 +1073,15 @@ try {
     $earlyGlobal = Invoke-Lifecycle @(
         'select',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '23',
+        '-PromptId', '25',
         '-Evidence', 'fixture://premature-global-exit'
     )
     if ($earlyGlobal.ExitCode -eq 0) {
         throw 'Global completion started before surface/page applicability decisions were resolved.'
     }
-    $results.Add('early prompt 23 exit -> blocked')
+    $results.Add('early prompt 25 exit -> blocked')
 
-    foreach ($id in @('13', '14', '16', '17', '18', '27', '28', '29')) {
+    foreach ($id in @('14', '15', '17', '18', '19', '29', '30', '31')) {
         $decision = Invoke-Lifecycle @(
             'decide',
             '-ProcessRoot', $fixtureRoot,
@@ -1095,12 +1095,12 @@ try {
     $selectGlobal = Invoke-Lifecycle @(
         'select',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '23',
+        '-PromptId', '25',
         '-Evidence', 'fixture://must-slices-complete'
     )
     Require-ExitCode -Execution $selectGlobal -Expected 0 -Label 'select global requirements'
 
-    foreach ($id in @('23', '24')) {
+    foreach ($id in @('25', '26')) {
         $record = Invoke-Lifecycle @(
             'record',
             '-ProcessRoot', $fixtureRoot,
@@ -1114,15 +1114,15 @@ try {
     $earlySecurity = Invoke-Lifecycle @(
         'select',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '39',
+        '-PromptId', '41',
         '-Evidence', 'fixture://premature-security-exit'
     )
     if ($earlySecurity.ExitCode -eq 0) {
         throw 'Security core started before optional capability decisions were resolved.'
     }
-    $results.Add('early prompt 39 exit -> blocked')
+    $results.Add('early prompt 41 exit -> blocked')
 
-    foreach ($id in 30..38 | ForEach-Object { '{0:D2}' -f $_ }) {
+    foreach ($id in 32..40 | ForEach-Object { '{0:D2}' -f $_ }) {
         $decision = Invoke-Lifecycle @(
             'decide',
             '-ProcessRoot', $fixtureRoot,
@@ -1146,27 +1146,27 @@ try {
     $selectSecurity = Invoke-Lifecycle @(
         'select',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '39',
+        '-PromptId', '41',
         '-Evidence', 'fixture://security-required'
     )
     Require-ExitCode -Execution $selectSecurity -Expected 0 -Label 'select security'
 
-    $record39 = Invoke-Lifecycle @(
+    $record41 = Invoke-Lifecycle @(
         'record',
         '-ProcessRoot', $fixtureRoot,
-        '-PromptId', '39',
+        '-PromptId', '41',
         '-Result', 'completed',
-        '-Evidence', 'fixture://prompt-39'
+        '-Evidence', 'fixture://prompt-41'
     )
-    Require-ExitCode -Execution $record39 -Expected 0 -Label 'route 39'
+    Require-ExitCode -Execution $record41 -Expected 0 -Label 'route 41'
 
     $postG05State = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'LIFECYCLE_STATE.json') | ConvertFrom-Json
-    if ($postG05State.currentPrompt -ne '40' -or $postG05State.gates.G05.status -ne 'passed') {
+    if ($postG05State.currentPrompt -ne '42' -or $postG05State.gates.G05.status -ne 'passed') {
         throw "G05/security routing failed: prompt=$($postG05State.currentPrompt), G05=$($postG05State.gates.G05.status)"
     }
-    $results.Add('applicability decisions + G05 + route 39 -> 40')
+    $results.Add('applicability decisions + G05 + route 41 -> 42')
 
-    foreach ($id in @('40', '41', '42', '43', '44')) {
+    foreach ($id in @('42', '43', '44', '45', '46')) {
         $record = Invoke-Lifecycle @(
             'record',
             '-ProcessRoot', $fixtureRoot,
@@ -1176,7 +1176,7 @@ try {
         )
         Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
     }
-    foreach ($id in @('45', '46', '47')) {
+    foreach ($id in @('47', '48', '49')) {
         $decision = Invoke-Lifecycle @(
             'decide',
             '-ProcessRoot', $fixtureRoot,
@@ -1186,29 +1186,29 @@ try {
         )
         Require-ExitCode -Execution $decision -Expected 0 -Label "decide $id"
     }
-    $select48 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '48',
+    $select50 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '50',
         '-Evidence', 'fixture://hardening-required'
     )
-    Require-ExitCode -Execution $select48 -Expected 0 -Label 'select hardening'
-    foreach ($id in @('48', '49')) {
+    Require-ExitCode -Execution $select50 -Expected 0 -Label 'select hardening'
+    foreach ($id in @('50', '51')) {
         $record = Invoke-Lifecycle @(
             'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
             '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
         )
         Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
     }
-    $decide50 = Invoke-Lifecycle @(
-        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '50',
+    $decide52 = Invoke-Lifecycle @(
+        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '52',
         '-Result', 'not_applicable', '-Evidence', 'fixture://scope-excludes-50'
     )
-    Require-ExitCode -Execution $decide50 -Expected 0 -Label 'decide 50'
-    $select51 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '51',
+    Require-ExitCode -Execution $decide52 -Expected 0 -Label 'decide 52'
+    $select53 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '53',
         '-Evidence', 'fixture://quality-required'
     )
-    Require-ExitCode -Execution $select51 -Expected 0 -Label 'select quality core'
-    foreach ($id in @('51', '52', '53')) {
+    Require-ExitCode -Execution $select53 -Expected 0 -Label 'select quality core'
+    foreach ($id in @('53', '54', '55')) {
         $record = Invoke-Lifecycle @(
             'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
             '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
@@ -1216,8 +1216,8 @@ try {
         Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
     }
     $invalidG06 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '54',
-        '-Result', 'completed', '-Evidence', 'fixture://prompt-54',
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '56',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-56',
         '-GateId', 'G06', '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://unstructured-hardening',
         '-ApprovedBy', 'Fixture Security Approver'
@@ -1229,37 +1229,37 @@ try {
     Copy-Item -LiteralPath (Join-Path $fixtureRoot 'pilot\fixtures\lifecycle-gates\valid-lifecycle-gate-evidence.json') `
         -Destination (Join-Path $fixtureRoot 'LIFECYCLE_GATE_EVIDENCE.json') -Force
     $gateG06 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '54',
-        '-Result', 'completed', '-Evidence', 'fixture://prompt-54',
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '56',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-56',
         '-GateId', 'G06', '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://hardening-approved',
         '-ApprovedBy', 'Fixture Security Approver'
     )
     Require-ExitCode -Execution $gateG06 -Expected 0 -Label 'G06'
 
-    $select55 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '55',
+    $select57 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '57',
         '-Evidence', 'fixture://delivery-required'
     )
-    Require-ExitCode -Execution $select55 -Expected 0 -Label 'select delivery'
-    $record55 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '55',
-        '-Result', 'completed', '-Evidence', 'fixture://prompt-55'
+    Require-ExitCode -Execution $select57 -Expected 0 -Label 'select delivery'
+    $record57 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '57',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-57'
     )
-    Require-ExitCode -Execution $record55 -Expected 0 -Label 'record 55'
-    foreach ($id in @('56', '57')) {
+    Require-ExitCode -Execution $record57 -Expected 0 -Label 'record 57'
+    foreach ($id in @('58', '59')) {
         $decision = Invoke-Lifecycle @(
             'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
             '-Result', 'not_applicable', '-Evidence', "fixture://scope-excludes-$id"
         )
         Require-ExitCode -Execution $decision -Expected 0 -Label "decide $id"
     }
-    $select58 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '58',
+    $select60 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '60',
         '-Evidence', 'fixture://operations-required'
     )
-    Require-ExitCode -Execution $select58 -Expected 0 -Label 'select operations'
-    foreach ($id in @('58', '59')) {
+    Require-ExitCode -Execution $select60 -Expected 0 -Label 'select operations'
+    foreach ($id in @('60', '61')) {
         $record = Invoke-Lifecycle @(
             'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
             '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
@@ -1267,20 +1267,20 @@ try {
         Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
     }
     $gateG07 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '60',
-        '-Result', 'completed', '-Evidence', 'fixture://prompt-60',
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '62',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-62',
         '-GateId', 'G07', '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://operations-approved',
         '-ApprovedBy', 'Fixture Operations Approver'
     )
     Require-ExitCode -Execution $gateG07 -Expected 0 -Label 'G07'
 
-    $select61 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '61',
+    $select63 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '63',
         '-Evidence', 'fixture://acceptance-required'
     )
-    Require-ExitCode -Execution $select61 -Expected 0 -Label 'select acceptance'
-    foreach ($id in @('61', '62')) {
+    Require-ExitCode -Execution $select63 -Expected 0 -Label 'select acceptance'
+    foreach ($id in @('63', '64')) {
         $record = Invoke-Lifecycle @(
             'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
             '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
@@ -1298,8 +1298,8 @@ try {
         ($invalidG08Evidence | ConvertTo-Json -Depth 20) + [Environment]::NewLine,
         $utf8NoBom)
     $invalidG08 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '63',
-        '-Result', 'completed', '-Evidence', 'fixture://prompt-63-read-only',
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '65',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-65-read-only',
         '-GateId', 'G08', '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://fake-review-without-identifiers',
         '-ApprovedBy', 'Fixture Independent Reviewer'
@@ -1310,8 +1310,8 @@ try {
     $results.Add('free-form G08 review -> blocked')
     [System.IO.File]::WriteAllText($lifecycleEvidencePath, $validEvidenceBeforeG08, $utf8NoBom)
     $gateG08 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '63',
-        '-Result', 'completed', '-Evidence', 'fixture://prompt-63-read-only',
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '65',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-65-read-only',
         '-GateId', 'G08', '-GateDecision', 'passed',
         '-GateEvidence', 'LIFECYCLE_GATE_EVIDENCE.json#G08',
         '-ApprovedBy', 'Fixture Independent Reviewer'
@@ -1339,7 +1339,7 @@ try {
         $utf8NoBom)
     $changedEvidenceValidate = Invoke-Lifecycle @('validate', '-ProcessRoot', $fixtureRoot)
     $changedEvidenceSelect = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '64',
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '66',
         '-Evidence', 'LIFECYCLE_GATE_EVIDENCE.json#G09.authorization'
     )
     if ($changedEvidenceValidate.ExitCode -eq 0 -or $changedEvidenceSelect.ExitCode -eq 0) {
@@ -1348,69 +1348,69 @@ try {
     [System.IO.File]::WriteAllText($lifecycleEvidencePath, $approvedEvidenceJson, $utf8NoBom)
     $results.Add('approved G08/G09 evidence mutation -> validate and mutator blocked')
 
-    $select64 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '64',
+    $select66 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '66',
         '-Evidence', 'LIFECYCLE_GATE_EVIDENCE.json#G09.authorization'
     )
-    Require-ExitCode -Execution $select64 -Expected 0 -Label 'select authorized release'
-    $record64 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '64',
+    Require-ExitCode -Execution $select66 -Expected 0 -Label 'select authorized release'
+    $record66 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '66',
         '-Result', 'completed', '-Evidence', 'LIFECYCLE_GATE_EVIDENCE.json#G09.deployment'
     )
-    Require-ExitCode -Execution $record64 -Expected 0 -Label 'release execution evidence'
+    Require-ExitCode -Execution $record66 -Expected 0 -Label 'release execution evidence'
 
-    foreach ($id in @('65', '66')) {
+    foreach ($id in @('67', '68')) {
         $decision = Invoke-Lifecycle @(
             'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
             '-Result', 'not_applicable', '-Evidence', "fixture://scope-excludes-$id"
         )
         Require-ExitCode -Execution $decision -Expected 0 -Label "decide $id"
     }
-    $select67 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '67',
+    $select69 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '69',
         '-Evidence', 'fixture://post-release-required'
     )
-    Require-ExitCode -Execution $select67 -Expected 0 -Label 'select post-release validation'
-    foreach ($id in @('67', '68')) {
+    Require-ExitCode -Execution $select69 -Expected 0 -Label 'select post-release validation'
+    foreach ($id in @('69', '70')) {
         $record = Invoke-Lifecycle @(
             'record', '-ProcessRoot', $fixtureRoot, '-PromptId', $id,
             '-Result', 'completed', '-Evidence', "fixture://prompt-$id"
         )
         Require-ExitCode -Execution $record -Expected 0 -Label "record $id"
     }
-    $decide69 = Invoke-Lifecycle @(
-        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '69',
+    $decide73 = Invoke-Lifecycle @(
+        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '71',
         '-Result', 'not_applicable', '-Evidence', 'fixture://scope-excludes-69'
     )
-    Require-ExitCode -Execution $decide69 -Expected 0 -Label 'decide 69'
-    $select70 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '70',
+    Require-ExitCode -Execution $decide73 -Expected 0 -Label 'decide 71'
+    $select74 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '72',
         '-Evidence', 'fixture://vulnerability-monitoring-required'
     )
-    Require-ExitCode -Execution $select70 -Expected 0 -Label 'select vulnerability monitoring'
-    $record70 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '70',
-        '-Result', 'completed', '-Evidence', 'fixture://prompt-70'
-    )
-    Require-ExitCode -Execution $record70 -Expected 0 -Label 'record 70'
-    $decide71 = Invoke-Lifecycle @(
-        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '71',
-        '-Result', 'not_applicable', '-Evidence', 'fixture://scope-excludes-71'
-    )
-    Require-ExitCode -Execution $decide71 -Expected 0 -Label 'decide 71'
-    $select72 = Invoke-Lifecycle @(
-        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '72',
-        '-Evidence', 'fixture://continuous-improvement-required'
-    )
-    Require-ExitCode -Execution $select72 -Expected 0 -Label 'select improvement'
-    $record72 = Invoke-Lifecycle @(
+    Require-ExitCode -Execution $select74 -Expected 0 -Label 'select vulnerability monitoring'
+    $record74 = Invoke-Lifecycle @(
         'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '72',
         '-Result', 'completed', '-Evidence', 'fixture://prompt-72'
     )
-    Require-ExitCode -Execution $record72 -Expected 0 -Label 'record 72'
+    Require-ExitCode -Execution $record74 -Expected 0 -Label 'record 72'
+    $decide73 = Invoke-Lifecycle @(
+        'decide', '-ProcessRoot', $fixtureRoot, '-PromptId', '73',
+        '-Result', 'not_applicable', '-Evidence', 'fixture://scope-excludes-71'
+    )
+    Require-ExitCode -Execution $decide73 -Expected 0 -Label 'decide 73'
+    $select74 = Invoke-Lifecycle @(
+        'select', '-ProcessRoot', $fixtureRoot, '-PromptId', '74',
+        '-Evidence', 'fixture://continuous-improvement-required'
+    )
+    Require-ExitCode -Execution $select74 -Expected 0 -Label 'select improvement'
+    $record74 = Invoke-Lifecycle @(
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '74',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-74'
+    )
+    Require-ExitCode -Execution $record74 -Expected 0 -Label 'record 74'
     $gateG10 = Invoke-Lifecycle @(
-        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '73',
-        '-Result', 'completed', '-Evidence', 'fixture://prompt-73',
+        'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '75',
+        '-Result', 'completed', '-Evidence', 'fixture://prompt-75',
         '-GateId', 'G10', '-GateDecision', 'passed',
         '-GateEvidence', 'fixture://continuous-operations-established'
     )

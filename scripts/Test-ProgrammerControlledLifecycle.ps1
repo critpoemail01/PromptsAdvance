@@ -45,18 +45,18 @@ try {
     )) 0 'start'
 
     $initialState = Read-State $process
-    foreach ($optionalPromptId in @('05', '06', '09', '10')) {
+    foreach ($optionalPromptId in @('05', '06', '10', '11')) {
         $optionalPrompt = $initialState.prompts.$optionalPromptId
         if ($optionalPrompt.applicability -ne 'conditional' -or
             $optionalPrompt.status -ne 'not_selected') {
             throw "Stage 2 optional prompt $optionalPromptId was not initialized as conditional."
         }
     }
-    if ($initialState.prompts.'74'.applicability -ne 'required' -or
-        $initialState.prompts.'74'.status -ne 'pending' -or
-        $initialState.prompts.'75'.applicability -ne 'conditional' -or
-        $initialState.prompts.'75'.status -ne 'not_selected') {
-        throw 'Requirements reconciliation prompts 74/75 have invalid initial applicability.'
+    if ($initialState.prompts.'09'.applicability -ne 'required' -or
+        $initialState.prompts.'09'.status -ne 'pending' -or
+        $initialState.prompts.'20'.applicability -ne 'conditional' -or
+        $initialState.prompts.'20'.status -ne 'not_selected') {
+        throw 'Requirements reconciliation prompts 09/20 have invalid initial applicability.'
     }
 
     Assert-ExitCode (Invoke-Lifecycle @(
@@ -139,8 +139,8 @@ try {
         @{ Current = '03'; Next = '04' },
         @{ Current = '04'; Next = '07' },
         @{ Current = '07'; Next = '08' },
-        @{ Current = '08'; Next = '74' },
-        @{ Current = '74'; Next = '11' }
+        @{ Current = '08'; Next = '09' },
+        @{ Current = '09'; Next = '12' }
     )) {
         Assert-ExitCode (Invoke-Lifecycle @(
             'record', '-ProcessRoot', $orderingProcess, '-PromptId', $transition.Current,

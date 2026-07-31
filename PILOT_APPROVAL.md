@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-31.15 |
+| Catalog version | 2026-08-01.1 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -226,3 +226,13 @@ programador. O upgrade automático continua reservado a catálogos `stable` com
 piloto aprovado; ações externas e de produção mantêm os respetivos hard stops.
 EVAL-03, EVAL-04, EVAL-11, EVAL-12, EVAL-13 e a suite completa devem ser
 repetidos. O piloto permanece `pending` e o canal permanece `candidate`.
+
+A versão 2026-08-01.1 corrige a numeração para refletir a ordem real de
+execução. A reconciliação técnica passa a prompt 09, a reconciliação visual a
+prompt 20, os antigos 09–18 avançam uma posição e os antigos 19–73 avançam
+duas, mantendo um inventário contínuo 01–75. Manifesto, routing, documentação e
+testes usam os mesmos IDs. O upgrade recusa versões anteriores cuja identidade
+associada a cada ID seja diferente, evitando reinterpretar resultados existentes.
+Esta migração altera identidades lógicas e exige repetir EVAL-05, EVAL-06,
+EVAL-11, EVAL-15 e a suite completa; o piloto permanece `pending` e o canal
+permanece `candidate`.

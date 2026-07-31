@@ -21,7 +21,7 @@ Validador: `scripts/Test-ProductDefinitionGate.ps1`.
   risco estão totalmente refinados;
 - especificação canónica e vistas derivadas em paridade para o detalhe já
   aprovado; nenhuma linha genérica finge que uma slice futura está pronta;
-- cada slice posterior passa um Definition of Ready no prompt 25/27, atualiza a
+- cada slice posterior passa um Definition of Ready no prompt 27/29, atualiza a
   fonte canónica e reconcilia checklist e `ALL_FUNCTIONALITIES.md` antes de código;
 - quando ajuda contextual/Academia estiver em âmbito, existe matriz
   `APP/PAGE/FNC -> artigo -> vídeo -> ajuda -> curso`, idiomas, owners,
@@ -182,7 +182,7 @@ Critérios:
 Regista estes campos em `LIFECYCLE_GATE_EVIDENCE.json` com identidades e
 artefactos locais acompanhados por SHA-256. Executa
 `scripts/Test-LifecycleGateEvidence.ps1`. G09 autoriza a release antes do
-prompt 64; no fim desse prompt, o mesmo validador compara deploy, ambiente,
+prompt 66; no fim desse prompt, o mesmo validador compara deploy, ambiente,
 SHA e digest autorizados e exige smoke tests, rollback e critérios de aborto.
 
 ## G10 — Operação e melhoria contínua

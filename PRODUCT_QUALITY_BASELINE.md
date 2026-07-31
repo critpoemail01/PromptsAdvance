@@ -8,7 +8,7 @@ Validação mecânica antes de G04:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-ProductQualityGate.ps1
 ```
 
-Este artefacto transforma o benchmark e os requisitos da aplicação em critérios mínimos aprovados e persistentes. É criado durante os prompts 1–4, confirmado antes do prompt 12 e atualizado apenas quando uma decisão de produto, evidência de utilizadores ou alteração material de plataforma justificar a mudança.
+Este artefacto transforma o benchmark e os requisitos da aplicação em critérios mínimos aprovados e persistentes. É criado durante os prompts 1–4, confirmado antes do prompt 13 e atualizado apenas quando uma decisão de produto, evidência de utilizadores ou alteração material de plataforma justificar a mudança.
 
 Não uses este template como uma checklist genérica. Substitui `A preencher` por critérios específicos do produto e liga cada decisão a requisitos, investigação, dados ou referências registadas. Um critério crítico sem evidência impede propagar a direção visual ou aprovar a release.
 

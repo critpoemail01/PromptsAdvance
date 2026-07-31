@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Audita e corrige a experiência PWA de `Client.Web` para `[BROWSERS_E_DISPOSITIVOS]`, focando manifest, instalação, modo standalone, comportamento offline, dados/operações pendentes e atualização vista pelo utilizador. A política HTTP/CDN de publicação pertence ao prompt 54 e a sua validação online ao prompt 65.
+Audita e corrige a experiência PWA de `Client.Web` para `[BROWSERS_E_DISPOSITIVOS]`, focando manifest, instalação, modo standalone, comportamento offline, dados/operações pendentes e atualização vista pelo utilizador. A política HTTP/CDN de publicação pertence ao prompt 56 e a sua validação online ao prompt 67.
 
 ## Critérios de sucesso
 
@@ -14,7 +14,7 @@ Audita e corrige a experiência PWA de `Client.Web` para `[BROWSERS_E_DISPOSITIV
 
 ## Processo
 
-1. Lê service worker, manifest, estratégia do prompt 54 e resultados online do prompt 65 quando já existirem, configuração de publicação e documentação de force update do boilerplate.
+1. Lê service worker, manifest, estratégia do prompt 56 e resultados online do prompt 67 quando já existirem, configuração de publicação e documentação de force update do boilerplate.
 2. Inventaria recursos precache/runtime, requests autenticados, IndexedDB/local storage e dados sensíveis.
 3. Define a matriz `recurso/jornada → online → offline → cache → invalidação → recuperação`.
 4. Confirma requisitos de instalação e offline por plataforma; não promete suporte universal.
@@ -34,7 +34,7 @@ Testa instalação limpa, standalone, primeira visita, visita repetida offline, 
 
 ## Entrega
 
-Apresenta matriz de instalação/offline/sync/atualização, ficheiros, browsers/dispositivos, testes/resultados, evidência de atualização, dados que nunca ficam offline e questões encaminhadas para os prompts 54/65.
+Apresenta matriz de instalação/offline/sync/atualização, ficheiros, browsers/dispositivos, testes/resultados, evidência de atualização, dados que nunca ficam offline e questões encaminhadas para os prompts 56/67.
 
 ## Referências oficiais
 

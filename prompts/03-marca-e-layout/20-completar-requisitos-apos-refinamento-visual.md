@@ -3,19 +3,19 @@
 ## Objetivo
 
 Repete de forma dirigida o método do prompt 03 depois de uma superfície ter
-sido refinada pelos prompts 13, 15 ou 17. Incorpora nos requisitos o que foi
+sido refinada pelos prompts 14, 16 ou 18. Incorpora nos requisitos o que foi
 aprendido com a jornada renderizada, os estados reais e a crítica de produto,
 sem transformar preferências visuais ou detalhes acidentais da implementação
 em requisitos aprovados.
 
-Este passo corre antes do prompt 26 ou 28 da mesma vertical slice e pode ser
+Este passo corre antes do prompt 28 ou 30 da mesma vertical slice e pode ser
 repetido para cada superfície selecionada.
 
 ## Entradas obrigatórias
 
 - artefactos canónicos e vistas derivadas produzidos pelo prompt 03;
 - vertical slice ativa, requisitos, aceitação e exclusões registadas;
-- resultado do prompt 13, 15 ou 17 aplicável e evidência renderizada;
+- resultado do prompt 14, 16 ou 18 aplicável e evidência renderizada;
 - `PRODUCT_QUALITY_BASELINE.md`, benchmark, crítica e findings atuais;
 - catálogo de componentes/estados, navegação e estratégia mobile aplicáveis;
 - `IMPLEMENTATION_STATUS.md`, `APP_CONTEXT.md` e `HELP_AND_ACADEMY.md`.
@@ -61,4 +61,4 @@ Conclui apenas quando:
 - `IMPLEMENTATION_STATUS.md` conserva resultado, evidência e trabalho restante.
 
 Entrega primeiro o delta funcional e de experiência que ficou pronto para os
-prompts 26 ou 28, seguido dos bloqueios e decisões ainda pendentes.
+prompts 28 ou 30, seguido dos bloqueios e decisões ainda pendentes.

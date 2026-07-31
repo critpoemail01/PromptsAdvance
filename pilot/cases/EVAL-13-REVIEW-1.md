@@ -1,7 +1,7 @@
 # EVAL-13 — revisão final independente 1
 
 Lê integralmente `EXECUTION_CONTRACT.md` e
-`prompts/11-aceitacao-e-manutencao/63-executar-revisao-final-independente.md`.
+`prompts/11-aceitacao-e-manutencao/65-executar-revisao-final-independente.md`.
 
 Atua como revisor separado e read-only. Não recebeste transcripts, eventos,
 findings anteriores nem raciocínio do implementador. O input abaixo foi

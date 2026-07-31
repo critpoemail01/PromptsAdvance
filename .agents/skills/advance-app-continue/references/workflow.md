@@ -39,13 +39,13 @@ not enough.
 | Stage | Prompts/work | Quality checkpoint |
 |---|---|---|
 | Product definition | 01–04 | G01 product clarity and requirements |
-| Architecture/foundation | 05–10, then 74 after the repository foundation | G02 architecture and repository foundation |
-| Design/surfaces | 11–18 and repeatable 75 after surface refinement | G03/G04 implementation and experience quality |
-| Backend/functions | 19–37 | G05 complete user journeys |
-| Security/public/hardening | 38–54 | G06 security and quality |
-| Delivery/operations | 55–60 | G07 operational readiness |
-| Acceptance/release | 61–64 | G08/G09 candidate, review, and authorization |
-| Continuous operations | 65–73 | G10 measured operation and improvement |
+| Architecture/foundation | 05–11, including reconciliation at 09 | G02 architecture and repository foundation |
+| Design/surfaces | 12–20, including repeatable reconciliation at 20 | G03/G04 implementation and experience quality |
+| Backend/functions | 21–39 | G05 complete user journeys |
+| Security/public/hardening | 40–56 | G06 security and quality |
+| Delivery/operations | 57–62 | G07 operational readiness |
+| Acceptance/release | 63–66 | G08/G09 candidate, review, and authorization |
+| Continuous operations | 67–75 | G10 measured operation and improvement |
 
 During normal local development, G01–G08 and G10 are advisory: report missing
 evidence and let the programmer decide whether to correct, repeat, or advance.
@@ -66,10 +66,10 @@ continue numerically or request the next useful page/feature prompt. A typical
 slice remains:
 
 ```text
-technical requirements reconciliation: 07 -> 08 -> 74
-foundation when needed: 19 -> 20 -> 21 -> 22
-page: 25 -> 13|15|17 -> 75 -> 26
-feature: 27 -> 13|15|17 -> 75 -> 28
+technical requirements reconciliation: 07 -> 08 -> 09
+foundation when needed: 21 -> 22 -> 23 -> 24
+page: 27 -> 14|16|18 -> 20 -> 28
+feature: 29 -> 14|16|18 -> 20 -> 30
 ```
 
 This is guidance, not an automatic route. Conditional prompts may be marked not

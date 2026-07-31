@@ -52,7 +52,7 @@ Executa ou confirma comandos, verifica caminhos/links, gera OpenAPI quando aplic
 
 ## Entrega
 
-Apresenta documentos criados/atualizados por audiência, mapa de ownership, comandos validados, conteúdo preservado/removido/arquivado e respetivo destino, lacunas e plano de manutenção com cadência e responsáveis. Atualiza o manifesto de evidência de `IMPLEMENTATION_STATUS.md` para a candidata que seguirá para os prompts 62 e 63.
+Apresenta documentos criados/atualizados por audiência, mapa de ownership, comandos validados, conteúdo preservado/removido/arquivado e respetivo destino, lacunas e plano de manutenção com cadência e responsáveis. Atualiza o manifesto de evidência de `IMPLEMENTATION_STATUS.md` para a candidata que seguirá para os prompts 64 e 65.
 
 ## Referências oficiais
 

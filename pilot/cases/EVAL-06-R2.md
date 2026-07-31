@@ -1,7 +1,7 @@
 # EVAL-06 — vertical slice funcional com fixture aprovada
 
-Lê integralmente as instruções, `PILOT_CASE_CONTEXT.md`, o prompt 19, o prompt
-25 e o prompt 26.
+Lê integralmente as instruções, `PILOT_CASE_CONTEXT.md`, o prompt 21, o prompt
+27 e o prompt 28.
 
 Implementa `PILOT-REQ-006` exatamente segundo o contrato e a baseline aprovados
 no fixture: notas pessoais autenticadas, isoladas por utilizador, com UI Web,

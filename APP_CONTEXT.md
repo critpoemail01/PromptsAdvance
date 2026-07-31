@@ -35,9 +35,9 @@ Não transformes todos os campos pendentes em bloqueio antecipado. Resolve apena
 | Fecho da definição | Prompts 02–04 | oportunidade selecionada, responsável, mercados/limites relevantes, público, requisitos, orçamento, prazo, competências e decisões materiais exigidas pelo Gate A |
 | A — definição do produto | Prompts 5–6 | `PRODUCT_DEFINITION.md` aprovado, decisão `GO`, DOR-01 a DOR-12 passados com evidência e prompts 01–04 concluídos |
 | B — criação/adoção | Prompts 7–8 | Gate A válido, modo greenfield/brownfield, nomes técnico/público, requisitos `Must`, arquitetura, plataformas, módulos, threat model, origem/destino ou raiz existente, identificadores aplicáveis e destino GitHub quando autorizado |
-| C — implementação | Prompts 9–54 | repositório/commit-base, comandos reais, piloto aprovado, baseline profissional, ambientes, vertical slice atual e critérios de aceitação |
-| D — prontidão de release | Prompts 55–63 | CI, SLI/SLO, observabilidade, backup/DR, runbooks, documentação, candidata imutável, aceitação e revisão independente |
-| E — produção e operação contínua | Prompts 64–73 | ambiente/artefacto alvo, owners, rollback, autorização externa/produção, monitorização pós-release e cadências operacionais |
+| C — implementação | Prompts 9–56 | repositório/commit-base, comandos reais, piloto aprovado, baseline profissional, ambientes, vertical slice atual e critérios de aceitação |
+| D — prontidão de release | Prompts 57–65 | CI, SLI/SLO, observabilidade, backup/DR, runbooks, documentação, candidata imutável, aceitação e revisão independente |
+| E — produção e operação contínua | Prompts 66–75 | ambiente/artefacto alvo, owners, rollback, autorização externa/produção, monitorização pós-release e cadências operacionais |
 
 O estado global do processo fica em `IMPLEMENTATION_STATUS.md`. Uma decisão material não confirmada bloqueia apenas o prompt que dela depende, salvo quando comprometer a segurança ou a validade de todas as etapas seguintes.
 

@@ -6,7 +6,7 @@ Implementa testes UI end-to-end em Playwright para os requisitos globais `Must` 
 
 ## Entradas
 
-Define `[LOTE_DE_REQUISITOS]`, `[BROWSERS_E_VIEWPORTS]` e `[REPETICOES_ANTI_FLAKINESS]`. Testa apenas o lote concluído no prompt 23; se não houver lote, propõe cobertura e termina antes de criar uma suite genérica.
+Define `[LOTE_DE_REQUISITOS]`, `[BROWSERS_E_VIEWPORTS]` e `[REPETICOES_ANTI_FLAKINESS]`. Testa apenas o lote concluído no prompt 25; se não houver lote, propõe cobertura e termina antes de criar uma suite genérica.
 
 ## Critérios de sucesso
 

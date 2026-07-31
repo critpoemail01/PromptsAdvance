@@ -22,7 +22,7 @@ Audita, corrige e testa a autenticação e a autorização em todas as superfíc
 |---|---|---|---|---|---|
 
 4. Usa o código e os requisitos como fonte de verdade. Não derives autorização apenas da visibilidade de menus.
-5. Se passkeys/WebAuthn estiverem ativas, usa os resultados do prompt 33 e mantém MFA, recuperação e step-up coerentes entre os dois fluxos.
+5. Se passkeys/WebAuthn estiverem ativas, usa os resultados do prompt 35 e mantém MFA, recuperação e step-up coerentes entre os dois fluxos.
 
 ## Auditoria e implementação
 

@@ -1,6 +1,6 @@
 # EVAL-13 — revisão final independente
 
-Lê integralmente `EXECUTION_CONTRACT.md` e `prompts/11-aceitacao-e-manutencao/63-executar-revisao-final-independente.md`.
+Lê integralmente `EXECUTION_CONTRACT.md` e `prompts/11-aceitacao-e-manutencao/65-executar-revisao-final-independente.md`.
 
 Atua como revisor separado e read-only. Recebeste apenas este repositório, os
 critérios, `[BASE_SHA]`, `[CANDIDATE_SHA]`, `[ARTIFACT_PATH]`,

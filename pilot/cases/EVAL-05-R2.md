@@ -3,7 +3,7 @@
 Lê integralmente `AGENTS.md`, `EXECUTION_CONTRACT.md`,
 `PRODUCT_EXCELLENCE.md`, `PRODUCT_QUALITY_BASELINE.md`,
 `PILOT_CASE_CONTEXT.md` e
-`prompts/03-marca-e-layout/15-melhorar-layout-client-web.md`.
+`prompts/03-marca-e-layout/16-melhorar-layout-client-web.md`.
 
 Implementa e valida apenas a primeira fatia visual da página autenticada de
 gestão de utilizadores segundo a baseline v1 aprovada no fixture. O domínio é

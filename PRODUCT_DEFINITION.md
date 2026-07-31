@@ -128,7 +128,7 @@ Cada requisito `Must` da release deve ter ID estável, fonte, resultado,
 critério de aceitação, prioridade, dependências, owner e slice candidata. A
 primeira slice e contratos transversais de alto risco exigem detalhe completo
 por `APP/PAGE`, estados e `RF-P`. Slices posteriores podem permanecer
-`approved_for_refinement`, nunca `implementation_ready`, até o prompt 25/27
+`approved_for_refinement`, nunca `implementation_ready`, até o prompt 27/29
 executar o Definition of Ready, atualizar a fonte canónica e reconciliar a
 checklist e `requirements/ALL_FUNCTIONALITIES.md`. Estas vistas representam
 apenas obrigações aprovadas: não omitem detalhe existente nem usam linhas
