@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-31.6 |
+| Catalog version | 2026-07-31.13 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -169,3 +169,42 @@ issuer, builder e chave autorizada. Os cenários ausente, adulterado, não
 autorizado/outro commit e válido são fail-closed. Esta correção permite repetir
 o piloto, mas não o aprova: suite completa, avaliação humana e revisão separada
 continuam pendentes.
+
+A versão 2026-07-31.7 corrige o routing de `REWORK` no Gate A. Ausência de
+evidência direta, validação da solução, orçamento, horizonte, competências ou
+aprovação mantém o prompt 04 ativo e produz apenas a decisão mínima necessária;
+01, 02 ou 03 só reabrem quando a respetiva fonte canónica tiver de mudar.
+EVAL-11 e a suite completa devem ser repetidos; avaliação humana e revisão
+separada continuam pendentes.
+
+A versão 2026-07-31.8 acrescenta `software-lifecycle.ps1 upgrade` para aplicar
+uma versão compatível do catálogo a lifecycles ativos já existentes. A operação
+preserva artefactos de produto, resultados, gates e tentativas; recusa ciclos
+concluídos, tentativas ativas e alterações de schema/quantidade de prompts.
+EVAL-11 e a suite completa continuam pendentes.
+
+A versão 2026-07-31.9 endurece o upgrade: versões automáticas usam
+`YYYY-MM-DD.N`, downgrade é recusado e o conjunto exato de IDs de prompts tem
+de permanecer igual. Os testes E2E e a suite piloto continuam pendentes na
+mesma condição de aprovação.
+
+A versão 2026-07-31.10 clarifica a evidência do upgrade: conteúdo do produto e
+resultados são preservados, enquanto regras de routing incorporadas e
+reconhecidas são migradas explicitamente. O estado do piloto não muda.
+
+A versão 2026-07-31.11 acrescenta a seleção controlada de ferramentas de layout
+no prompt 08 e a respetiva validação sobre a primeira vertical slice real no
+prompt 12. A instalação exige autorização nominal e um smoke test não prova
+melhoria visual. EVAL-05, a suite completa, a avaliação humana e a revisão
+separada continuam pendentes.
+
+A versão 2026-07-31.13 mantém o catálogo `candidate` e introduz o fluxo
+programmer-controlled de um prompt por tarefa. A versão anterior separava o catálogo `candidate` de uma
+versão `stable`, impede upgrades automáticos sem piloto aprovado para a versão
+exata, acrescenta routing progressivo de contexto com hashes, perfis
+`fast|standard|deep`, continuidade segura limitada a dois prompts, modos
+`zero-input|ideia-fornecida|brownfield` no prompt 01 e regressão dirigida por
+impacto. Acrescenta ainda configuração Codex por projeto e revisão Codex Action
+apenas como opções autorizadas. Estas alterações são materiais: os casos
+dirigidos e depois a suite completa, a avaliação humana e a revisão separada
+continuam pendentes. O canal permanece `candidate`.

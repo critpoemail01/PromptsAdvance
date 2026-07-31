@@ -41,7 +41,9 @@ Decisões permitidas para o Gate A:
 - `PENDENTE` — a definição ainda não foi auditada;
 - `GO` — todos os critérios bloqueantes passaram e a etapa 2 pode começar;
 - `NO-GO` — a oportunidade foi rejeitada;
-- `REWORK` — existem lacunas concretas que devem regressar aos prompts 01, 02 ou 03.
+- `REWORK` — existem lacunas concretas; o prompt 04 permanece ativo quando
+  faltam evidência, viabilidade ou aprovação e só reabre 01, 02 ou 03 se a fonte
+  canónica desse prompt tiver de mudar.
 
 ## 1. Problema e oportunidade
 
@@ -188,9 +190,14 @@ quando DOR-01 a DOR-12 tiverem `passou`, com evidência rastreável, e não exis
 Se um critério falhar ou não for verificável:
 
 1. mantém a decisão `REWORK` ou usa `NO-GO` quando a oportunidade tiver sido rejeitada;
-2. identifica exatamente o prompt 01, 02 ou 03 que deve ser repetido;
-3. regista o bloqueio em `IMPLEMENTATION_STATUS.md`;
-4. não inicia arquitetura, seleção de módulos, threat model técnico ou criação do projeto.
+2. mantém o prompt 04 quando falta autorização, investigação/teste a executar
+   ou incorporar, orçamento, prazo, competências ou aprovação da versão;
+3. reabre exatamente o prompt 01, 02 ou 03 apenas quando for necessário alterar,
+   respetivamente, oportunidade/público, identidade ou requisitos;
+4. regista em `IMPLEMENTATION_STATUS.md` a ação mínima, owner, evidência esperada
+   e eventual prompt proprietário, sem tratar DOR-11/DOR-12 como causas para
+   repetir a descoberta;
+5. não inicia arquitetura, seleção de módulos, threat model técnico ou criação do projeto.
 
 ## Histórico de aprovação
 

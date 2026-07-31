@@ -42,6 +42,15 @@ foreach ($line in ($content -split "\r?\n")) {
 }
 
 $issues = [System.Collections.Generic.List[string]]::new()
+$manifestChannel = if ($manifest.PSObject.Properties.Name -contains 'releaseChannel') {
+    [string]$manifest.releaseChannel
+}
+else {
+    'missing'
+}
+if ($manifestChannel -ne 'stable') {
+    $issues.Add("Manifest releaseChannel must be 'stable' before implementation; found '$manifestChannel'.")
+}
 function Require-Exact {
     param([string]$Key, [string]$Expected)
     if (-not $values.ContainsKey($Key) -or $values[$Key] -ne $Expected) {

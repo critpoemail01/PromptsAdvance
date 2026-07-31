@@ -1,218 +1,142 @@
 ---
 name: advance-app-continue
-description: Continue, adopt, validate, or recover an Advance application's complete gated lifecycle for greenfield or existing brownfield professional web software, from idea/product discovery through architecture, UX/UI, vertical-slice implementation, security, delivery, release, monitoring, ROI, bugs, and continuous improvement. Use when Codex is asked to continue or adopt an Advance project from a filesystem path, determine or execute the next lifecycle prompt, automate the 73-prompt process, assess stage readiness, or produce professional layout, architecture, and engineering evidence without skipping gates.
+description: Continue, adopt, validate, recover, or rerun an Advance application lifecycle one prompt at a time. Use for an existing application, lifecycle, or filesystem project path, when the user asks for the next prompt, a specific prompt, a rerun, or an honest readiness/result assessment.
 ---
 
 # Advance App Continue
 
-Operate the prompt catalog as a controlled software team workflow. Keep one task per prompt, use small complete vertical slices, and fail closed when a gate, decision, evidence, authorization, or independent review is missing.
+Operate the Advance catalog as a programmer-controlled prompt sequence. Execute
+exactly one prompt, report its honest result, and stop. Never move to another
+prompt until the programmer explicitly says `next` or names another prompt.
 
-If the user asks to create or start a brand-new initiative without an existing
-application or lifecycle, stop and use `$advance-app-start`. Do not initialize a
-new greenfield lifecycle from this skill.
+Use `$advance-app-start` only for a brand-new initiative without an existing
+application or lifecycle.
 
-## Locate the process
+## Locate and inspect
 
 1. Find the nearest `PROCESS_MANIFEST.json` and `software-lifecycle.ps1`.
-2. Treat that directory as the lifecycle root.
-3. Read `AGENTS.md`, `EXECUTION_CONTRACT.md`, `CHANGE_CONTROL.md`,
-   `APP_CONTEXT.md`, `IMPLEMENTATION_STATUS.md`, `LIFECYCLE_STATE.json` when
-   present, and the current prompt. Read `HELP_AND_ACADEMY.md` when contextual
-   help, task videos, or an Academy is in scope for the current prompt.
-4. Read [workflow.md](references/workflow.md) completely before selecting a prompt or crossing a stage.
-5. Read [quality-gates.md](references/quality-gates.md) and the root `QUALITY_GATES.md` before architecture, UI/UX, implementation, hardening, acceptance, release, or operations work.
+2. For an active lifecycle, run `status`, `validate`, and `next`, then read
+   `NEXT_TASK.md` and every item in its `Required context` list completely.
+3. Read [workflow.md](references/workflow.md) before choosing or repeating a
+   prompt. Read [quality-gates.md](references/quality-gates.md) and the root
+   `QUALITY_GATES.md` when the prompt affects architecture, UI, implementation,
+   security, release, production, or operations.
+   Read `HELP_AND_ACADEMY.md` when contextual help, task videos, or an Academy
+   is in scope.
+4. Inspect the application, Git state, code, tests, and previous prompt history.
+   Existing implementation is evidence, not proof of completeness.
 
-## Continue an initiative
+## Continue or adopt an existing application
 
-From the instance root:
-
-```powershell
-.\software-lifecycle.ps1 status -ProcessRoot .
-.\software-lifecycle.ps1 validate -ProcessRoot .
-.\software-lifecycle.ps1 next -ProcessRoot .
-```
-
-If validation fails, repair lifecycle metadata only when evidence supports it. Do not bypass a failed product, architecture, design, security, release, or production gate.
-
-For an already completed lifecycle, do not edit state or silently patch the
-released baseline. Create and approve `changes/CHG-####/PROPOSAL.md` according
-to `CHANGE_CONTROL.md`, then run:
+For `Continue the Advance project at <path>`, run:
 
 ```powershell
-.\software-lifecycle.ps1 cycle-start `
-  -ProcessRoot . `
-  -ChangeId CHG-0001 `
-  -Evidence changes/CHG-0001/PROPOSAL.md
+.\software-lifecycle.ps1 continue -ProjectPath "<exact-existing-path>"
 ```
 
-This archives the previous state and returns to prompt 01 in `change-cycle`.
+The lifecycle remains isolated from the application and must not overwrite its
+files, Git history, branches, remotes, or local changes. Prompt 01 adapts to a
+brownfield application by discovering the implemented product and gaps.
 
-## Continue or adopt from an application path
+## Before executing a requested prompt
 
-Treat natural-language requests such as `Continua o projeto Advance em
-C:\Work\produto` as path-based lifecycle discovery. Require the exact existing
-directory, then run the catalog entry point:
+Check its history and the application first.
+
+- If the prompt has already run, do not run it immediately. State its previous
+  result, summary, evidence, and remaining work. Ask whether it should run again
+  and require a concrete objective such as fixing pending work, revalidating
+  after changes, or replacing a previous decision.
+- If this is a brownfield application and no lifecycle history proves the prompt
+  ran, say that clearly. Identify likely overlap with implemented behavior and
+  require confirmation plus an objective before repeating that scope.
+- Never claim that a prompt ran merely because similar code exists.
+
+The supported inspection/confirmation flow is:
 
 ```powershell
-.\software-lifecycle.ps1 continue -ProjectPath "C:\Work\produto"
+.\software-lifecycle.ps1 request -ProcessRoot . -PromptId 03
+.\software-lifecycle.ps1 repeat -ProcessRoot . -PromptId 03 `
+  -Objective "Revalidate requirements after the billing change" -ConfirmRepeat
 ```
 
-Pass `-Owner` when the user supplied the product owner. Do not invent it; a
-brownfield lifecycle may start with the owner pending. Prompt 01 performs
-zero-input market discovery without asking for that owner; the owner must be
-resolved by prompt 04 before Gate G01.
+## Execute one prompt
 
-The command must:
+1. Read the current packet and resolve only inputs material to this prompt.
+2. Create a short plan for non-trivial work.
+3. Implement the smallest coherent scope and validate it proportionately.
+4. Perform an adversarial self-review. Use the task ledger and findings commands
+   when the task is complex or their diagnostic value is useful; they are not a
+   routine prerequisite for recording a prompt result.
+5. Record one honest result and stop.
 
-- use `LIFECYCLE_STATE.json` directly when the supplied path is already a
-  lifecycle root;
-- resolve an existing isolated process whose `applicationRoot` matches;
-- otherwise create an isolated brownfield process outside both the application
-  and `BoilerPlateAdvance`, and outside the existing Git repository tree;
-- capture only non-sensitive Git baseline metadata and leave application files,
-  `.git`, history, branches, working-tree changes and remotes untouched;
-- validate the lifecycle and prepare `NEXT_TASK.md`.
-
-After resolution, use the returned process root to run `status`, `validate` and
-`next`, then execute only `NEXT_TASK.md`. For brownfield work, use the
-application as evidence but never infer that existing behavior satisfies a
-requirement or gate. Prompt 07 performs the controlled adoption baseline instead
-of copying the boilerplate over the application.
-
-Use the explicit initializer when discovery is not desired:
+Example completed result:
 
 ```powershell
-.\software-lifecycle.ps1 adopt `
-  -ProjectPath "C:\Work\produto" `
-  -Name produto `
-  -Owner "Product owner"
+.\software-lifecycle.ps1 record -ProcessRoot . -PromptId 03 `
+  -Result completed -Evidence "requirements/traceability.md" `
+  -Summary "All in-scope pages and functions have detailed requirements"
 ```
 
-## Execute the current task
-
-1. Read `NEXT_TASK.md` and its embedded prompt.
-2. Resolve all material inputs and show their source/confidence/status.
-3. Start the durable task ledger with `work-start`; for non-trivial work, pass
-   the staged plan as `kind::description` goals.
-4. Checkpoint goals with evidence, and record proportionate validation with
-   `verify`.
-5. Implement only the current prompt or selected vertical-slice lot.
-6. Run prompt-specific checks plus the applicable quality gate.
-7. Perform an adversarial self-review. Record accepted issues with
-   `finding-add`, resolve them only with correction and verification evidence,
-   then run `finding-gate`. Call a review independent only when another
-   separated reviewer/task actually performed it.
-8. Update human-readable artefacts and durable evidence.
-9. Record the result with the lifecycle tool. `completed` is rejected until
-   the task-ledger closeout passes; use `partial` or `blocked` honestly when it
-   does not.
-
-Example start:
+Example incomplete result:
 
 ```powershell
-.\software-lifecycle.ps1 work-start `
-  -ProcessRoot . `
-  -Goal "inspect::Confirm current behavior and evidence",
-        "change::Execute the scoped prompt",
-        "verify::Run proportionate validation",
-        "review::Perform adversarial self-review"
+.\software-lifecycle.ps1 record -ProcessRoot . -PromptId 03 `
+  -Result partial -Evidence "requirements/traceability.md" `
+  -Summary "Public and authenticated web requirements were captured" `
+  -RemainingWork "Inventory the native application",`
+                 "Validate permissions with the product owner"
 ```
 
-For a small, fully evidenced task, `closeout` may complete the standard goals
-atomically, but it still requires a passing verification record, adversarial
-review evidence and zero open findings. Complex tasks should checkpoint each
-goal separately so the evidence remains diagnostic.
+Use:
 
-Example:
+- `completed` only when the prompt objective and criteria are satisfied;
+- `partial` when useful implementation exists but work remains;
+- `blocked` when a material dependency prevents safe progress;
+- `not_applicable` only with evidence.
+
+## Wait for the programmer
+
+After `record`, do not continue automatically. Present these choices:
+
+- `next` — prepare the following numeric prompt;
+- `repeat` or `correct` — rerun the same prompt with a stated objective;
+- `skip and advance` — accept listed gaps and continue with a stated reason;
+- request a specific prompt — inspect its history before preparing it.
+
+Commands:
 
 ```powershell
-.\software-lifecycle.ps1 record `
-  -ProcessRoot . `
-  -PromptId 03 `
-  -Result completed `
-  -Evidence "IMPLEMENTATION_STATUS.md; requirements/traceability.md"
+.\software-lifecycle.ps1 advance -ProcessRoot .
+.\software-lifecycle.ps1 advance -ProcessRoot . -AcceptIncomplete `
+  -Objective "Accepted by the programmer for this iteration"
 ```
 
-Deterministic transitions are selected automatically. When the lifecycle enters
-`waiting_decision`, use `select` with the allowed decision shown by `status`;
-never force `NextPrompt`. Use `partial` or `blocked` when evidence is
-incomplete. For a human gate, also pass `-GateId`, `-GateDecision`,
-`-GateEvidence`, and `-ApprovedBy`. Never manufacture the approver.
+Routine product, architecture, design, and quality gates are advisory
+checklists in this default workflow. They must be reported honestly but do not
+force a return to earlier prompts. Hard stops remain for secrets, impossible
+technical prerequisites, and external, destructive, financial, Git, store, or
+production actions without exact authorization. Release still requires the
+exact candidate, environment, authorization, smoke tests, and rollback plan.
 
-## Route work correctly
+The legacy governed profile may still use `work-start`, `checkpoint`,
+`finding-add`, `finding-gate`, deterministic `select`, human gates, pilot
+approval, and `software-lifecycle.ps1 record` closeout. Those controls are
+optional and are not the default application-development flow.
 
-- Follow 01–12 linearly, subject to G01/G02/G03.
-- After prompt 12, do not continue numerically.
-- Select a small vertical slice and store its requirement IDs, kind, surface, acceptance criteria, exclusions, and evidence in `LIFECYCLE_STATE.json` and `IMPLEMENTATION_STATUS.md`.
-- Use the lifecycle selector instead of editing `currentPrompt` directly:
+For a compatible lifecycle upgrade, keep the existing safety rule: the source manifest is `stable` and `PILOT_APPROVAL.md` is approved for the exact version
+before running `software-lifecycle.ps1 upgrade -ProcessRoot <lifecycle-root>`.
+Candidate catalogs may be tested in isolation but never auto-upgrade an
+existing lifecycle.
 
-```powershell
-.\software-lifecycle.ps1 select `
-  -ProcessRoot . `
-  -PromptId 19 `
-  -SliceId "SLICE-001" `
-  -SliceKind page `
-  -Surface web `
-  -Requirements "FR-001, SEC-001" `
-  -AcceptanceCriteria "FR-001 succeeds; SEC-001 denies unauthorized access" `
-  -OutOfScope "billing, native app and external identity providers" `
-  -Evidence "PRODUCT_DEFINITION.md; IMPLEMENTATION_STATUS.md"
-```
+## Deliver each prompt result
 
-- For the first slice, establish backend/data/auth foundations with 19–22 only as needed.
-- For a page, execute 25, the surface prompt 13/15/17, then 26.
-- For a feature, execute 27, the surface prompt 13/15/17, then 28.
-- Repeat until every `Must` journey is evidenced.
-- Execute 23/24 and 14/16/18 only when closing the applicable global/surface scope.
-- Select optional prompts only from approved architecture or requirements.
-- Record a proven exclusion with `software-lifecycle.ps1 decide -PromptId <ID> -Result not_applicable -Evidence "<decision>"`; never leave conditional work silently skipped before its exit gate.
-- Use `software-lifecycle.ps1 gate` for a gate that is reached between prompts, after all manifest prerequisites pass. Never edit gate JSON directly.
-- Continue through security, public presence, hardening, delivery, operations, acceptance, independent review, authorized release, and recurring operations according to [workflow.md](references/workflow.md).
+Start with:
 
-When the next prompt is not mechanically determined, leave `currentPrompt` empty, set a precise `nextAction`, and stop for the smallest material decision. Never use numeric order to invent a product decision.
+1. `Result` — completed, partial, blocked, or not applicable;
+2. `Achieved` — what was implemented or validated;
+3. `Missing to finish` — specific implementation still required, or `none`;
+4. `Evidence` — essential files and checks;
+5. `Decision` — `next`, `repeat`, `correct`, or `skip and advance`.
 
-## Preserve professional quality
-
-Require observable evidence, not adjectives:
-
-- architecture mapped to requirements, C4/ADRs, dependency rules, contracts, threat model, and operational trade-offs;
-- code that respects repository boundaries, naming, tests, analyzers, data integrity, authorization, observability, and recovery;
-- UI with product-specific hierarchy, information architecture, tokens, responsive behavior, complete states, accessibility, real content, render evidence, visual regression, and professional critique;
-- immutable release candidates, separated read-only review, smoke tests, monitoring, and rollback;
-- structured G06–G10 evidence in `LIFECYCLE_GATE_EVIDENCE.json`, including verified local artifact hashes, identities and exact release authorization before prompt 64;
-- post-release SLO, RUM/Core Web Vitals, bugs, costs, vulnerabilities, DORA, and ROI feedback.
-
-Do not promise zero bugs, professional usability, accessibility conformance, or production readiness without the evidence required by `QUALITY_GATES.md`.
-
-## Use team separation
-
-Use distinct roles/tasks when available:
-
-- product discovery and requirements;
-- architecture/security design;
-- Product Design/UX critique;
-- implementation;
-- QA/accessibility/performance;
-- security review;
-- SRE/operational readiness;
-- final independent read-only review.
-
-Parallelize only bounded read-only or isolated work. Never let two live tasks edit the same checkout. A role label alone does not create independence.
-
-## Respect authorization
-
-Auto-continue through local reversible work. Stop before external, destructive, financial, legal, identity, GitHub, baseline-changing, store, or production actions unless the exact target and authorization are recorded.
-
-Plan or Goal mode never broadens permission.
-
-## Deliver
-
-Always finish with:
-
-- current stage, prompt, and gate;
-- result and evidence;
-- files or artefacts changed;
-- validation and adversarial findings;
-- blockers and residual risks;
-- next authorized prompt/action;
-- lifecycle state: `completed`, `partial`, `blocked`, or `waiting_decision`.
+Never hide missing work inside a long report and never prepare the next prompt
+in the same task.

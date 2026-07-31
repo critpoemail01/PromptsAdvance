@@ -1,21 +1,84 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-07-31.6",
+  "catalogVersion": "2026-07-31.13",
+  "releaseChannel": "candidate",
   "name": "Professional Advance .NET Software Lifecycle",
   "promptCount": 73,
   "executionPolicy": {
+    "workflowMode": "programmer_controlled",
     "onePromptPerTask": true,
+    "manualPromptAdvance": true,
+    "safeSequentialContinuation": false,
+    "maxSequentialPromptsPerTask": 1,
     "planRequiredForComplexWork": true,
     "decisionFirstResponsesRequired": true,
-    "taskLedgerRequired": true,
-    "findingsGateRequired": true,
+    "promptCompletionSummaryRequired": true,
+    "remainingWorkRequiredForIncompleteResult": true,
+    "rerunObjectiveRequired": true,
+    "brownfieldOverlapConfirmationRequired": true,
+    "taskLedgerRequired": false,
+    "findingsGateRequired": false,
     "adversarialReviewRequired": true,
     "externalActionsRequireExplicitAuthorization": true,
     "brownfieldIsolationRequired": true,
-    "changeControlRequired": true,
+    "routineGatesAreAdvisory": true,
+    "changeControlRequired": false,
     "signedBuildProvenanceRequired": true,
     "productionRequiresImmutableCandidate": true,
-    "independentReleaseReviewRequired": true
+    "independentReleaseReviewRequired": true,
+    "stableUpgradeRequiresApprovedPilot": true
+  },
+  "executionProfiles": {
+    "fast": {
+      "useWhen": "Local, reversible and low-risk work with a narrow observable outcome.",
+      "minimumEvidence": "Targeted checks, diff review and adversarial self-review.",
+      "separateReview": false
+    },
+    "standard": {
+      "useWhen": "Normal product, implementation, integration or UX work with bounded impact.",
+      "minimumEvidence": "Affected build/tests, behavioral evidence, task ledger and adversarial self-review.",
+      "separateReview": false
+    },
+    "deep": {
+      "useWhen": "Discovery, architecture, security, data compatibility, release or another costly-to-miss decision.",
+      "minimumEvidence": "Broader research or verification, negative cases, explicit trade-offs and the applicable independent/human gate.",
+      "separateReview": true
+    }
+  },
+  "promptExecutionProfiles": {
+    "deep": ["01", "03", "04", "05", "06", "11", "12", "38", "39", "48", "49", "51", "52", "53", "54", "55", "58", "59", "60", "61", "62", "63", "64"],
+    "fast": ["08", "65", "66", "67", "68", "69", "70", "71", "72", "73"],
+    "standard": "all remaining prompts"
+  },
+  "contextRouting": {
+    "always": ["AGENTS.md", "EXECUTION_CONTRACT.md", "APP_CONTEXT.md", "IMPLEMENTATION_STATUS.md"],
+    "groups": [
+      {
+        "name": "product-and-experience",
+        "promptIds": ["01", "02", "03", "04", "11", "12", "13", "14", "15", "16", "17", "18", "25", "26", "27", "28", "29", "45", "46", "47", "61"],
+        "documents": ["PRODUCT_EXCELLENCE.md"]
+      },
+      {
+        "name": "approved-product-definition",
+        "promptIds": ["05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73"],
+        "documents": ["PRODUCT_DEFINITION.md"]
+      },
+      {
+        "name": "quality-gates",
+        "promptIds": ["04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73"],
+        "documents": ["QUALITY_GATES.md"]
+      },
+      {
+        "name": "visual-baseline",
+        "promptIds": ["11", "12", "13", "14", "15", "16", "17", "18", "25", "26", "27", "28", "29", "45", "46", "47", "61", "62", "63", "64"],
+        "documents": ["PRODUCT_QUALITY_BASELINE.md"]
+      },
+      {
+        "name": "help-and-academy",
+        "promptIds": ["03", "04", "05", "06", "12", "13", "14", "15", "16", "17", "18", "25", "26", "27", "28", "29", "38", "61", "62", "63", "64"],
+        "documents": ["HELP_AND_ACADEMY.md"]
+      }
+    ]
   },
   "statuses": [
     "pending",
@@ -363,6 +426,7 @@
     "APP_CONTEXT.md",
     "IMPLEMENTATION_STATUS.md",
     "QUALITY_GATES.md",
-    "PROMPT_EVALUATION.md"
+    "PROMPT_EVALUATION.md",
+    "EVALUATION_IMPACT_MAP.json"
   ]
 }

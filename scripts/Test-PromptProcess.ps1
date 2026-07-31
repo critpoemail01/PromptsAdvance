@@ -75,7 +75,8 @@ $requiredDocuments = @(
     'IMPLEMENTATION_STATUS.md',
     'LIFECYCLE_GATE_EVIDENCE.json',
     'PILOT_APPROVAL.md',
-    'PROMPT_EVALUATION.md'
+    'PROMPT_EVALUATION.md',
+    'EVALUATION_IMPACT_MAP.json'
 )
 
 $requiredScripts = @(
@@ -87,6 +88,7 @@ $requiredScripts = @(
     'scripts/Test-ProductQualityGate.ps1',
     'scripts/Test-SoftwareLifecycle.ps1',
     'scripts/Test-ProcessInDisposableCopy.ps1',
+    'scripts/Get-PromptEvaluationScope.ps1',
     'software-lifecycle.ps1'
 )
 
@@ -157,6 +159,35 @@ if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
         $manifestDuplicates = @($manifestPromptIds | Group-Object | Where-Object Count -gt 1)
         foreach ($duplicate in $manifestDuplicates) {
             Add-Failure "Prompt duplicado no PROCESS_MANIFEST.json: $($duplicate.Name)"
+        }
+        if ([string]$manifest.releaseChannel -notin @('candidate', 'stable')) {
+            Add-Failure "PROCESS_MANIFEST.json tem releaseChannel invalido: $($manifest.releaseChannel)."
+        }
+        $profileIds = @($manifest.promptExecutionProfiles.deep) + @($manifest.promptExecutionProfiles.fast)
+        foreach ($profileId in $profileIds) {
+            if ([string]$profileId -notin $manifestPromptIds) {
+                Add-Failure "Perfil de execucao referencia prompt inexistente: $profileId"
+            }
+        }
+        foreach ($duplicateProfileId in @($profileIds | Group-Object | Where-Object Count -gt 1)) {
+            Add-Failure "Prompt aparece em mais de um perfil de execucao: $($duplicateProfileId.Name)"
+        }
+        foreach ($contextDocument in @($manifest.contextRouting.always)) {
+            if (-not (Test-Path -LiteralPath (Join-Path $root ([string]$contextDocument)) -PathType Leaf)) {
+                Add-Failure "Routing de contexto obrigatorio referencia documento inexistente: $contextDocument"
+            }
+        }
+        foreach ($contextGroup in @($manifest.contextRouting.groups)) {
+            foreach ($contextPromptId in @($contextGroup.promptIds)) {
+                if ([string]$contextPromptId -notin $manifestPromptIds) {
+                    Add-Failure "Routing de contexto '$($contextGroup.name)' referencia prompt inexistente: $contextPromptId"
+                }
+            }
+            foreach ($contextDocument in @($contextGroup.documents)) {
+                if (-not (Test-Path -LiteralPath (Join-Path $root ([string]$contextDocument)) -PathType Leaf)) {
+                    Add-Failure "Routing de contexto '$($contextGroup.name)' referencia documento inexistente: $contextDocument"
+                }
+            }
         }
     }
     catch {
@@ -246,8 +277,8 @@ Require-Pattern 'QUALITY_GATES.md' 'Hierarquia e composi..o' 'O gate visual nao 
 Require-Pattern 'QUALITY_GATES.md' 'rastreabilidade ponta a ponta' 'O gate de codigo nao exige rastreabilidade ponta a ponta.'
 Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)^---.*name: advance-app-start.*description:.*---' 'A skill de criacao do lifecycle nao tem frontmatter valido.'
 Require-Pattern '.agents/skills/advance-app-start/SKILL.md' 'software-lifecycle\.ps1 start' 'A skill de criacao nao executa o inicializador deterministico.'
-Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)work-start.*finding-add.*finding-gate.*software-lifecycle\.ps1 record' 'A skill de criacao nao executa o prompt 01 com task ledger e findings gate.'
-Require-Pattern '.agents/skills/advance-app-start/SKILL.md' 'Do not execute prompt 02' 'A skill de criacao pode ultrapassar o prompt 01.'
+Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)software-lifecycle\.ps1 record.*Summary.*RemainingWork' 'A skill de criacao nao fecha o prompt com resultado e trabalho em falta.'
+Require-Pattern '.agents/skills/advance-app-start/SKILL.md' 'Do not execute prompt 02.*do not prepare' 'A skill de criacao pode ultrapassar o prompt 01.'
 Require-Pattern '.agents/skills/advance-app-start/agents/openai.yaml' 'display_name: "Advance App Start"' 'A skill de criacao nao tem nome visivel proprio.'
 Require-Pattern '.agents/skills/advance-app-start/agents/openai.yaml' 'default_prompt: "Use \$advance-app-start' 'A skill de criacao nao tem prompt explicito de invocacao.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)^---.*name: advance-app-continue.*description:.*---' 'A skill do lifecycle nao tem frontmatter valido.'
@@ -275,6 +306,13 @@ Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.m
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'Context7; preserva biblioteca' 'O prompt 08 nao encaminha documentacao atual de bibliotecas.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'MCPs, plugins, hooks ou skills globais' 'O prompt 08 permite alterar capacidades globais sem proveniencia e opt-in.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'segundo framework de lifecycle' 'O prompt 08 nao impede metodologias concorrentes com Advance.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'CODEX_LAYOUT_TOOLING\.md' 'O prompt 08 nao conserva a decisao sobre ferramentas de layout.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'lacuna . candidato . fonte/vers.o . compatibilidade . licen.a . permiss.es/dados/telemetria' 'O prompt 08 nao exige uma comparacao auditavel das ferramentas de layout.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'Recomenda no m.ximo tr.s ferramentas' 'O prompt 08 pode instalar um conjunto ilimitado de ferramentas de layout.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' '\[AUTORIZAR_FERRAMENTAS_LAYOUT\]' 'O prompt 08 nao exige autorizacao nominal antes de configurar ferramentas de layout.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'Figma MCP e Code Connect.*Figma for fonte de verdade' 'O prompt 08 trata Figma como dependencia universal.'
+Require-Pattern 'prompts/03-marca-e-layout/12-criar-layout-inicial.md' 'CODEX_LAYOUT_TOOLING\.md' 'O prompt 12 nao recebe o handoff das ferramentas de layout.'
+Require-Pattern 'prompts/03-marca-e-layout/12-criar-layout-inicial.md' 'decis.o manter\|remover' 'O prompt 12 nao decide ferramentas de layout com evidencia da primeira slice.'
 Require-Pattern '.gitattributes' 'pilot/fixtures/lifecycle-gates/gate-artifact\.txt\s+text\s+eol=lf' 'O artefacto com hash dos gates nao fixa line endings portaveis.'
 Require-Pattern 'scripts/Test-SoftwareLifecycle.ps1' 'prompts-boilerplate-fixture-' 'O lifecycle E2E depende de um BoilerPlateAdvance externo ao checkout.'
 Require-Pattern 'scripts/Test-ProcessInDisposableCopy.ps1' 'prompts-boilerplate-source-' 'A copia descartavel depende de um BoilerPlateAdvance externo ao checkout.'
@@ -307,13 +345,20 @@ Require-Pattern 'software-lifecycle.ps1' "Command -eq 'gate'" 'O lifecycle nao p
 Require-Pattern 'software-lifecycle.ps1' 'Test-GatePrerequisites' 'Os pre-requisitos declarados dos gates nao sao aplicados.'
 Require-Pattern 'software-lifecycle.ps1' 'Concurrent lifecycle update detected' 'O estado nao usa controlo de concorrencia otimista.'
 Require-Pattern 'software-lifecycle.ps1' 'State catalogVersion.*does not match manifest' 'A validacao nao deteta catalogVersion corrompida.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)catalog-upgrade:.*Product content, prompt results, gates and attempts: preserved.*Embedded lifecycle routing rules' 'O lifecycle nao fornece upgrade controlado para instancias congeladas.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)Compare-CatalogVersion.*refuses to downgrade.*prompt ID set changed' 'O upgrade nao impede downgrade ou mudanca silenciosa dos prompts.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)Assert-CatalogEligibleForAutomaticUpgrade.*releaseChannel.*stable.*PILOT_APPROVAL\.md.*15/15.*Human evaluator.*Independent reviewer' 'O upgrade nao exige canal stable e piloto aprovado para a versao exata.'
+Require-Pattern 'PROCESS_MANIFEST.json' '"releaseChannel"\s*:\s*"candidate"' 'O catalogo ainda nao distingue a candidata da versao stable.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"executionProfiles".*"fast".*"standard".*"deep".*"contextRouting"' 'O manifesto nao define perfis proporcionais e routing progressivo de contexto.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)(?=.*Execution profile:)(?=.*## Required context)(?=.*SHA-256)(?=.*execute only this prompt)(?=.*After recording, stop)' 'NEXT_TASK nao gera perfil, contexto auditavel e paragem obrigatoria.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'software-lifecycle\.ps1 upgrade.*lifecycle-root' 'A skill canonica nao atualiza instancias compativeis antes de continuar.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)source manifest is `stable`.*PILOT_APPROVAL\.md.*Candidate catalogs' 'A skill permite upgrade automatico de uma candidata nao aprovada.'
 Require-Pattern 'software-lifecycle.ps1' 'Assert-ApplicabilityDecisions' 'O routing nao bloqueia saidas com opcionais por decidir.'
 Require-Pattern 'software-lifecycle.ps1' 'AcceptanceCriteria' 'O lifecycle nao preserva criterios de aceitacao da slice.'
 Require-Pattern 'software-lifecycle.ps1' 'Required progress:' 'O estado nao distingue progresso obrigatorio de opcionais.'
 Require-Pattern 'software-lifecycle.ps1' 'Active/latest slice:' 'O estado nao apresenta a fatia ativa e os seus criterios.'
 Require-Pattern 'software-lifecycle.ps1' 'Gate command first:' 'O estado nao orienta a passagem do gate antes de selecoes bloqueadas.'
-Require-Pattern 'PROCESS_MANIFEST.json' '"taskLedgerRequired": true' 'O manifesto nao exige o task ledger estruturado.'
-Require-Pattern 'PROCESS_MANIFEST.json' '"findingsGateRequired": true' 'O manifesto nao exige o findings gate.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"workflowMode": "programmer_controlled".*"onePromptPerTask": true.*"manualPromptAdvance": true.*"taskLedgerRequired": false.*"findingsGateRequired": false' 'O manifesto nao define o fluxo simples controlado pelo programador.'
 Require-Pattern 'PROCESS_MANIFEST.json' '"decisionFirstResponsesRequired": true' 'O manifesto nao exige respostas orientadas primeiro a decisao.'
 Require-Pattern 'software-lifecycle.ps1' "Command -eq 'work-start'" 'O lifecycle nao inicia tentativas de trabalho estruturadas.'
 Require-Pattern 'software-lifecycle.ps1' "(?s)Command -eq 'finding-add'.*Command -eq 'finding-resolve'.*Command -eq 'finding-gate'" 'O lifecycle nao implementa o ciclo completo de findings.'
@@ -321,21 +366,21 @@ Require-Pattern 'software-lifecycle.ps1' "(?s)Command -eq 'cycle-start'.*CHANGE_
 Require-Pattern 'CHANGE_CONTROL.md' '(?s)CHANGE_ID.*CHANGE_STATUS.*Analisar impacto.*Iniciar ciclo.*Incorporar e fechar' 'O protocolo de mudancas nao cobre delta, impacto, execucao e incorporacao.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)Assert-WorkAttemptCanComplete.*open or blocked findings' 'O closeout nao bloqueia goals ou findings incompletos.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)Command -eq ''record''.*Test-TaskLedgerRequired.*Assert-WorkAttemptCanComplete' 'O record completed nao aplica mecanicamente o task ledger.'
-Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)finding-add.*finding-gate' 'O contrato nao exige registo e gate de findings.'
-Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)Resposta conversacional orientada . decis.o.*interface de decis.o.*no m.ximo tr.s raz.es.*entre duas e cinco op..es.*Prova.*Riscos e bloqueios.*Pr.ximo passo.*8.12 linhas.*artefactos dur.veis' 'O contrato comum nao separa uma resposta curta de decisao da evidencia detalhada.'
+Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)partial.*blocked.*RemainingWork|RemainingWork.*parcial.*bloqueado' 'O contrato nao exige a lista de trabalho em falta.'
+Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)Resposta conversacional orientada . decis.o.*interface de decis.o.*Resultado.*Falta para terminar.*Prova.*Riscos e bloqueios.*Decis.o do programador.*artefactos dur.veis' 'O contrato comum nao separa uma resposta curta de decisao da evidencia detalhada.'
 Require-Pattern 'AGENTS.md' 'HELP_AND_ACADEMY\.md' 'As instrucoes nao encaminham tarefas de ajuda e Academia para o protocolo proprio.'
 Require-Pattern 'PROCESS_MANIFEST.json' '"HELP_AND_ACADEMY\.md"' 'O manifesto nao conserva o protocolo de ajuda como referencia autoritativa.'
 Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)(?=.*APP/PAGE/FNC)(?=.*HLP-\*)(?=.*VID-\*)(?=.*CRS-\*)(?=.*1920.1080)(?=.*1.4 minutos)(?=.*caption autom.tica)(?=.*nunca prova final)' 'O protocolo nao define inventario, IDs, perfil de video e captions verificaveis.'
 Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)(?=.*n.o listado.*n.o . controlo de\s+acesso)(?=.*fornecedor)(?=.*indisponibilidade)(?=.*fallback textual)(?=.*autoriza..o expl.cita)(?=.*conta/canal)' 'O protocolo nao trata privacidade, falha do provider e publicacao externa com fail-closed.'
 Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)Definition of Done por unidade.*UI e vers.o atuais.*idiomas.*rota/contexto.*player.*build e testes' 'O protocolo nao possui Definition of Done ponta a ponta por unidade de ajuda.'
-Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)work-start.*checkpoint.*finding-add' 'A skill nao conduz o task ledger durante cada prompt.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)Execute one prompt.*After `record`, do not continue automatically.*next.*repeat.*skip and advance' 'A skill nao para depois de cada prompt sob controlo do programador.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-04.*work ledger.*finding-gate.*record completed' 'O piloto nao exercita o findings gate durante a revisao adversarial.'
-Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11.*sem `work-start`.*goals.*incompletos.*finding aberto' 'O piloto nao tenta contornar o task ledger.'
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11.*awaiting_programmer.*parcial.*skip and advance.*request/repeat.*brownfield.*objetivo' 'O piloto nao cobre o fluxo controlado, gaps e reruns.'
 Require-Pattern 'pilot/cases/EVAL-04.md' '(?s)work-start.*finding-add.*finding-gate.*finding-resolve.*attempt ID' 'O caso EVAL-04 nao conserva o ciclo completo do task ledger.'
 Require-Pattern 'pilot/cases/EVAL-11.md' '(?s)sem `work-start`.*goals incompletos.*finding aberto.*activeWorkAttemptId.*goal ID' 'O caso EVAL-11 nao cobre bypass e corrupcao do task ledger.'
 Require-Pattern 'README.md' 'DOR-01 a DOR-12.*passou' 'O README nao bloqueia a etapa 2 ate a definicao do produto passar.'
-Require-Pattern 'AGENTS.md' 'PRODUCT_DEFINITION\.md.*Gate A.*GO' 'As instrucoes duradouras nao aplicam o Gate A antes da etapa 2.'
-Require-Pattern 'AGENTS.md' '(?s)work-start.*checkpointa goals.*findings.*record completed' 'As instrucoes duradouras nao aplicam o task ledger em cada prompt.'
+Require-Pattern 'AGENTS.md' '(?s)PRODUCT_DEFINITION\.md.*diagn.stico.*n.o bloqueies.*pr.ximo' 'As instrucoes duradouras nao tratam o Gate A como diagnóstico consultivo.'
+Require-Pattern 'AGENTS.md' '(?s)Exatamente um prompt.*falta implementar.*pr.ximo.*repetir.*ignorar e avan.ar' 'As instrucoes duradouras nao aplicam o controlo do programador.'
 Require-Pattern 'PRODUCT_DEFINITION.md' 'DOR-12' 'A definicao do produto nao contem a checklist completa do Gate A.'
 Require-Pattern 'PRODUCT_DEFINITION.md' 'Decis.o do Gate A: GO' 'A definicao do produto nao especifica a decisao GO.'
 Require-Pattern 'AGENTS.md' 'Test-ProductDefinitionGate\.ps1' 'As instrucoes duradouras nao executam o gate da definicao.'
@@ -360,6 +405,10 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-ap
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Liga `DISCOVERY_RESEARCH\.md`.*n.o transcrevas.*linguagem direta.*t.tulos previs.veis.*Evita introdu.*gen.ricas.*jarg.o de startups' 'O prompt 01 nao separa a sintese clara do detalhe auditavel.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)proveni.ncia upstream diferente.*Republica..es, sindica..o.*contam como uma .nica fonte' 'O prompt 01 permite falsa independencia entre fontes derivadas da mesma origem.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Todas as notas est.o orientadas para `5 = oportunidade mais favor.vel`.*quatro cen.rios.*total continuar 100%.*ranking como inst.vel' 'O scoring e a sensibilidade do prompt 01 nao sao deterministicos.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Seleção determinística do modo.*change-cycle.*brownfield.*ideia-fornecida.*zero-input.*3–5 direções.*manter.*melhorar.*reposicionar.*integrar/substituir' 'O prompt 01 nao adapta a descoberta a ideia fornecida e aplicacao existente.'
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-01-IDEA.*EVAL-01-BROWNFIELD.*não aumentam a contagem de 15 casos' 'EVAL-01 nao cobre routing de ideia fornecida e brownfield.'
+Require-Pattern 'EVALUATION_IMPACT_MAP.json' '(?s)targetedOnEveryChange.*fullSuiteRequiredForStablePromotion.*EVAL-15' 'A politica de avaliacao nao separa regressao dirigida de promocao stable.'
+Require-Pattern 'scripts/Get-PromptEvaluationScope.ps1' '(?s)StablePromotion.*fullSuiteCaseIds.*impact-based regression' 'O seletor de avaliacoes por impacto esta incompleto.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)proxy de pagamento n.o satisfaz a .ncora 5 de monetiza..o.*canal apenas\s+plaus.vel n.o satisfaz a .ncora 5 de distribui..o' 'O prompt 01 permite notas maximas contraditas pela propria evidencia.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)top 3 corrente, depois de todas as corre..es.*linha por\s+URL can.nico.*n.o agregues v.rias fontes' 'O prompt 01 permite sensibilidade sobre finalistas antigas ou fontes agregadas.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)finding alterar uma fonte material, nota, shortlist, top 3 ou finalista.*regenera a matriz de evid.ncia.*cen.rios de pesos.*recomenda..o' 'O prompt 01 nao invalida derivados depois de findings materiais.'
@@ -399,6 +448,11 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcio
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'caminho absoluto registado no lifecycle' 'O prompt 07 nao identifica a origem canonica registada no lifecycle.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'GO.*REWORK.*NO-GO' 'O prompt 04 nao produz uma decisao completa do Gate A.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'DOR-01 a DOR-12' 'O prompt 04 nao audita todos os criterios de passagem.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' '(?s)DOR-03/DOR-08.*\| 04 \|.*DOR-09.*\| 04 \|.*DOR-12.*\| 04 \|' 'O prompt 04 nao conserva evidencias, viabilidade e aprovacao no proprio Gate A.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' '(?s)currentPrompt = 04.*resolve_current_prompt.*N.o declares.*repetir o prompt 01.*entrevistar utilizadores.*or.amento, prazo e equipa' 'O prompt 04 ainda pode criar o ciclo impossivel entre descoberta e Gate A.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' '(?s)S. uma conclus.o que altere materialmente.*reabre o\s+prompt propriet.rio 01, 02 ou 03' 'O prompt 04 reabre prompts anteriores sem mudanca da fonte canonica.'
+Require-Pattern 'PRODUCT_DEFINITION.md' '(?s)mant.m o prompt 04 quando falta autoriza..o.*or.amento, prazo, compet.ncias ou aprova..o.*reabre exatamente o prompt 01, 02 ou 03 apenas quando' 'A regra do Gate A ainda encaminha pendencias operacionais para a descoberta.'
+Require-Pattern 'pilot/cases/EVAL-11.md' '(?s)DOR-03/DOR-08.*DOR-09.*DOR-12.*prompt 04 ainda ativo.*proibido.*repetir o prompt 01' 'EVAL-11 nao cobre a regressao de routing do Gate A.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '10.15 nomes' 'O prompt 02 nao exige uma shortlist final de 10 a 15 nomes.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'OVHcloud.*dispon.vel para registo' 'O prompt 02 nao exige disponibilidade especifica na OVHcloud.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '\[CUSTO_MAXIMO_ANUAL_DOMINIO\]' 'O prompt 02 nao possui um limite de custo verificavel.'
@@ -629,9 +683,24 @@ if (
 ) {
     & $powerShellExe -NoProfile -ExecutionPolicy Bypass -File $readinessGateScript `
         -ApprovalPath $validPilotApproval -ManifestPath $manifestPath *> $null
+    if ($LASTEXITCODE -eq 0) {
+        Add-Failure 'O gate de readiness aceitou uma candidata mesmo com piloto fixture aprovado.'
+    }
+
+    $stableManifestFixture = Join-Path ([System.IO.Path]::GetTempPath()) `
+        ("stable-manifest-fixture-" + [Guid]::NewGuid().ToString('N') + '.json')
+    $stableManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath | ConvertFrom-Json
+    $stableManifest.releaseChannel = 'stable'
+    [System.IO.File]::WriteAllText(
+        $stableManifestFixture,
+        ($stableManifest | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        (New-Object System.Text.UTF8Encoding($false)))
+    & $powerShellExe -NoProfile -ExecutionPolicy Bypass -File $readinessGateScript `
+        -ApprovalPath $validPilotApproval -ManifestPath $stableManifestFixture *> $null
     if ($LASTEXITCODE -ne 0) {
         Add-Failure 'O gate de readiness rejeitou a fixture de piloto valida.'
     }
+    Remove-Item -LiteralPath $stableManifestFixture -Force
 
     & $powerShellExe -NoProfile -ExecutionPolicy Bypass -File $readinessGateScript `
         -ApprovalPath (Join-Path $root 'PILOT_APPROVAL.md') -ManifestPath $manifestPath *> $null

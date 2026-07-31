@@ -493,6 +493,9 @@ Estes valores não devem ficar implicitamente aprovados neste ficheiro. O prompt
 | `[AMBIENTE_ALVO]` | Alvo exato, confirmado imediatamente antes da ação externa. |
 | `[AUTORIZAR_CRIACAO_GITHUB_E_PUSH_INICIAL]` | Autorização explícita para criar exatamente `[GITHUB_OWNER]/[GITHUB_REPOSITORY]`, adicionar `origin`, criar o commit-base e fazer o primeiro `push`. |
 | `[AUTORIZAR_ALTERACAO_DE_BASELINE_VISUAL]` | Baselines e diffs visuais concretos cuja alteração foi revista e aprovada. |
+| `[AUTORIZAR_FERRAMENTAS_LAYOUT]` | Lista nominal das ferramentas de layout autorizadas, respetivo âmbito pessoal/projeto, origem, versão e permissões; vazio significa pesquisar e propor sem instalar. |
+| `[AUTORIZAR_CONFIG_CODEX_PROJETO]` | Chaves e valores não sensíveis exatos autorizados para `.codex/config.toml`; vazio significa propor sem persistir. |
+| `[AUTORIZAR_CODEX_ACTION]` | Workflow/repositório exatos, permissões e comportamento de check autorizados para integrar `openai/codex-action`; vazio significa não alterar a CI. |
 | `[EXCECAO_DE_USABILIDADE_APROVADA]` | Risco, owner, prazo e aprovador quando um teste de usabilidade obrigatório não puder ser executado. |
 | `[AUTORIZAR_RELEASE]` | Ambiente, candidate SHA, digest e janela exatos autorizados para publicação. |
 | `[AUTORIZAR_ACOES_CORRETIVAS_OPERACIONAIS]` | Ações externas concretas permitidas durante triagem/monitorização; observar e reportar não implica autorização para alterar produção. |

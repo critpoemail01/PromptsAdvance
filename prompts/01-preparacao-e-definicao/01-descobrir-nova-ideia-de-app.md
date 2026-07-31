@@ -15,10 +15,16 @@ para implementar. Pesquisa documental e sinais públicos reduzem incerteza; não
 substituem entrevistas, observação contextual, teste de conceito/protótipo ou
 evidência comportamental com pessoas representativas.
 
-O trabalho só fica `concluído` quando:
+O trabalho só fica `concluído` quando os critérios do modo selecionado passarem:
 
-- a exploração cobrir 12–20 espaços de problema e justificar a redução a cinco
-  oportunidades e três finalistas;
+- em `zero-input`, a exploração cobrir 12–20 espaços de problema e justificar
+  a redução a cinco oportunidades e três finalistas;
+- em `ideia-fornecida`, a ideia for testada contra manter a formulação,
+  estreitar o segmento, alterar a jornada e pelo menos uma alternativa atual,
+  sem fabricar 12–20 ideias irrelevantes;
+- em `brownfield`, a proposta já implementada for reconstruída a partir do
+  código, documentação, jornadas e evidência observável, separando claramente
+  comportamento atual, intenção, utilização comprovada e lacunas;
 - as cinco oportunidades forem apresentadas como aplicações possíveis, cada
   uma com problema, solução, modelo de negócio, novidade face ao que existe e
   razão comparativa para apostar nela;
@@ -89,9 +95,42 @@ tem de persistir os artefactos autorizados antes da entrega.
 
 ## Objetivo
 
-Como primeiro passo de produto, parte de uma folha em branco e identifica autonomamente oportunidades de aplicações web/mobile que o mercado atual demonstre necessitar. Pesquisa procura, adoção, queixas, fragmentação e mudanças recentes; recomenda aplicações novas com um problema claro, melhoria defensável e adequação preliminar ao `BoilerPlateAdvance` localizado em `[PASTA_ORIGEM_BOILERPLATE]`, resolvida pelo lifecycle e confirmada em `APP_CONTEXT.md`. Não implementes código.
+Como primeiro passo de produto, determina primeiro se estás perante folha em
+branco, uma ideia concreta fornecida ou uma aplicação existente. Pesquisa
+procura, adoção, queixas, fragmentação e mudanças recentes com profundidade
+proporcional ao modo; recomenda uma direção com problema claro, melhoria
+defensável e adequação preliminar ao `BoilerPlateAdvance` localizado em
+`[PASTA_ORIGEM_BOILERPLATE]`, resolvida pelo lifecycle e confirmada em
+`APP_CONTEXT.md`. Não implementes código.
 
 Este prompt inicia, mas não aprova, `PRODUCT_DEFINITION.md`. Mesmo quando a recomendação for `avançar`, o Gate A permanece `PENDENTE` até o prompt 04 validar toda a definição.
+
+## Seleção determinística do modo
+
+Regista no plano e em `DISCOVERY_RESEARCH.md` exatamente um modo, nesta ordem:
+
+1. `change-cycle`, quando `activeChange` estiver presente; aplica a secção
+   própria abaixo;
+2. `brownfield`, quando `initiativeMode` for `brownfield` ou existir uma
+   `applicationRoot` confirmada;
+3. `ideia-fornecida`, quando o utilizador descreveu uma aplicação, problema,
+   público ou jornada concreta que pretende validar;
+4. `zero-input`, apenas quando nenhuma das condições anteriores se aplicar.
+
+No modo `ideia-fornecida`, a ideia é a hipótese principal, não uma preferência
+decorativa. Reformula-a numa frase verificável, identifica o que permanece
+desconhecido e compara-a com 3–5 direções realmente úteis: manter, estreitar,
+reposicionar, integrar uma alternativa existente ou não avançar. Pesquisa ampla
+fora desse conjunto apenas se duas rondas mostrarem que o problema/público
+inicial está errado ou que existe um risco eliminatório.
+
+No modo `brownfield`, começa por inventário read-only da aplicação: produtos e
+projetos, rotas/ecrãs, atores, operações, dados, integrações, documentação,
+testes e comportamento executável disponível. O código prova comportamento,
+não procura, intenção nem satisfação. Usa essa baseline para reconstruir a ideia
+implementada e compara `manter`, `melhorar`, `reposicionar`, `integrar/substituir`
+e `não avançar`; não promove funcionalidades existentes a requisitos aprovados
+sem evidência de produto.
 
 ## Modo de ciclo de mudança
 
@@ -109,9 +148,22 @@ produto. O restante prompt continua aplicável de forma proporcional.
 
 Não existem entradas obrigatórias do utilizador para executar este prompt. Não peças mercado/geografia, público-alvo, orçamento, prazo, competências/equipa, modelo de receita, setor preferido nem restrições antes de pesquisar e recomendar.
 
-Se o utilizador tiver fornecido espontaneamente preferências ou exclusões, usa-as como orientação explícita. Se não tiver fornecido nada, inicia imediatamente uma pesquisa ampla, deixa os campos de contexto ainda desconhecidos como `pendente` e permite que a evidência revele os mercados, segmentos e modelos mais promissores. A ausência desses dados nunca bloqueia o prompt 01 e não justifica terminar com perguntas.
+Se o utilizador tiver fornecido apenas preferências ou exclusões, usa-as como
+orientação do modo `zero-input`. Se tiver fornecido uma ideia concreta, usa
+`ideia-fornecida`; não a diluas numa descoberta genérica. Se existir uma
+aplicação ligada, usa `brownfield` e agarra na ideia realmente implementada. Se
+não existir nada, inicia imediatamente pesquisa ampla. A ausência de orçamento,
+prazo ou equipa nunca bloqueia o prompt 01 nem justifica um questionário.
+A ausência desses dados nunca bloqueia o prompt 01.
 
 Não solicites, estimes nem uses `[ORÇAMENTO]` ou `[PRAZO]` nesta fase. Serão resolvidos nos prompts seguintes e validados no DOR-09 antes do Gate A, quando já existir uma oportunidade concreta e requisitos suficientes para uma estimativa responsável.
+
+Se o Gate A detetar mais tarde ausência de investigação direta, teste da
+solução, orçamento, prazo ou competências, essa ausência não transforma o
+prompt 01 num prompt de entrevistas, piloto ou viabilidade. O prompt 01 só é
+reaberto quando a evidência exigir alterar materialmente a oportunidade,
+problema ou público definidos; recolha/autorização de evidência e DOR-09 são
+resolvidos no prompt 04.
 
 ## Método e utilização de ferramentas
 
@@ -125,7 +177,11 @@ Não solicites, estimes nem uses `[ORÇAMENTO]` ou `[PRAZO]` nesta fase. Serão 
    para consultas dirigidas apenas quando faltar uma prova material. Se um
    resultado for vazio, parcial ou suspeitosamente estreito, tenta uma ou duas
    fontes ou formulações alternativas antes de concluir que não existe evidência.
-4. Faz uma exploração internacional suficientemente ampla para descobrir 12–20 espaços de problema. Deixa a evidência determinar geografias e segmentos, assinalando diferenças regionais relevantes.
+4. Em `zero-input`, faz uma exploração internacional suficientemente ampla
+   para descobrir 12–20 espaços de problema. Em `ideia-fornecida` e
+   `brownfield`, usa o conjunto comparativo definido no modo e expande apenas
+   quando a evidência refutar a hipótese inicial. Deixa a evidência determinar
+   diferenças regionais e segmentos relevantes.
 5. Combina fontes de natureza diferente e regista data, região, URL, sinal observado e limitação:
    - tendências de pesquisa, sazonalidade e alterações recentes de interesse;
    - rankings, categorias, lançamentos, avaliações e histórico de reviews em lojas de aplicações;
@@ -212,10 +268,16 @@ Não solicites, estimes nem uses `[ORÇAMENTO]` ou `[PRAZO]` nesta fase. Serão 
 ## Condições de paragem da pesquisa
 
 Continua a pesquisar enquanto faltar evidência capaz de alterar materialmente a
-shortlist ou a decisão. Pára quando:
+shortlist ou a decisão. Pára quando os critérios comuns e os do modo estiverem
+satisfeitos:
 
-- os 12–20 espaços estiverem cobertos e cada oportunidade do top 5 tiver pelo
+- em `zero-input`, os 12–20 espaços estiverem cobertos e cada oportunidade do top 5 tiver pelo
   menos duas fontes independentes de dois tipos diferentes;
+- em `ideia-fornecida`, a hipótese e as 3–5 direções comparativas tiverem
+  evidência suficiente para escolher, estreitar ou rejeitar a ideia;
+- em `brownfield`, o inventário cobrir a jornada principal e as comparações
+  `manter|melhorar|reposicionar|integrar/substituir|não avançar`, com lacunas e
+  limitações explícitas;
 - cada finalista tiver pelo menos três fontes independentes, incluindo um sinal
   direto do problema vivido pelo utilizador e um sinal de mercado, adoção ou
   alternativas;
@@ -244,8 +306,10 @@ Usa `não avançar` para uma oportunidade quando existir impedimento material de
 Cria ou atualiza `DISCOVERY_RESEARCH.md` e conserva nele, por esta ordem:
 
 1. âmbito, data, janela, geografias, estratégia, fontes inacessíveis e limites;
-2. mapa dos 12–20 espaços de problema e motivo de exclusão ou promoção;
-3. cinco hipóteses de aplicação com a mesma estrutura: aplicação, problema,
+2. mapa dos 12–20 espaços no modo `zero-input`; nos outros modos, baseline da
+   ideia/aplicação e matriz das 3–5 direções comparadas;
+3. cinco hipóteses de aplicação no modo `zero-input`, ou as direções comparadas
+   nos restantes modos, com a mesma estrutura: aplicação, problema,
    solução, modelo de negócio, novidade concreta, razão comparativa, evidência,
    confiança, maior risco e condição que a faria perder;
 4. matriz de claims e fontes com data, região, tipo de sinal, independência,
@@ -271,7 +335,8 @@ Apresenta apenas a síntese necessária para decidir, nesta ordem:
    ainda`/`não avançar`, confiança, principal hipótese por provar e decisão
    mínima pedida ao responsável;
 2. até três razões determinantes e três riscos que podem alterar a escolha;
-3. tabela das cinco hipóteses com exatamente estas colunas:
+3. tabela das cinco hipóteses em `zero-input`, ou das 3–5 direções nos restantes
+   modos, com exatamente estas colunas:
 
    | # | Hipótese | Utilizador e problema | Proposta em uma frase | Pontuação/confiança | Risco decisivo |
    |---|---|---|---|---|---|

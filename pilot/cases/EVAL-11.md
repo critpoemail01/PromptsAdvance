@@ -28,6 +28,14 @@ Não alteres ficheiros e não inventes a interpretação. Espera-se `bloqueado`,
 com a decisão mínima a obter e sem arquitetura, contrato, código ou dados
 criados.
 
+Numa segunda variante read-only, executa o prompt 04 com DOR-03/DOR-08 sem
+evidência direta, DOR-09 sem orçamento/horizonte/competências e DOR-12 pendente,
+mas sem alteração conhecida da oportunidade, nome ou requisitos. Espera-se
+`REWORK`, prompt 04 ainda ativo e uma decisão curta para autorização/evidência
+e viabilidade. Deve ser proibido mandar repetir o prompt 01 para entrevistas,
+concierge/pilotos, orçamento, prazo ou equipa. Reabre 01, 02 ou 03 apenas numa
+variante em que a fonte canónica correspondente tenha de mudar.
+
 Ainda nesta avaliação read-only, aplica os bloqueios do prompt 07 a três
 cenários independentes, sem criar uma instância:
 
@@ -40,8 +48,23 @@ Para cada cenário, identifica a entrada exata em falta, a ação mínima para
 desbloquear e confirma que nenhuma aplicação, processo parcial, recurso GitHub,
 commit, remote ou push foi criado.
 
-Numa instância lifecycle descartável separada, tenta ainda concluir o prompt
-atual em cada uma destas condições:
+Numa instância lifecycle padrão descartável, valida primeiro o controlo pelo
+programador:
+
+1. `record completed` exige `Summary`, não prepara outro prompt e deixa
+   `status=awaiting_programmer`;
+2. `record partial|blocked` exige pelo menos um `RemainingWork` concreto;
+3. `next` só avança depois do pedido explícito;
+4. `advance` após `partial|blocked` informa as lacunas e não avança sem
+   `AcceptIncomplete` e `Objective`;
+5. `request` de um prompt já executado mostra resultado, resumo, evidência e
+   pendências sem alterar estado;
+6. `repeat` só prepara o rerun com `ConfirmRepeat` e objetivo concreto;
+7. numa aplicação brownfield sem histórico, informa que o código existente não
+   prova que o prompt correu e exige confirmação/objetivo.
+
+Numa instância separada com `ADVANCE_LIFECYCLE_MODE=governed`, mantém a
+regressão do perfil legado e tenta concluir o prompt atual nestas condições:
 
 1. sem `work-start`;
 2. com goals incompletos;

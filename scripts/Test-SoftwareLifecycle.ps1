@@ -7,6 +7,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+$env:ADVANCE_LIFECYCLE_MODE = 'governed'
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [Console]::InputEncoding = $utf8NoBom
 [Console]::OutputEncoding = $utf8NoBom
@@ -41,6 +42,7 @@ $brownfieldFixtureRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("prompts-b
 $brownfieldProjectRoot = Join-Path $brownfieldFixtureRoot 'existing-application'
 $brownfieldProcessRoot = Join-Path $brownfieldFixtureRoot 'isolated-process'
 $brownfieldCollisionRoot = Join-Path $brownfieldFixtureRoot 'occupied-process'
+$stableCatalogRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("prompts-stable-catalog-" + [Guid]::NewGuid().ToString('N'))
 $boilerplate = [System.IO.Path]::GetFullPath((Join-Path $CatalogRoot '..\BoilerPlateAdvance'))
 $ownedBoilerplateFixture = $null
 if (-not (Test-Path -LiteralPath $boilerplate -PathType Container)) {
@@ -108,8 +110,10 @@ function Prepare-TestWorkCloseout {
     catch {
         return
     }
-    if ($null -eq $manifest.executionPolicy.PSObject.Properties['taskLedgerRequired'] -or
-        -not [bool]$manifest.executionPolicy.taskLedgerRequired -or
+    $ledgerRequired = [string]$env:ADVANCE_LIFECYCLE_MODE -eq 'governed' -or
+        ($null -ne $manifest.executionPolicy.PSObject.Properties['taskLedgerRequired'] -and
+            [bool]$manifest.executionPolicy.taskLedgerRequired)
+    if (-not $ledgerRequired -or
         [string]$state.currentPrompt -ne $promptId) {
         return
     }
@@ -481,6 +485,142 @@ try {
     if (-not $nextTask.Contains('[PASTA_ORIGEM_BOILERPLATE]')) {
         throw 'Prompt 01 no longer resolves the boilerplate through the lifecycle context placeholder.'
     }
+    if ($nextTask -notmatch 'Execution profile:\s*deep' -or
+        $nextTask -notmatch '## Required context' -or
+        $nextTask -notmatch 'EXECUTION_CONTRACT\.md.*SHA-256' -or
+        $nextTask -notmatch 'PRODUCT_EXCELLENCE\.md.*SHA-256' -or
+        $nextTask -notmatch 'at most\s+one immediately related prompt') {
+        throw 'NEXT_TASK.md does not expose the proportional profile, hashed context route and bounded continuation rule.'
+    }
+
+    $sourceManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $CatalogRoot 'PROCESS_MANIFEST.json') |
+        ConvertFrom-Json
+    $staleVersion = '2026-01-01.1'
+    $staleManifestPath = Join-Path $fixtureRoot 'PROCESS_MANIFEST.json'
+    $staleManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $staleManifestPath | ConvertFrom-Json
+    $staleManifest.catalogVersion = $staleVersion
+    [System.IO.File]::WriteAllText(
+        $staleManifestPath,
+        ($staleManifest | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $staleState = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath | ConvertFrom-Json
+    $staleState.catalogVersion = $staleVersion
+    [System.IO.File]::WriteAllText(
+        $statePath,
+        ($staleState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $gateEvidencePath = Join-Path $fixtureRoot 'LIFECYCLE_GATE_EVIDENCE.json'
+    $staleGateEvidence = Get-Content -Raw -Encoding UTF8 -LiteralPath $gateEvidencePath | ConvertFrom-Json
+    $staleGateEvidence.catalogVersion = $staleVersion
+    [System.IO.File]::WriteAllText(
+        $gateEvidencePath,
+        ($staleGateEvidence | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $contextBeforeUpgrade = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'APP_CONTEXT.md')
+    [System.IO.File]::WriteAllText(
+        (Join-Path $fixtureRoot 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md'),
+        "# stale prompt 04`n",
+        $utf8NoBom)
+
+    $candidateStateBefore = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath
+    $candidateManifestBefore = Get-Content -Raw -Encoding UTF8 -LiteralPath $staleManifestPath
+    $candidateUpgrade = Invoke-RawLifecycle @('upgrade', '-ProcessRoot', $fixtureRoot)
+    if ($candidateUpgrade.ExitCode -eq 0 -or
+        $candidateUpgrade.Output -notmatch 'only accepts a stable catalog' -or
+        (Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath) -ne $candidateStateBefore -or
+        (Get-Content -Raw -Encoding UTF8 -LiteralPath $staleManifestPath) -ne $candidateManifestBefore) {
+        throw 'Catalog upgrade accepted a candidate source or mutated the instance before refusing it.'
+    }
+    $results.Add('candidate catalog upgrade -> refused without mutation')
+
+    New-Item -ItemType Directory -Path $stableCatalogRoot | Out-Null
+    foreach ($directory in @('prompts', 'scripts', '.agents')) {
+        Copy-Item -LiteralPath (Join-Path $CatalogRoot $directory) -Destination $stableCatalogRoot -Recurse
+    }
+    foreach ($file in @(
+        'AGENTS.md', 'CHANGE_CONTROL.md', 'CLAUDE.md', 'EXECUTION_CONTRACT.md',
+        'EVALUATION_IMPACT_MAP.json', 'HELP_AND_ACADEMY.md', 'PILOT_APPROVAL.md',
+        'PRODUCT_EXCELLENCE.md', 'PROMPT_EVALUATION.md', 'QUALITY_GATES.md',
+        'PROCESS_MANIFEST.json', 'README.md', 'START_HERE.md', 'software-lifecycle.ps1'
+    )) {
+        Copy-Item -LiteralPath (Join-Path $CatalogRoot $file) -Destination $stableCatalogRoot
+    }
+    $stableManifestPath = Join-Path $stableCatalogRoot 'PROCESS_MANIFEST.json'
+    $stableManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $stableManifestPath | ConvertFrom-Json
+    $stableManifest.releaseChannel = 'stable'
+    [System.IO.File]::WriteAllText(
+        $stableManifestPath,
+        ($stableManifest | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    Copy-Item -LiteralPath (Join-Path $CatalogRoot 'pilot/fixtures/implementation-readiness-gate/valid-pilot-approval.md') `
+        -Destination (Join-Path $stableCatalogRoot 'PILOT_APPROVAL.md') -Force
+
+    $upgrade = Invoke-RawLifecycle -Arguments @('upgrade', '-ProcessRoot', $fixtureRoot) `
+        -ScriptPath (Join-Path $stableCatalogRoot 'software-lifecycle.ps1')
+    Require-ExitCode -Execution $upgrade -Expected 0 -Label 'approved stable catalog upgrade'
+    $upgradedState = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath | ConvertFrom-Json
+    $upgradedManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $staleManifestPath | ConvertFrom-Json
+    $upgradedGateEvidence = Get-Content -Raw -Encoding UTF8 -LiteralPath $gateEvidencePath | ConvertFrom-Json
+    $upgradedPrompt04 = Get-Content -Raw -Encoding UTF8 -LiteralPath `
+        (Join-Path $fixtureRoot 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md')
+    $contextAfterUpgrade = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'APP_CONTEXT.md')
+    if ([string]$upgradedState.catalogVersion -ne [string]$sourceManifest.catalogVersion -or
+        [string]$upgradedManifest.catalogVersion -ne [string]$sourceManifest.catalogVersion -or
+        [string]$upgradedGateEvidence.catalogVersion -ne [string]$sourceManifest.catalogVersion -or
+        -not $upgradedPrompt04.Contains('Triagem de pendências sem ciclo de prompts') -or
+        $contextAfterUpgrade -ne $contextBeforeUpgrade) {
+        throw 'Compatible upgrade did not synchronize process files while preserving product context.'
+    }
+    $validateUpgrade = Invoke-RawLifecycle @('validate', '-ProcessRoot', $fixtureRoot)
+    Require-ExitCode -Execution $validateUpgrade -Expected 0 -Label 'upgraded lifecycle validate'
+    $results.Add('stable catalog upgrade -> process synchronized and product context preserved')
+
+    $futureVersion = '2099-01-01.1'
+    $futureState = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath | ConvertFrom-Json
+    $futureManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $staleManifestPath | ConvertFrom-Json
+    $futureGateEvidence = Get-Content -Raw -Encoding UTF8 -LiteralPath $gateEvidencePath | ConvertFrom-Json
+    $futureState.catalogVersion = $futureVersion
+    $futureManifest.catalogVersion = $futureVersion
+    $futureGateEvidence.catalogVersion = $futureVersion
+    [System.IO.File]::WriteAllText(
+        $statePath,
+        ($futureState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    [System.IO.File]::WriteAllText(
+        $staleManifestPath,
+        ($futureManifest | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    [System.IO.File]::WriteAllText(
+        $gateEvidencePath,
+        ($futureGateEvidence | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $futureStateBefore = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath
+    $futureManifestBefore = Get-Content -Raw -Encoding UTF8 -LiteralPath $staleManifestPath
+    $futureGateEvidenceBefore = Get-Content -Raw -Encoding UTF8 -LiteralPath $gateEvidencePath
+    $downgrade = Invoke-RawLifecycle -Arguments @('upgrade', '-ProcessRoot', $fixtureRoot) `
+        -ScriptPath (Join-Path $stableCatalogRoot 'software-lifecycle.ps1')
+    if ($downgrade.ExitCode -eq 0 -or
+        (Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath) -ne $futureStateBefore -or
+        (Get-Content -Raw -Encoding UTF8 -LiteralPath $staleManifestPath) -ne $futureManifestBefore -or
+        (Get-Content -Raw -Encoding UTF8 -LiteralPath $gateEvidencePath) -ne $futureGateEvidenceBefore) {
+        throw 'Catalog upgrade accepted a downgrade or mutated the instance before refusing it.'
+    }
+    $futureState.catalogVersion = [string]$sourceManifest.catalogVersion
+    $futureManifest.catalogVersion = [string]$sourceManifest.catalogVersion
+    $futureGateEvidence.catalogVersion = [string]$sourceManifest.catalogVersion
+    [System.IO.File]::WriteAllText(
+        $statePath,
+        ($futureState | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    [System.IO.File]::WriteAllText(
+        $staleManifestPath,
+        ($futureManifest | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    [System.IO.File]::WriteAllText(
+        $gateEvidencePath,
+        ($futureGateEvidence | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    $results.Add('catalog downgrade -> refused without mutation')
 
     $missingLedgerRecord = Invoke-RawLifecycle @(
         'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '01',
@@ -773,6 +913,16 @@ try {
     )
     Require-ExitCode -Execution $record11 -Expected 0 -Label 'record 11'
 
+    $fixtureManifestPath = Join-Path $fixtureRoot 'PROCESS_MANIFEST.json'
+    $candidateFixtureManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $fixtureManifestPath | ConvertFrom-Json
+    $candidateFixtureManifest.releaseChannel = 'candidate'
+    [System.IO.File]::WriteAllText(
+        $fixtureManifestPath,
+        ($candidateFixtureManifest | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
+    Copy-Item -LiteralPath (Join-Path $CatalogRoot 'PILOT_APPROVAL.md') `
+        -Destination (Join-Path $fixtureRoot 'PILOT_APPROVAL.md') -Force
+
     $pendingPilot = Invoke-Lifecycle @(
         'record',
         '-ProcessRoot', $fixtureRoot,
@@ -791,6 +941,12 @@ try {
 
     Copy-Item -LiteralPath (Join-Path $fixtureRoot 'pilot\fixtures\implementation-readiness-gate\valid-pilot-approval.md') `
         -Destination (Join-Path $fixtureRoot 'PILOT_APPROVAL.md') -Force
+    $stableFixtureManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $fixtureManifestPath | ConvertFrom-Json
+    $stableFixtureManifest.releaseChannel = 'stable'
+    [System.IO.File]::WriteAllText(
+        $fixtureManifestPath,
+        ($stableFixtureManifest | ConvertTo-Json -Depth 30) + [Environment]::NewLine,
+        $utf8NoBom)
 
     $gateG03 = Invoke-Lifecycle @(
         'record',
@@ -1338,6 +1494,17 @@ CHANGE_APPROVED_AT: 2026-07-30T16:30:00+01:00
     }
 }
 finally {
+    if (Test-Path -LiteralPath $stableCatalogRoot -PathType Container) {
+        $resolvedStableCatalog = [System.IO.Path]::GetFullPath($stableCatalogRoot)
+        $resolvedTempForStable = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd(
+            [System.IO.Path]::DirectorySeparatorChar,
+            [System.IO.Path]::AltDirectorySeparatorChar)
+        $stablePrefix = $resolvedTempForStable + [System.IO.Path]::DirectorySeparatorChar + 'prompts-stable-catalog-'
+        if (-not $resolvedStableCatalog.StartsWith($stablePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove unverified stable catalog fixture: $resolvedStableCatalog"
+        }
+        Remove-Item -LiteralPath $resolvedStableCatalog -Recurse -Force
+    }
     if (Test-Path -LiteralPath $junctionRoot) {
         $junctionItem = Get-Item -Force -LiteralPath $junctionRoot
         $resolvedTemp = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd(

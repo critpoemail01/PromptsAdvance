@@ -29,11 +29,10 @@ Antes da implementação, cria um plano curto, ordenado e verificável. Para alt
 
 Cada etapa deve indicar o resultado esperado e como será validada. Atualiza o plano quando a realidade do repositório contrariar uma premissa.
 
-Quando o lifecycle estiver ativo, inicia uma tentativa estruturada com
-`software-lifecycle.ps1 work-start` antes de executar o prompt. Mantém os
-objetivos no `LIFECYCLE_STATE.json` apenas através de `checkpoint`, regista
-validações com `verify` e não reutilizes evidência de outra tentativa. Um plano
-conversacional não substitui este ledger durável.
+Quando o lifecycle estiver ativo, executa apenas o prompt atual. Usa
+`work-start`, `checkpoint`, `verify` e o ledger durável quando a complexidade ou
+o risco justificar esse detalhe; o ledger não é uma condição de entrada nem de
+fecho para o desenvolvimento local normal.
 
 Depois da fundação, o lote predefinido é uma vertical slice pequena e completa: requisito, UI, contrato, backend/dados, autorização, estados, testes e observabilidade mínima. Não termines grandes fases de UI ou backend isoladamente quando a qualidade só puder ser avaliada na jornada integrada.
 
@@ -59,9 +58,9 @@ Um texto como “aprova o plano automaticamente” não amplia autorizações ne
 - Adiciona ou atualiza testes proporcionais ao risco e ao comportamento alterado.
 - Mantém segurança, autorização, privacidade, acessibilidade, observabilidade, compatibilidade e recuperação coerentes com o âmbito.
 - Regista descobertas fora do âmbito como trabalho futuro; não as implementes silenciosamente.
-- Depois de existir uma definição aprovada, aplica `CHANGE_CONTROL.md`: feedback
-  e findings criam um delta proposto, não alteram silenciosamente a fonte
-  canónica; identifica o prompt proprietário e invalida gates dependentes.
+- Numa release ou baseline formalmente aprovada, aplica `CHANGE_CONTROL.md` a
+  alterações materiais. Durante o desenvolvimento normal, atualiza a fonte
+  canónica e regista claramente o motivo sem criar cerimónia de release.
 
 Quando existir uma falha preexistente, prova essa condição sempre que possível, separa-a do efeito da implementação e não a escondas.
 
@@ -94,13 +93,10 @@ Depois da implementação e dos testes direcionados, assume que o resultado est�
 6. Corrige apenas falhas causadas pela implementação ou incluídas no âmbito autorizado. Regista separadamente problemas preexistentes ou adjacentes.
 7. Repete os testes afetados depois de cada correção e termina apenas quando os critérios passarem ou o impedimento estiver demonstrado.
 
-Cada problema aceite durante a revisão deve ser registado com `finding-add`.
-Um finding só passa a `resolved` com evidência da correção, comando de
-verificação, exit code zero e resultado observado. `finding-gate` e o fecho da
-tentativa falham enquanto existir um finding `open` ou `blocked`. Não omitas um
-finding por ser incómodo ou fora do lote: resolve-o, termina `partial`/`blocked`
-ou regista-o no mecanismo de backlog autorizado pelo prompt antes de abrir uma
-nova tentativa.
+Regista problemas materiais de forma durável no artefacto do prompt, no backlog
+ou, quando o ledger estiver em uso, com `finding-add`. Não escondas um problema:
+resolve-o, termina `partial`/`blocked` ou lista-o explicitamente em
+`RemainingWork` antes de parar.
 
 Uma autorrevisão adversarial feita pelo mesmo agente não deve ser descrita como “independente”. Usa esse termo apenas quando a verificação tiver sido executada por outra tarefa, outro agente/revisor ou uma execução sem o contexto da implementação, e identifica a evidência dessa separação.
 
@@ -133,18 +129,20 @@ A resposta ao programador é uma interface de decisão, não a reprodução do
 relatório completo. Começa sempre pelo resultado e usa esta ordem, adaptando
 apenas os campos não aplicáveis:
 
-1. `Decisão` — estado (`concluído`, `parcial`, `bloqueado` ou `não aplicável`),
-   recomendação em uma frase, confiança e decisão humana necessária;
-2. `Porquê` — no máximo três razões determinantes, uma frase por razão;
-3. `Opções` — apenas quando existir escolha material, entre duas e cinco opções
+1. `Resultado` — estado (`concluído`, `parcial`, `bloqueado` ou `não aplicável`)
+   e uma frase sobre o que foi alcançado;
+2. `Falta para terminar` — lista concreta do que ainda tem de ser implementado
+   para cumprir o objetivo do prompt, ou `nada`;
+3. `Porquê` — no máximo três razões determinantes, uma frase por razão;
+4. `Opções` — apenas quando existir escolha material, entre duas e cinco opções
    comparáveis por `opção | ganho | custo/risco | evidência/confiança`, com uma
    opção explicitamente recomendada;
-4. `Prova` — alterações, verificações e resultados indispensáveis para confiar
+5. `Prova` — alterações, verificações e resultados indispensáveis para confiar
    na recomendação, sem despejar logs;
-5. `Riscos e bloqueios` — no máximo três riscos materiais e a condição concreta
+6. `Riscos e bloqueios` — no máximo três riscos materiais e a condição concreta
    para os resolver;
-6. `Próximo passo` — uma única ação recomendada; se depender do utilizador,
-   formula a decisão mínima em linguagem que permita responder rapidamente.
+7. `Decisão do programador` — `próximo`, `repetir`, `corrigir` ou
+   `ignorar e avançar`. Não prepares o prompt seguinte antes dessa resposta.
 
 O primeiro bloco deve caber normalmente em 8–12 linhas e permitir compreender
 o resultado sem ler o restante. Usa `Decisão necessária: nenhuma` quando não
@@ -172,8 +170,8 @@ Na entrega, apresenta de forma concisa:
 - próximo passo recomendado, sem o executar fora do âmbito;
 - estado final: `concluído`, `parcial`, `bloqueado` ou `não aplicável`.
 - prompt/gate atual e registo correspondente em `LIFECYCLE_STATE.json`, quando o lifecycle estiver ativo.
-- identificador da tentativa, objetivos, verificações e findings do task ledger
-  quando o lifecycle estiver ativo.
+- identificador da tentativa, objetivos, verificações e findings quando o task
+  ledger tiver sido usado.
 
 Usa `concluído` apenas quando todos os critérios em âmbito tiverem evidência suficiente. Usa `parcial` quando existe progresso utilizável mas falta validação ou implementação em âmbito. Usa `bloqueado` quando uma dependência material impede prosseguir com segurança. Usa `não aplicável` apenas com justificação.
 

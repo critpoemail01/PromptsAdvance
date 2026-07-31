@@ -1,6 +1,10 @@
 # Avaliação piloto dos prompts
 
-Executa este piloto antes de concluir o Gate C e sempre que mudarem regras comuns, estrutura dos prompts, modelo principal ou ferramentas essenciais. Usa uma aplicação descartável derivada do `BoilerPlateAdvance`, nunca produção. Qualidade documental não substitui a execução do piloto.
+Executa esta avaliação antes de promover o catálogo para `stable` e sempre que
+mudarem regras comuns, estrutura dos prompts, modelo principal ou ferramentas
+essenciais. Usa uma aplicação descartável, nunca produção. O piloto avalia o
+processo; um estado pendente não bloqueia o desenvolvimento local de uma
+aplicação.
 
 ## Preparação
 
@@ -50,6 +54,21 @@ Quando o runner declarar `workspace-write`, o executor tem de persistir
 uma alegação de sandbox read-only sem tentativa de escrita e erro exato é falha
 material.
 
+Repete ainda EVAL-01 em dois subcasos dirigidos:
+
+- `EVAL-01-IDEA`: fornece uma ideia concreta com problema, público e jornada. O
+  executor seleciona `ideia-fornecida`, conserva-a como hipótese principal,
+  compara 3–5 direções úteis e não executa artificialmente a exploração de
+  12–20 espaços;
+- `EVAL-01-BROWNFIELD`: liga uma aplicação descartável existente com rotas,
+  testes e comportamento executável. O executor seleciona `brownfield`,
+  inventaria a ideia implementada read-only, separa comportamento de procura e
+  requisitos aprovados e compara `manter|melhorar|reposicionar|integrar ou
+  substituir|não avançar` sem copiar o boilerplate por cima da aplicação.
+
+Os subcasos usam a mesma grelha e não aumentam a contagem de 15 casos; são
+variantes obrigatórias de EVAL-01 sempre que o routing do prompt 01 mudar.
+
 ### EVAL-02 — alteração local limitada
 
 Seleciona um requisito pequeno e observável e executa apenas o prompt específico correspondente.
@@ -89,6 +108,7 @@ Espera-se:
 - ausência de UI genérica de IA ou dashboard administrativo indiferenciado;
 - estados, mobile e evidência renderizada;
 - crítica da primeira slice, usabilidade ou exceção explícita.
+- quando `CODEX_LAYOUT_TOOLING.md` existir, utilização apenas das ferramentas nominalmente aprovadas e decisão `manter|remover` baseada na primeira slice real, sem confundir instalação ou smoke test com melhoria visual.
 
 ### EVAL-06 — vertical slice funcional completa
 
@@ -132,16 +152,18 @@ prompt 07 em `brownfield` sem `[RAIZ_APLICACAO_EXISTENTE]`. Espera-se que
 identifique exatamente a falta, não altere a aplicação, não crie uma instância
 parcial nem recursos e termine `bloqueado` com a ação mínima necessária.
 
-No lifecycle executável, tenta ainda: impor um `NextPrompt` fora da rota,
-selecionar o prompt 64 depois do 12, aprovar G03 com
-`PILOT_APPROVAL.md` pendente, aprovar G04 com a baseline template e aprovar um
-gate antes dos prompts/gates dos quais depende. Tenta ainda associar uma
+No lifecycle executável padrão, confirma que `record` apresenta resultado,
+resumo e trabalho em falta, deixa o estado em `awaiting_programmer` e não
+prepara outro prompt. Confirma que `next` só avança após o pedido explícito,
+que um resultado parcial exige confirmação/razão para `skip and advance`, e
+que `request/repeat` mostram o histórico ou a sobreposição brownfield e exigem
+um objetivo antes da repetição. Tenta ainda associar uma
 instância brownfield ao `BoilerPlateAdvance`, colocar o processo dentro da
 aplicação e reutilizar um `ProcessRoot` que pertence a outra aplicação.
-Tenta também registar um prompt como `completed` sem `work-start`, com goals
-incompletos, sem verificação, sem autorrevisão e com um finding aberto. Corrompe
-depois o `activeWorkAttemptId`, os IDs dos goals e a evidência de um finding
-resolvido.
+
+No perfil governado legado, mantém os testes de gate, `work-start`, goals,
+verificação, autorrevisão, findings e corrupção do ledger. Esses testes validam
+o perfil opcional e não podem ser usados para bloquear o fluxo padrão.
 
 Depois de concluir uma fixture, tenta `cycle-start` sem proposta, com proposta
 `pending`, `CHANGE_ID` divergente, caminho fora de `ProcessRoot`, timestamp
@@ -293,7 +315,24 @@ O piloto passa apenas quando:
   separação entre evidência, hipótese, aprovação e baseline técnica;
 - não existe falha crítica.
 
-Se falhar, corrige a regra mínima responsável, repete o caso afetado e todos os casos que dependam dessa regra. Depois repete a suite completa nas mesmas condições antes de alterar o Gate C.
+Se falhar, corrige a regra mínima responsável, repete o caso afetado e todos os
+casos dependentes. Repete a suite completa antes de promover o catálogo para
+`stable`; não bloqueies por isso o desenvolvimento local de uma aplicação.
+
+## Execução proporcional por impacto
+
+Em cada alteração, executa primeiro a regressão dirigida calculada por
+`scripts/Get-PromptEvaluationScope.ps1`. A matriz versionada
+`EVALUATION_IMPACT_MAP.json` liga ficheiros alterados aos casos que podem
+detetar a regressão; um caso dirigido que falhe expande o âmbito para os casos
+dependentes. Esta seleção reduz feedback desperdiçado, mas nunca promove uma
+versão.
+
+Antes de alterar `releaseChannel` de `candidate` para `stable`, executa sempre
+`scripts/Get-PromptEvaluationScope.ps1 -StablePromotion` e a suite completa dos
+15 casos nas mesmas condições, seguida de avaliação humana e revisão separada.
+Só então atualiza `PILOT_APPROVAL.md` para a mesma `catalogVersion`. Testes
+estruturais, fixtures ou regressão dirigida não substituem essa promoção.
 
 ## Registo
 
@@ -604,6 +643,64 @@ ausente, adulterada e simultaneamente não autorizada/de outro commit, seguido d
 `GO` apenas para evidência válida. A validação estrutural e os testes do harness
 não substituem a repetição dos 15 casos, avaliação humana e revisão separada;
 `PILOT_APPROVAL.md` permanece `pending`.
+
+Na `catalogVersion` `2026-07-31.7`, o Gate A deixa de encaminhar entrevistas,
+concierge/pilotos, orçamento, prazo e equipa para o prompt 01. O prompt 04
+permanece ativo para autorização/evidência, viabilidade e aprovação; só reabre
+01, 02 ou 03 quando a fonte canónica correspondente precisar de alteração.
+EVAL-11 deve provar este comportamento e rejeitar o ciclo 01 → 04 → 01. A
+validação estrutural não substitui a repetição da suite completa, avaliação
+humana e revisão separada; `PILOT_APPROVAL.md` permanece `pending`.
+
+Na `catalogVersion` `2026-07-31.8`, o comando `upgrade` aplica o catálogo
+compatível a uma instância ativa congelada sem substituir os artefactos de
+produto nem editar o estado à margem do orquestrador. Deve recusar lifecycle
+concluído, work attempt ativo e mudança de schema/quantidade de prompts. EVAL-11
+e os testes E2E devem cobrir preservação e validação final; a suite piloto,
+avaliação humana e revisão separada permanecem pendentes.
+
+Na `catalogVersion` `2026-07-31.9`, o upgrade passa a recusar downgrade e
+qualquer alteração no conjunto de IDs de prompts, além das incompatibilidades
+de schema/quantidade já bloqueadas. Os testes E2E devem provar a atualização
+compatível e a recusa fail-closed; o piloto, avaliação humana e revisão separada
+permanecem pendentes.
+
+Na `catalogVersion` `2026-07-31.10`, a mensagem e o contrato do upgrade passam
+a distinguir conteúdo de produto preservado de regras de lifecycle incorporadas
+que são migradas. Esta clarificação não reduz os testes pendentes nem aprova o
+piloto.
+
+Na `catalogVersion` `2026-07-31.11`, o prompt 08 passa a pesquisar e selecionar
+capacidades de layout através de uma matriz auditável, limitada a três opções e
+com autorização nominal antes de qualquer configuração. O prompt 12 recebe esse
+handoff e só mantém uma ferramenta depois de medir o benefício na primeira
+vertical slice real. EVAL-05 deve rejeitar instalações sem autorização,
+dependências visuais universais e alegações de melhoria baseadas apenas em smoke
+tests. A validação estrutural não substitui a repetição de EVAL-05, da suite
+completa, da avaliação humana e da revisão separada; `PILOT_APPROVAL.md`
+permanece `pending`.
+
+Na `catalogVersion` `2026-07-31.12`, o catálogo ganha canais explícitos
+`candidate|stable`; `upgrade` só aceita uma fonte `stable` com
+`PILOT_APPROVAL.md` aprovado para a versão exata. `NEXT_TASK.md` passa a gerar
+contexto obrigatório por prompt com hashes e um perfil
+`fast|standard|deep`; uma task pode continuar no máximo mais um prompt apenas
+sem gate, decisão, autorização ou mudança material. O prompt 01 distingue
+folha em branco, ideia fornecida, brownfield e change-cycle. A regressão passa a
+ser dirigida por `EVALUATION_IMPACT_MAP.json` em cada alteração, conservando os
+15 casos, avaliação humana e revisão separada como condição obrigatória de
+promoção a `stable`. EVAL-01, EVAL-03, EVAL-04, EVAL-05, EVAL-11, EVAL-12,
+EVAL-13 e a suite completa devem ser executados; o piloto permanece pendente.
+
+Na `catalogVersion` `2026-07-31.13`, o fluxo padrão passa a ser controlado pelo
+programador e executa exatamente um prompt por tarefa. `record` exige resumo e,
+para `partial|blocked`, trabalho em falta específico; fica depois em
+`awaiting_programmer`. `advance`, `request` e `repeat` implementam as escolhas
+explícitas, conservam gaps aceites e impedem reruns silenciosos em histórico ou
+brownfield sem objetivo confirmado. Gates de rotina e task ledger passam a
+consultivos; autorizações externas/release continuam bloqueantes. EVAL-11 e a
+regressão estrutural devem cobrir este contrato; a promoção para `stable`, a
+avaliação humana e a revisão separada continuam pendentes.
 
 ## Referências
 

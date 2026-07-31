@@ -1,7 +1,7 @@
 {
   "name": "advance-app",
-  "version": "0.1.0+codex.20260731173912",
-  "description": "Start, adopt, and continue gated Advance application lifecycles from any Codex project.",
+  "version": "0.1.0+codex.20260731203955",
+  "description": "Start, adopt, and continue Advance applications one prompt at a time under programmer control.",
   "author": {
     "name": "PromptsAdvance Maintainers",
     "url": "https://github.com/critpoemail01"
@@ -18,8 +18,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Advance App",
-    "shortDescription": "Start and continue gated Advance applications.",
-    "longDescription": "Advance App exposes global Codex skills for creating a new greenfield Advance lifecycle or continuing and adopting an existing project through the controlled 73-prompt workflow.",
+    "shortDescription": "Develop Advance apps one prompt at a time.",
+    "longDescription": "Advance App creates or adopts an application, executes one prompt, reports result and remaining work, and waits for the programmer before advancing or rerunning.",
     "developerName": "PromptsAdvance Maintainers",
     "category": "Productivity",
     "capabilities": [

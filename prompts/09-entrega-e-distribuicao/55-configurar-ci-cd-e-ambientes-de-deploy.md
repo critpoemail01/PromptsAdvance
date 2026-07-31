@@ -43,6 +43,12 @@ Adapta os workflows existentes (`ci.yml`, `ci-maui.yml`, `cd-test.yml`, `cd-prod
 - Não atualiza baselines automaticamente. Uma alteração exige `[AUTORIZAR_ALTERACAO_DE_BASELINE_VISUAL]`, requisito associado e revisão do diff.
 - Configura branch protection/ruleset para exigir os checks bloqueantes, revisão por alguém diferente do último autor e Code Owners nas áreas sensíveis quando existirem.
 - Inclui dependency review, secret scanning/code scanning ou equivalentes disponíveis, sem transformar ausência de uma licença GitHub numa falsa garantia.
+- Depois de a CI determinística estar estável, avalia opcionalmente
+  `openai/codex-action` para revisão read-only de pull requests. Só o adiciona
+  com `[AUTORIZAR_CODEX_ACTION]`, permissões mínimas, inputs do PR tratados como
+  não confiáveis, ausência de secrets em eventos de forks e output meramente
+  consultivo ou ligado a um check explicitamente aprovado. A action não
+  substitui build, testes, Code Owners nem revisão humana exigida.
 
 ## Validação
 
@@ -61,3 +67,4 @@ Apresenta matriz, workflows alterados, actions com SHA e versão de origem, perm
 - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
 - https://playwright.dev/docs/test-snapshots
 - https://www.w3.org/WAI/test-evaluate/
+- https://github.com/openai/codex-action

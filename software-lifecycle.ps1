@@ -2,10 +2,10 @@
 param(
     [Parameter(Mandatory, Position = 0)]
     [ValidateSet(
-        'start', 'adopt', 'continue', 'status', 'next', 'select', 'decide',
+        'start', 'adopt', 'continue', 'status', 'next', 'advance', 'request', 'repeat', 'select', 'decide',
         'gate', 'record', 'validate', 'work-start', 'checkpoint', 'verify',
         'finding-add', 'finding-resolve', 'finding-gate', 'closeout',
-        'cycle-start')]
+        'cycle-start', 'upgrade')]
     [string]$Command,
 
     [string]$Name,
@@ -19,6 +19,11 @@ param(
     [string]$Result,
     [string]$Evidence,
     [string]$NextPrompt,
+    [string]$Summary,
+    [string[]]$RemainingWork,
+    [string]$Objective,
+    [switch]$ConfirmRepeat,
+    [switch]$AcceptIncomplete,
 
     [string]$GateId,
     [ValidateSet('passed', 'failed', 'pending')]
@@ -176,6 +181,33 @@ function Convert-ToTimestamp {
     return $null
 }
 
+function Compare-CatalogVersion {
+    param(
+        [Parameter(Mandatory)][string]$Left,
+        [Parameter(Mandatory)][string]$Right
+    )
+
+    $pattern = '^(\d{4})-(\d{2})-(\d{2})\.(\d+)$'
+    $leftMatch = [regex]::Match($Left, $pattern)
+    $rightMatch = [regex]::Match($Right, $pattern)
+    if (-not $leftMatch.Success -or -not $rightMatch.Success) {
+        throw "Catalog versions must use YYYY-MM-DD.N for automatic upgrade: '$Left', '$Right'."
+    }
+    $leftDate = [DateTime]::new(
+        [int]$leftMatch.Groups[1].Value,
+        [int]$leftMatch.Groups[2].Value,
+        [int]$leftMatch.Groups[3].Value)
+    $rightDate = [DateTime]::new(
+        [int]$rightMatch.Groups[1].Value,
+        [int]$rightMatch.Groups[2].Value,
+        [int]$rightMatch.Groups[3].Value)
+    $dateComparison = [DateTime]::Compare($leftDate, $rightDate)
+    if ($dateComparison -ne 0) {
+        return $dateComparison
+    }
+    return ([int]$leftMatch.Groups[4].Value).CompareTo([int]$rightMatch.Groups[4].Value)
+}
+
 function Get-Manifest {
     param([Parameter(Mandatory)][string]$Root)
     $path = Join-Path $Root 'PROCESS_MANIFEST.json'
@@ -183,6 +215,66 @@ function Get-Manifest {
         throw "PROCESS_MANIFEST.json is missing: $path"
     }
     return Get-Content -Raw -Encoding UTF8 -LiteralPath $path | ConvertFrom-Json
+}
+
+function Get-TwoColumnMarkdownValues {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $values = @{}
+    foreach ($line in (Get-Content -Raw -Encoding UTF8 -LiteralPath $Path) -split "\r?\n") {
+        if ($line -notmatch '^\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$') {
+            continue
+        }
+        $key = $Matches[1].Trim()
+        if ($key -notin @('Campo', '---')) {
+            $values[$key] = $Matches[2].Trim()
+        }
+    }
+    return $values
+}
+
+function Assert-CatalogEligibleForAutomaticUpgrade {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)]$Manifest
+    )
+
+    $channel = if ($Manifest.PSObject.Properties.Name -contains 'releaseChannel') {
+        [string]$Manifest.releaseChannel
+    }
+    else {
+        'candidate'
+    }
+    if ($channel -ne 'stable') {
+        throw "upgrade only accepts a stable catalog; source $($Manifest.catalogVersion) is '$channel'."
+    }
+
+    $approvalPath = Join-Path $Root 'PILOT_APPROVAL.md'
+    if (-not (Test-Path -LiteralPath $approvalPath -PathType Leaf)) {
+        throw 'upgrade requires PILOT_APPROVAL.md for the source catalog.'
+    }
+    $approval = Get-TwoColumnMarkdownValues -Path $approvalPath
+    $required = [ordered]@{
+        'Catalog version' = [string]$Manifest.catalogVersion
+        'Status' = 'approved'
+        'Suite cases' = '15/15'
+        'Critical failures' = '0'
+    }
+    foreach ($entry in $required.GetEnumerator()) {
+        if (-not $approval.ContainsKey($entry.Key) -or [string]$approval[$entry.Key] -ne $entry.Value) {
+            throw "upgrade requires approved current-version pilot evidence: $($entry.Key) must be '$($entry.Value)'."
+        }
+    }
+    foreach ($key in @('Human evaluator', 'Independent reviewer', 'Evidence', 'Approved at')) {
+        if (-not $approval.ContainsKey($key) -or
+            [string]::IsNullOrWhiteSpace([string]$approval[$key]) -or
+            [string]$approval[$key] -match '(?i)^(pending|a preencher|-)$') {
+            throw "upgrade requires durable pilot evidence in '$key'."
+        }
+    }
+    if ([string]$approval['Human evaluator'] -eq [string]$approval['Independent reviewer']) {
+        throw 'upgrade requires different human evaluator and independent reviewer identities.'
+    }
 }
 
 function Get-StatePath {
@@ -304,10 +396,92 @@ function Get-PromptState {
 function Test-TaskLedgerRequired {
     param([Parameter(Mandatory)]$Manifest)
 
+    if ([string]$env:ADVANCE_LIFECYCLE_MODE -eq 'governed') {
+        return $true
+    }
     $policy = $Manifest.executionPolicy
     return $null -ne $policy -and
         $null -ne $policy.PSObject.Properties['taskLedgerRequired'] -and
         [bool]$policy.taskLedgerRequired
+}
+
+function Test-ProgrammerControlledWorkflow {
+    param([Parameter(Mandatory)]$Manifest)
+
+    if (-not [string]::IsNullOrWhiteSpace([string]$env:ADVANCE_LIFECYCLE_MODE)) {
+        return [string]$env:ADVANCE_LIFECYCLE_MODE -eq 'programmer_controlled'
+    }
+    $policy = $Manifest.executionPolicy
+    return $null -ne $policy -and
+        $null -ne $policy.PSObject.Properties['workflowMode'] -and
+        [string]$policy.workflowMode -eq 'programmer_controlled'
+}
+
+function Get-LastRecordedPromptId {
+    param([Parameter(Mandatory)]$State)
+
+    if ($null -ne $State.PSObject.Properties['lastPrompt'] -and
+        -not [string]::IsNullOrWhiteSpace([string]$State.lastPrompt)) {
+        return Normalize-PromptId ([string]$State.lastPrompt)
+    }
+    $results = @(
+        @($State.history) |
+            Where-Object { $null -ne $_.PSObject.Properties['promptId'] }
+    )
+    if ($results.Count -eq 0) {
+        return $null
+    }
+    return Normalize-PromptId ([string]$results[-1].promptId)
+}
+
+function Get-PromptResultHistory {
+    param(
+        [Parameter(Mandatory)]$State,
+        [Parameter(Mandatory)][string]$Id
+    )
+
+    return @(
+        @($State.history) |
+            Where-Object {
+                $null -ne $_.PSObject.Properties['promptId'] -and
+                (Normalize-PromptId ([string]$_.promptId)) -eq $Id
+            }
+    )
+}
+
+function Write-PromptHistoryNotice {
+    param(
+        [Parameter(Mandatory)]$State,
+        [Parameter(Mandatory)][string]$Id,
+        [Parameter(Mandatory)]$PromptState,
+        [switch]$BrownfieldOverlap
+    )
+
+    $history = @(Get-PromptResultHistory -State $State -Id $Id)
+    Write-Host "CONFIRMATION REQUIRED: prompt $Id will not run yet." -ForegroundColor Yellow
+    if ($history.Count -gt 0) {
+        $last = $history[-1]
+        Write-Host " - Previous result: $($last.result)"
+        if ($null -ne $last.PSObject.Properties['summary'] -and
+            -not [string]::IsNullOrWhiteSpace([string]$last.summary)) {
+            Write-Host " - Previous summary: $($last.summary)"
+        }
+        if ($null -ne $last.PSObject.Properties['remainingWork'] -and
+            @($last.remainingWork).Count -gt 0) {
+            Write-Host ' - Work that remained:'
+            @($last.remainingWork) | ForEach-Object { Write-Host "   - $_" }
+        }
+        Write-Host " - Previous evidence: $($last.evidence)"
+    }
+    elseif ($BrownfieldOverlap) {
+        Write-Host ' - This is an existing application; the lifecycle has no evidence proving whether this scope was already performed.'
+        Write-Host ' - Inspect the implemented application and use the rerun only to validate or change a defined objective.'
+    }
+    else {
+        Write-Host " - Current recorded status: $($PromptState.status)"
+    }
+    Write-Host ' - Confirm only after stating the objective: fix pending work, revalidate after changes, or replace a previous decision.'
+    Write-Host " - Command: .\software-lifecycle.ps1 repeat -ProcessRoot `"$ProcessRoot`" -PromptId $Id -Objective `"<objective>`" -ConfirmRepeat"
 }
 
 function Add-LifecycleHistoryAction {
@@ -546,6 +720,10 @@ function Test-EntryGate {
         [Parameter(Mandatory)]$Manifest,
         [Parameter(Mandatory)][string]$NextId
     )
+
+    if ((Test-ProgrammerControlledWorkflow -Manifest $Manifest) -and $NextId -ne '64') {
+        return
+    }
 
     $stage = Get-PromptStage -Manifest $Manifest -Id $NextId
     $entryGate = $stage.entryGate
@@ -987,6 +1165,73 @@ function Assert-ApplicabilityDecisions {
     }
 }
 
+function Get-PromptExecutionProfile {
+    param(
+        [Parameter(Mandatory)][string]$PromptId,
+        [Parameter(Mandatory)]$Manifest
+    )
+
+    if ($Manifest.PSObject.Properties.Name -notcontains 'promptExecutionProfiles') {
+        return 'standard'
+    }
+    if (@($Manifest.promptExecutionProfiles.deep) -contains $PromptId) {
+        return 'deep'
+    }
+    if (@($Manifest.promptExecutionProfiles.fast) -contains $PromptId) {
+        return 'fast'
+    }
+    return 'standard'
+}
+
+function Get-TaskContextDocuments {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)][string]$PromptId,
+        [Parameter(Mandatory)]$State,
+        [Parameter(Mandatory)]$Manifest
+    )
+
+    $documents = [System.Collections.Generic.List[string]]::new()
+    if ($Manifest.PSObject.Properties.Name -contains 'contextRouting') {
+        foreach ($document in @($Manifest.contextRouting.always)) {
+            if (-not $documents.Contains([string]$document)) {
+                $documents.Add([string]$document)
+            }
+        }
+        foreach ($group in @($Manifest.contextRouting.groups)) {
+            if (@($group.promptIds) -notcontains $PromptId) {
+                continue
+            }
+            foreach ($document in @($group.documents)) {
+                if (-not $documents.Contains([string]$document)) {
+                    $documents.Add([string]$document)
+                }
+            }
+        }
+    }
+    else {
+        foreach ($document in @('AGENTS.md', 'EXECUTION_CONTRACT.md', 'APP_CONTEXT.md', 'IMPLEMENTATION_STATUS.md')) {
+            $documents.Add($document)
+        }
+    }
+    if ($null -ne $State.activeChange -and -not $documents.Contains('CHANGE_CONTROL.md')) {
+        $documents.Add('CHANGE_CONTROL.md')
+    }
+
+    return @(
+        foreach ($document in $documents) {
+            $path = Join-Path $Root $document
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+                throw "Context routing requires a missing document: $document"
+            }
+            [ordered]@{
+                path = $document
+                sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash.ToLowerInvariant()
+            }
+        }
+    )
+}
+
 function New-TaskPacket {
     param(
         [Parameter(Mandatory)][string]$Root,
@@ -1004,23 +1249,55 @@ function New-TaskPacket {
     $promptContent = Get-Content -Raw -Encoding UTF8 -LiteralPath $promptFile.FullName
     $relativePrompt = $promptFile.FullName.Substring($Root.Length + 1).Replace('\', '/')
     $packetPath = Join-Path $Root 'NEXT_TASK.md'
+    $executionProfile = Get-PromptExecutionProfile -PromptId $id -Manifest $Manifest
+    $profileDefinition = $Manifest.executionProfiles.$executionProfile
+    $contextDocuments = @(Get-TaskContextDocuments -Root $Root -PromptId $id -State $State -Manifest $Manifest)
+    $contextLines = @($contextDocuments | ForEach-Object { "- ``$($_.path)`` — SHA-256 ``$($_.sha256)``" }) -join [Environment]::NewLine
 
-    $packet = @"
-# Next lifecycle task
+    $executionInstructions = if (Test-ProgrammerControlledWorkflow -Manifest $Manifest) {
+@"
+Use `$advance-app-continue` and execute only this prompt. Do not start another
+prompt in the same task. The programmer controls every transition.
 
-Process: $($State.processName)
-Process ID: $($State.processId)
-Initiative mode: $($State.initiativeMode)
-Application root: $(if ([string]::IsNullOrWhiteSpace([string]$State.applicationRoot)) { 'pending until prompt 07' } else { $State.applicationRoot })
-Stage: $($stage.id) - $($stage.name)
-Prompt: $id
-Source: $relativePrompt
+Inspect the existing application before changing it. Existing code is evidence,
+not proof that the prompt has already been completed. Preserve working behavior
+and implement only the missing or explicitly requested scope.
 
-## Execution contract
+Use a short plan for non-trivial work and proportionate validation. The task
+ledger and routine quality gates are available as aids, but do not block normal
+local development. Exact authorization remains mandatory for external,
+destructive, financial, Git, store and production actions.
 
+Finish by recording an honest result and a decision-ready report:
+
+```powershell
+.\software-lifecycle.ps1 record -ProcessRoot "$Root" -PromptId $id -Result completed -Evidence "path or durable evidence" -Summary "what was achieved"
+```
+
+Use `partial` or `blocked` when the objective was not fully achieved, and add
+one or more `-RemainingWork "specific missing implementation"` values. A
+completed result must have no remaining work.
+
+After recording, stop. Report:
+
+- result: completed, partial, blocked or not applicable;
+- what was implemented or validated;
+- what still needs to be implemented to satisfy this prompt;
+- evidence and checks;
+- choices: `next`, `repeat`, `correct`, or `skip and advance`.
+
+Do not advance until the programmer explicitly asks. If this prompt has already
+run, or a brownfield application may already contain its scope, show the prior
+result/evidence or the detected overlap first. Ask whether it should run again
+and require a concrete rerun objective before changing files.
+"@
+    }
+    else {
+@"
 Use `$advance-app-continue`.
-Execute only this prompt in this task.
-Read AGENTS.md and every mandatory document it references before acting.
+Execute this prompt first. Do not skip or merge its result with another prompt.
+Use the required-context list above instead of recursively loading every linked
+document in the catalog; the prompt may add a specific document when needed.
 Resolve material inputs from APP_CONTEXT.md, approved decisions and repository evidence.
 For a brownfield initiative, treat the existing application as read-only evidence until the current prompt authorizes a scoped change. Never copy BoilerPlateAdvance over it, replace its Git history/remotes, or mark existing behavior complete without verification.
 For non-trivial work, create and maintain a short staged plan before implementation.
@@ -1051,6 +1328,43 @@ When a product/applicability decision is required, the result changes to
 `waiting_decision` and `status` prints the valid next-action hint. After prompt
 12, select a vertical slice using the workflow reference.
 
+After recording this prompt, the same Codex task may continue through at most
+one immediately related prompt only when `status` returns a deterministic next
+prompt, no gate/decision/authorization is pending, both prompts use compatible
+profiles and all work remains local and reversible. Regenerate and read the new
+`NEXT_TASK.md`, then start a new ledger attempt. Stop at every gate, decision,
+external action, material scope change or ambiguous transition.
+"@
+    }
+
+    $packet = @"
+# Next lifecycle task
+
+Process: $($State.processName)
+Process ID: $($State.processId)
+Initiative mode: $($State.initiativeMode)
+Application root: $(if ([string]::IsNullOrWhiteSpace([string]$State.applicationRoot)) { 'pending until prompt 07' } else { $State.applicationRoot })
+Stage: $($stage.id) - $($stage.name)
+Prompt: $id
+Source: $relativePrompt
+Execution profile: $executionProfile
+
+## Required context
+
+Read these files completely for this prompt. Their hashes make the generated
+context packet auditable; follow a linked document beyond this list only when
+the prompt, a missing decision or a changed surface makes it material.
+
+$contextLines
+
+Profile rule: $($profileDefinition.useWhen)
+Minimum evidence: $($profileDefinition.minimumEvidence)
+Separated review expected by profile: $($profileDefinition.separateReview)
+
+## Execution contract
+
+$executionInstructions
+
 ## Prompt
 
 $promptContent
@@ -1071,7 +1385,26 @@ function Test-Lifecycle {
     $manifest = Get-Manifest $Root
     $state = Get-State $Root
 
+    $releaseChannel = if ($manifest.PSObject.Properties.Name -contains 'releaseChannel') {
+        [string]$manifest.releaseChannel
+    }
+    else {
+        'candidate'
+    }
+    if ($releaseChannel -notin @('candidate', 'stable')) {
+        $issues.Add("Manifest releaseChannel must be 'candidate' or 'stable'; found '$releaseChannel'.")
+    }
+    elseif ($releaseChannel -eq 'stable') {
+        try {
+            Assert-CatalogEligibleForAutomaticUpgrade -Root $Root -Manifest $manifest
+        }
+        catch {
+            $issues.Add("Stable catalog evidence is invalid: $($_.Exception.Message)")
+        }
+    }
+
     if ((Test-TaskLedgerRequired -Manifest $manifest) -and
+        [string]$env:ADVANCE_LIFECYCLE_MODE -ne 'governed' -and
         ($null -eq $manifest.executionPolicy.PSObject.Properties['findingsGateRequired'] -or
             -not [bool]$manifest.executionPolicy.findingsGateRequired)) {
         $issues.Add('taskLedgerRequired requires findingsGateRequired in the manifest.')
@@ -1154,7 +1487,8 @@ function Test-Lifecycle {
     if (-not [Guid]::TryParse([string]$state.processId, [ref]$processGuid)) {
         $issues.Add("State processId is not a valid GUID: $($state.processId).")
     }
-    if ($state.status -notin @('ready', 'partial', 'blocked', 'waiting_decision', 'completed')) {
+    $programmerControlled = Test-ProgrammerControlledWorkflow -Manifest $manifest
+    if ($state.status -notin @('ready', 'partial', 'blocked', 'waiting_decision', 'awaiting_programmer', 'completed')) {
         $issues.Add("Invalid lifecycle status: $($state.status).")
     }
     if ($null -eq $state.PSObject.Properties['cycleNumber'] -or [int]$state.cycleNumber -lt 1) {
@@ -1338,9 +1672,10 @@ function Test-Lifecycle {
         }
     }
 
+    $activeStatuses = $(if ($programmerControlled) { @('ready') } else { @('ready', 'partial', 'blocked') })
     $activePromptProperties = @(
         $state.prompts.PSObject.Properties |
-            Where-Object { $_.Value.status -in @('ready', 'partial', 'blocked') }
+            Where-Object { $_.Value.status -in $activeStatuses }
     )
     $hasCurrentPrompt = $null -ne $state.currentPrompt -and
         -not [string]::IsNullOrWhiteSpace([string]$state.currentPrompt)
@@ -1367,6 +1702,23 @@ function Test-Lifecycle {
         }
         if (@($state.blockers).Count -lt 1) {
             $issues.Add("$($state.status) lifecycle must contain at least one blocker.")
+        }
+    }
+    if ($state.status -eq 'awaiting_programmer') {
+        if (-not $programmerControlled) {
+            $issues.Add('awaiting_programmer requires the programmer-controlled workflow.')
+        }
+        if ($hasCurrentPrompt) {
+            $issues.Add('awaiting_programmer lifecycle cannot have a currentPrompt.')
+        }
+        if ([string]$state.nextAction -ne 'next | repeat | correct | skip_and_advance') {
+            $issues.Add("awaiting_programmer nextAction is invalid: '$($state.nextAction)'.")
+        }
+        if ($null -eq (Get-LastRecordedPromptId -State $state)) {
+            $issues.Add('awaiting_programmer lifecycle has no recorded prompt result.')
+        }
+        if (@($state.blockers).Count -gt 0) {
+            $issues.Add('awaiting_programmer lifecycle cannot retain lifecycle blockers.')
         }
     }
     if ($state.status -eq 'waiting_decision') {
@@ -1402,32 +1754,34 @@ function Test-Lifecycle {
         if (@($state.blockers).Count -gt 0) {
             $issues.Add('Completed lifecycle cannot retain blockers.')
         }
-        $g10CompletionState = Get-GateState -State $state -Id 'G10'
-        if ($g10CompletionState.status -ne 'passed') {
-            $issues.Add("Completed lifecycle requires G10 passed; found '$($g10CompletionState.status)'.")
-        }
-        if ((Get-PromptState -State $state -Id '73').status -ne 'completed') {
-            $issues.Add('Completed lifecycle requires prompt 73 completed.')
-        }
-        $unfinishedRequired = @(
-            $state.prompts.PSObject.Properties |
-                Where-Object {
-                    $_.Value.applicability -eq 'required' -and
-                    $_.Value.status -ne 'completed'
-                }
-        )
-        if ($unfinishedRequired.Count -gt 0) {
-            $issues.Add("Completed lifecycle has unfinished required prompts: $($unfinishedRequired.Name -join ', ').")
-        }
-        $unresolvedSelected = @(
-            $state.prompts.PSObject.Properties |
-                Where-Object {
-                    $_.Value.applicability -eq 'selected' -and
-                    $_.Value.status -notin @('completed', 'not_applicable')
-                }
-        )
-        if ($unresolvedSelected.Count -gt 0) {
-            $issues.Add("Completed lifecycle has unresolved selected prompts: $($unresolvedSelected.Name -join ', ').")
+        if (-not $programmerControlled) {
+            $g10CompletionState = Get-GateState -State $state -Id 'G10'
+            if ($g10CompletionState.status -ne 'passed') {
+                $issues.Add("Completed lifecycle requires G10 passed; found '$($g10CompletionState.status)'.")
+            }
+            if ((Get-PromptState -State $state -Id '73').status -ne 'completed') {
+                $issues.Add('Completed lifecycle requires prompt 73 completed.')
+            }
+            $unfinishedRequired = @(
+                $state.prompts.PSObject.Properties |
+                    Where-Object {
+                        $_.Value.applicability -eq 'required' -and
+                        $_.Value.status -ne 'completed'
+                    }
+            )
+            if ($unfinishedRequired.Count -gt 0) {
+                $issues.Add("Completed lifecycle has unfinished required prompts: $($unfinishedRequired.Name -join ', ').")
+            }
+            $unresolvedSelected = @(
+                $state.prompts.PSObject.Properties |
+                    Where-Object {
+                        $_.Value.applicability -eq 'selected' -and
+                        $_.Value.status -notin @('completed', 'not_applicable')
+                    }
+            )
+            if ($unresolvedSelected.Count -gt 0) {
+                $issues.Add("Completed lifecycle has unresolved selected prompts: $($unresolvedSelected.Name -join ', ').")
+            }
         }
     }
 
@@ -1556,7 +1910,7 @@ function Test-Lifecycle {
             $issues.Add($_.Exception.Message)
         }
     }
-    elseif ($state.status -notin @('waiting_decision', 'completed')) {
+    elseif ($state.status -notin @('waiting_decision', 'awaiting_programmer', 'completed')) {
         $issues.Add("Lifecycle has no current prompt but status is '$($state.status)'.")
     }
 
@@ -1741,6 +2095,7 @@ function New-LifecycleInstance {
         'CHANGE_CONTROL.md',
         'CLAUDE.md',
         'EXECUTION_CONTRACT.md',
+        'EVALUATION_IMPACT_MAP.json',
         'HELP_AND_ACADEMY.md',
         'IMPLEMENTATION_STATUS.md',
         'LIFECYCLE_GATE_EVIDENCE.json',
@@ -1850,6 +2205,7 @@ function New-LifecycleInstance {
         activeChange = $null
         currentStage = '01'
         currentPrompt = '01'
+        lastPrompt = $null
         nextAction = 'execute_prompt'
         activeWorkAttemptId = $null
         activeSlice = $null
@@ -2065,6 +2421,132 @@ if (-not (Test-Path -LiteralPath $ProcessRoot -PathType Container)) {
     throw "ProcessRoot does not exist: $ProcessRoot"
 }
 
+if ($Command -eq 'upgrade') {
+    if ((Get-PhysicalPath $ProcessRoot).Equals(
+        (Get-PhysicalPath $catalogRoot),
+        [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'upgrade requires an external lifecycle instance, not the catalog itself.'
+    }
+
+    $sourceManifest = Get-Manifest $catalogRoot
+    $targetManifest = Get-Manifest $ProcessRoot
+    $targetState = Get-State $ProcessRoot
+    if ($targetState.status -eq 'completed') {
+        throw 'upgrade does not mutate a completed lifecycle baseline.'
+    }
+    if ($null -ne (Get-ActiveWorkAttempt -State $targetState -AllowMissing)) {
+        throw "upgrade requires an idle lifecycle; active attempt '$($targetState.activeWorkAttemptId)' must finish first."
+    }
+    if ([string]$targetState.catalogVersion -ne [string]$targetManifest.catalogVersion) {
+        throw 'upgrade requires the existing state and manifest to match before migration.'
+    }
+    if ([string]$targetManifest.catalogVersion -eq [string]$sourceManifest.catalogVersion) {
+        $unchangedPacket = New-TaskPacket -Root $ProcessRoot -State $targetState -Manifest $targetManifest
+        Write-Host "PASS: lifecycle already uses catalog $($sourceManifest.catalogVersion)." -ForegroundColor Green
+        Write-Host " - Task packet: $unchangedPacket"
+        exit 0
+    }
+    Assert-CatalogEligibleForAutomaticUpgrade -Root $catalogRoot -Manifest $sourceManifest
+    if ((Compare-CatalogVersion `
+            -Left ([string]$sourceManifest.catalogVersion) `
+            -Right ([string]$targetManifest.catalogVersion)) -lt 0) {
+        throw "upgrade refuses to downgrade catalog $($targetManifest.catalogVersion) to $($sourceManifest.catalogVersion)."
+    }
+    if ([int]$targetManifest.promptCount -ne [int]$sourceManifest.promptCount -or
+        [int]$targetManifest.schemaVersion -ne [int]$sourceManifest.schemaVersion) {
+        throw 'upgrade requires an explicit migration because catalog schema or prompt count changed.'
+    }
+    $sourcePromptIds = @($sourceManifest.stages | ForEach-Object { @($_.promptIds) } | Sort-Object -Unique)
+    $targetPromptIds = @($targetState.prompts.PSObject.Properties.Name | Sort-Object -Unique)
+    if (($sourcePromptIds -join ',') -ne ($targetPromptIds -join ',')) {
+        throw 'upgrade requires an explicit migration because the prompt ID set changed.'
+    }
+
+    foreach ($directory in @('prompts', 'scripts', '.agents')) {
+        Copy-Item -LiteralPath (Join-Path $catalogRoot $directory) `
+            -Destination $ProcessRoot -Recurse -Force
+    }
+    foreach ($file in @(
+        'AGENTS.md',
+        'CHANGE_CONTROL.md',
+        'CLAUDE.md',
+        'EXECUTION_CONTRACT.md',
+        'EVALUATION_IMPACT_MAP.json',
+        'HELP_AND_ACADEMY.md',
+        'PILOT_APPROVAL.md',
+        'PRODUCT_EXCELLENCE.md',
+        'PROMPT_EVALUATION.md',
+        'QUALITY_GATES.md',
+        'PROCESS_MANIFEST.json',
+        'README.md',
+        'START_HERE.md',
+        'software-lifecycle.ps1'
+    )) {
+        Copy-Item -LiteralPath (Join-Path $catalogRoot $file) `
+            -Destination (Join-Path $ProcessRoot $file) -Force
+    }
+
+    $definitionPath = Join-Path $ProcessRoot 'PRODUCT_DEFINITION.md'
+    $definition = Get-Content -Raw -Encoding UTF8 -LiteralPath $definitionPath
+    $legacyDecision = '- `REWORK` — existem lacunas concretas que devem regressar aos prompts 01, 02 ou 03.'
+    $currentDecision = @'
+- `REWORK` — existem lacunas concretas; o prompt 04 permanece ativo quando
+  faltam evidência, viabilidade ou aprovação e só reabre 01, 02 ou 03 se a fonte
+  canónica desse prompt tiver de mudar.
+'@
+    if ($definition.Contains($legacyDecision)) {
+        $definition = $definition.Replace($legacyDecision, $currentDecision.TrimEnd())
+    }
+    $legacyRouting = @'
+1. mantém a decisão `REWORK` ou usa `NO-GO` quando a oportunidade tiver sido rejeitada;
+2. identifica exatamente o prompt 01, 02 ou 03 que deve ser repetido;
+3. regista o bloqueio em `IMPLEMENTATION_STATUS.md`;
+4. não inicia arquitetura, seleção de módulos, threat model técnico ou criação do projeto.
+'@
+    $currentRouting = @'
+1. mantém a decisão `REWORK` ou usa `NO-GO` quando a oportunidade tiver sido rejeitada;
+2. mantém o prompt 04 quando falta autorização, investigação/teste a executar
+   ou incorporar, orçamento, prazo, competências ou aprovação da versão;
+3. reabre exatamente o prompt 01, 02 ou 03 apenas quando for necessário alterar,
+   respetivamente, oportunidade/público, identidade ou requisitos;
+4. regista em `IMPLEMENTATION_STATUS.md` a ação mínima, owner, evidência esperada
+   e eventual prompt proprietário, sem tratar DOR-11/DOR-12 como causas para
+   repetir a descoberta;
+5. não inicia arquitetura, seleção de módulos, threat model técnico ou criação do projeto.
+'@
+    if ($definition.Contains($legacyRouting.TrimEnd())) {
+        $definition = $definition.Replace($legacyRouting.TrimEnd(), $currentRouting.TrimEnd())
+    }
+    [System.IO.File]::WriteAllText($definitionPath, $definition, $utf8NoBom)
+
+    $gateEvidencePath = Join-Path $ProcessRoot 'LIFECYCLE_GATE_EVIDENCE.json'
+    $gateEvidenceObject = Get-Content -Raw -Encoding UTF8 -LiteralPath $gateEvidencePath | ConvertFrom-Json
+    $gateEvidenceObject.catalogVersion = [string]$sourceManifest.catalogVersion
+    [System.IO.File]::WriteAllText(
+        $gateEvidencePath,
+        (($gateEvidenceObject | ConvertTo-Json -Depth 30) + [Environment]::NewLine),
+        $utf8NoBom)
+
+    $oldCatalogVersion = [string]$targetState.catalogVersion
+    $targetState.catalogVersion = [string]$sourceManifest.catalogVersion
+    Add-LifecycleHistoryAction -State $targetState `
+        -Action "catalog-upgrade:$oldCatalogVersion->$($sourceManifest.catalogVersion)" `
+        -Evidence 'canonical prompt catalog; product content and lifecycle results preserved'
+    Save-State -State $targetState -Root $ProcessRoot
+
+    $upgradedManifest = Get-Manifest $ProcessRoot
+    $upgradedState = Get-State $ProcessRoot
+    if (-not (Test-Lifecycle -Root $ProcessRoot)) {
+        throw 'Lifecycle upgrade copied the catalog but final validation failed.'
+    }
+    $upgradedPacket = New-TaskPacket -Root $ProcessRoot -State $upgradedState -Manifest $upgradedManifest
+    Write-Host "PASS: lifecycle upgraded from $oldCatalogVersion to $($sourceManifest.catalogVersion)." -ForegroundColor Green
+    Write-Host ' - Product content, prompt results, gates and attempts: preserved'
+    Write-Host ' - Embedded lifecycle routing rules: migrated when recognized'
+    Write-Host " - Task packet: $upgradedPacket"
+    exit 0
+}
+
 $manifest = Get-Manifest $ProcessRoot
 $state = Get-State $ProcessRoot
 
@@ -2238,6 +2720,7 @@ if ($Command -eq 'cycle-start') {
     $state.selectedOptionalPromptIds = @()
     $state.currentStage = '01'
     $state.currentPrompt = '01'
+    $state | Add-Member -NotePropertyName 'lastPrompt' -NotePropertyValue $null -Force
     $state.status = 'ready'
     $state.nextAction = 'execute_prompt'
     $state.blockers = @()
@@ -2510,6 +2993,21 @@ if ($Command -eq 'status') {
         Write-Host " - Out of scope: $($state.activeSlice.outOfScope)"
     }
     Write-Host "Next action: $($state.nextAction)"
+    if ($state.status -eq 'awaiting_programmer') {
+        $lastId = Get-LastRecordedPromptId -State $state
+        if ($null -ne $lastId) {
+            $lastPromptState = Get-PromptState -State $state -Id $lastId
+            Write-Host "Last prompt result: $lastId -> $($lastPromptState.status)"
+            if ($null -ne $lastPromptState.PSObject.Properties['summary']) {
+                Write-Host " - Summary: $($lastPromptState.summary)"
+            }
+            if ($null -ne $lastPromptState.PSObject.Properties['remainingWork'] -and
+                @($lastPromptState.remainingWork).Count -gt 0) {
+                Write-Host ' - Remaining implementation:'
+                @($lastPromptState.remainingWork) | ForEach-Object { Write-Host "   - $_" }
+            }
+        }
+    }
     Write-Host 'Gates:'
     foreach ($gate in $state.gates.PSObject.Properties) {
         Write-Host " - $($gate.Name): $($gate.Value.status)"
@@ -2520,6 +3018,10 @@ if ($Command -eq 'status') {
     }
     if ($state.status -eq 'ready') {
         Write-Host "Next command: .\software-lifecycle.ps1 next -ProcessRoot `"$ProcessRoot`""
+    }
+    elseif ($state.status -eq 'awaiting_programmer') {
+        Write-Host "Programmer choices: next | repeat | correct | skip and advance"
+        Write-Host "Next command: .\software-lifecycle.ps1 advance -ProcessRoot `"$ProcessRoot`""
     }
     elseif ($state.status -eq 'waiting_decision') {
         Write-Host "Decision required: $($state.nextAction)"
@@ -2573,6 +3075,148 @@ if ($Command -eq 'status') {
             Write-Host 'Vertical-slice fields: -SliceId <ID> -SliceKind <page|feature> -Surface <ssr|web|maui> -Requirements "<IDs>" -AcceptanceCriteria "<observable criteria>" -OutOfScope "<explicit exclusions>"'
         }
     }
+    exit 0
+}
+
+if ($Command -eq 'next' -and (Test-ProgrammerControlledWorkflow -Manifest $manifest) -and
+    [string]::IsNullOrWhiteSpace([string]$state.currentPrompt)) {
+    $Command = 'advance'
+}
+
+if ($Command -eq 'advance') {
+    if (-not (Test-ProgrammerControlledWorkflow -Manifest $manifest)) {
+        throw 'advance is available only in the programmer-controlled workflow.'
+    }
+    if (-not [string]::IsNullOrWhiteSpace([string]$state.currentPrompt)) {
+        throw "Prompt $($state.currentPrompt) is still active. Finish and record it before advancing."
+    }
+    if ($state.status -ne 'awaiting_programmer') {
+        throw "advance requires lifecycle status awaiting_programmer; found '$($state.status)'."
+    }
+    $lastId = Get-LastRecordedPromptId -State $state
+    if ($null -eq $lastId) {
+        throw 'No recorded prompt exists to advance from.'
+    }
+    $lastState = Get-PromptState -State $state -Id $lastId
+    $skippedIncomplete = $false
+    if ($lastState.status -in @('partial', 'blocked')) {
+        if (-not $AcceptIncomplete) {
+            Write-Host "CONFIRMATION REQUIRED: prompt $lastId is $($lastState.status)." -ForegroundColor Yellow
+            Write-Host ' - Missing implementation:'
+            @($lastState.remainingWork) | ForEach-Object { Write-Host "   - $_" }
+            Write-Host ' - Use skip and advance only after stating why the incomplete work is being accepted.'
+            Write-Host " - Command: .\software-lifecycle.ps1 advance -ProcessRoot `"$ProcessRoot`" -AcceptIncomplete -Objective `"<reason>`""
+            exit 0
+        }
+        Require-SafeText -Value $Objective -Label 'Objective'
+        $skippedIncomplete = $true
+    }
+
+    $nextNumber = [int]$lastId + 1
+    if ($nextNumber -gt [int]$manifest.promptCount) {
+        $state.status = 'completed'
+        $state.nextAction = 'none'
+        $state.blockers = @()
+        $incomplete = @(
+            $state.prompts.PSObject.Properties |
+                Where-Object { $_.Value.status -in @('partial', 'blocked', 'pending', 'ready') }
+        )
+        $state | Add-Member -NotePropertyName 'completion' `
+            -NotePropertyValue $(if ($incomplete.Count -eq 0) { 'complete' } else { 'with_gaps' }) -Force
+        Save-State -State $state -Root $ProcessRoot
+        Write-Host 'PROCESS FINISHED.' -ForegroundColor Green
+        Write-Host " - Completion: $($state.completion)"
+        Write-Host " - Prompts with pending or incomplete work: $($incomplete.Count)"
+        exit 0
+    }
+
+    $nextId = '{0:D2}' -f $nextNumber
+    $nextState = Get-PromptState -State $state -Id $nextId
+    $previousRuns = @(Get-PromptResultHistory -State $state -Id $nextId)
+    if ($previousRuns.Count -gt 0) {
+        if (-not $ConfirmRepeat) {
+            Write-PromptHistoryNotice -State $state -Id $nextId -PromptState $nextState
+            exit 0
+        }
+        Require-SafeText -Value $Objective -Label 'Objective'
+        $nextState | Add-Member -NotePropertyName 'rerunObjective' -NotePropertyValue $Objective -Force
+    }
+    Test-EntryGate -State $state -Manifest $manifest -NextId $nextId
+    Set-CurrentPrompt -State $state -Manifest $manifest -Id $nextId
+    $advanceAction = $(if ($skippedIncomplete) { "skip-incomplete-and-advance:$lastId->$nextId" } else { "advance:$lastId->$nextId" })
+    Add-LifecycleHistoryAction -State $state -Action $advanceAction `
+        -Evidence $(if ([string]::IsNullOrWhiteSpace($Objective)) { 'programmer requested next' } else { $Objective })
+    Save-State -State $state -Root $ProcessRoot
+    $freshState = Get-State $ProcessRoot
+    $packet = New-TaskPacket -Root $ProcessRoot -State $freshState -Manifest $manifest
+    Write-Host "READY: prompt $nextId prepared only after the programmer requested next." -ForegroundColor Green
+    Write-Host " - Task packet: $packet"
+    exit 0
+}
+
+if ($Command -in @('request', 'repeat')) {
+    if (-not (Test-ProgrammerControlledWorkflow -Manifest $manifest)) {
+        throw "$Command is available only in the programmer-controlled workflow."
+    }
+    $requestedId = Normalize-PromptId $PromptId
+    if ($null -eq $requestedId) {
+        if ($Command -eq 'repeat') {
+            $requestedId = Get-LastRecordedPromptId -State $state
+        }
+        if ($null -eq $requestedId) {
+            throw 'PromptId is required because no previous prompt result exists.'
+        }
+    }
+    if (-not [string]::IsNullOrWhiteSpace([string]$state.currentPrompt)) {
+        if ([string]$state.currentPrompt -eq $requestedId -and
+            @(Get-PromptResultHistory -State $state -Id $requestedId).Count -eq 0) {
+            if ([string]$state.initiativeMode -eq 'brownfield') {
+                $currentState = Get-PromptState -State $state -Id $requestedId
+                if (-not $ConfirmRepeat) {
+                    Write-PromptHistoryNotice -State $state -Id $requestedId -PromptState $currentState -BrownfieldOverlap
+                    exit 0
+                }
+                Require-SafeText -Value $Objective -Label 'Objective'
+                $currentState | Add-Member -NotePropertyName 'rerunObjective' -NotePropertyValue $Objective -Force
+                Add-LifecycleHistoryAction -State $state -Action "confirm-brownfield-prompt:$requestedId" -Evidence $Objective
+                Save-State -State $state -Root $ProcessRoot
+                $state = Get-State $ProcessRoot
+            }
+            $packet = New-TaskPacket -Root $ProcessRoot -State $state -Manifest $manifest
+            Write-Host "READY: prompt $requestedId is already prepared: $packet" -ForegroundColor Green
+            if ([string]$state.initiativeMode -eq 'brownfield') {
+                Write-Host " - Objective: $Objective"
+            }
+            exit 0
+        }
+        throw "Prompt $($state.currentPrompt) is active. Finish it before requesting prompt $requestedId."
+    }
+
+    $requestedState = Get-PromptState -State $state -Id $requestedId
+    $history = @(Get-PromptResultHistory -State $state -Id $requestedId)
+    $brownfieldOverlap = [string]$state.initiativeMode -eq 'brownfield'
+    $confirmationRequired = $history.Count -gt 0 -or $brownfieldOverlap -or $Command -eq 'repeat'
+    if ($confirmationRequired -and -not $ConfirmRepeat) {
+        Write-PromptHistoryNotice -State $state -Id $requestedId -PromptState $requestedState `
+            -BrownfieldOverlap:$brownfieldOverlap
+        exit 0
+    }
+    if ($confirmationRequired) {
+        Require-SafeText -Value $Objective -Label 'Objective'
+        $requestedState | Add-Member -NotePropertyName 'rerunObjective' -NotePropertyValue $Objective -Force
+    }
+    Test-EntryGate -State $state -Manifest $manifest -NextId $requestedId
+    Set-CurrentPrompt -State $state -Manifest $manifest -Id $requestedId
+    Add-LifecycleHistoryAction -State $state -Action "request:$requestedId" `
+        -Evidence $(if ([string]::IsNullOrWhiteSpace($Objective)) { 'programmer requested prompt' } else { $Objective })
+    Save-State -State $state -Root $ProcessRoot
+    $freshState = Get-State $ProcessRoot
+    $packet = New-TaskPacket -Root $ProcessRoot -State $freshState -Manifest $manifest
+    Write-Host "READY: prompt $requestedId prepared." -ForegroundColor Green
+    if ($confirmationRequired) {
+        Write-Host " - Rerun objective: $Objective"
+    }
+    Write-Host " - Task packet: $packet"
     exit 0
 }
 
@@ -2879,6 +3523,25 @@ if ($Command -eq 'record') {
         throw 'Result is required for record.'
     }
     Require-SafeText -Value $Evidence -Label 'Evidence'
+    $programmerControlled = Test-ProgrammerControlledWorkflow -Manifest $manifest
+    $normalizedRemainingWork = @()
+    if ($programmerControlled) {
+        Require-SafeText -Value $Summary -Label 'Summary'
+        $normalizedRemainingWork = @(
+            @($RemainingWork) |
+                Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } |
+                ForEach-Object {
+                    Require-SafeText -Value ([string]$_) -Label 'RemainingWork'
+                    ([string]$_).Trim()
+                }
+        )
+        if ($Result -in @('partial', 'blocked') -and $normalizedRemainingWork.Count -eq 0) {
+            throw "Result '$Result' requires at least one specific RemainingWork item."
+        }
+        if ($Result -in @('completed', 'not_applicable') -and $normalizedRemainingWork.Count -gt 0) {
+            throw "Result '$Result' cannot contain RemainingWork; use partial or blocked."
+        }
+    }
     if ($PromptId -ne [string]$state.currentPrompt) {
         throw "Out-of-order result: current prompt is $($state.currentPrompt), received $PromptId."
     }
@@ -2906,11 +3569,19 @@ if ($Command -eq 'record') {
             at = [DateTimeOffset]::Now.ToString('o')
             result = $Result
             evidence = $Evidence
+            summary = $Summary
+            remainingWork = @($normalizedRemainingWork)
         }
         $promptState.attempts = @($promptState.attempts) + @($attempt)
     }
     $promptState.status = $Result
     $promptState.evidence = $Evidence
+    if ($programmerControlled) {
+        $promptState | Add-Member -NotePropertyName 'summary' -NotePropertyValue $Summary -Force
+        $promptState | Add-Member -NotePropertyName 'remainingWork' -NotePropertyValue @($normalizedRemainingWork) -Force
+        $promptState | Add-Member -NotePropertyName 'finishedAt' `
+            -NotePropertyValue ([DateTimeOffset]::Now.ToString('o')) -Force
+    }
     if ($PromptId -in @('26', '28') -and $Result -eq 'completed' -and $null -ne $state.activeSlice) {
         $state.activeSlice.status = 'completed'
         $state.activeSlice | Add-Member -NotePropertyName 'completedAt' `
@@ -2997,7 +3668,7 @@ if ($Command -eq 'record') {
         Set-G09DeploymentSnapshot -State $state -Root $ProcessRoot
     }
 
-    if ($PromptId -eq '04' -and $Result -eq 'completed') {
+    if (-not $programmerControlled -and $PromptId -eq '04' -and $Result -eq 'completed') {
         $g01Definition = @($manifest.gates | Where-Object { $_.id -eq 'G01' })[0]
         Test-GatePrerequisites -State $state -GateDefinition $g01Definition
         Invoke-ProductDefinitionGate -Root $ProcessRoot
@@ -3014,8 +3685,33 @@ if ($Command -eq 'record') {
         result = $Result
         evidence = $Evidence
         nextPrompt = $NextPrompt
+        summary = $Summary
+        remainingWork = @($normalizedRemainingWork)
     }
     $state.history = @($state.history) + @($historyItem)
+
+    if ($programmerControlled) {
+        $state | Add-Member -NotePropertyName 'lastPrompt' -NotePropertyValue $PromptId -Force
+        $state.currentPrompt = $null
+        $state.status = 'awaiting_programmer'
+        $state.nextAction = 'next | repeat | correct | skip_and_advance'
+        $state.blockers = @()
+        Save-State -State $state -Root $ProcessRoot
+
+        $colour = $(if ($Result -eq 'completed') { 'Green' } else { 'Yellow' })
+        Write-Host "PROMPT $PromptId RESULT: $Result" -ForegroundColor $colour
+        Write-Host " - Summary: $Summary"
+        Write-Host " - Evidence: $Evidence"
+        if ($normalizedRemainingWork.Count -eq 0) {
+            Write-Host ' - Remaining implementation: none.'
+        }
+        else {
+            Write-Host ' - Remaining implementation:'
+            $normalizedRemainingWork | ForEach-Object { Write-Host "   - $_" }
+        }
+        Write-Host ' - Waiting for programmer: next | repeat | correct | skip and advance'
+        exit 0
+    }
 
     if ($Result -in @('blocked', 'partial')) {
         $state.status = $Result

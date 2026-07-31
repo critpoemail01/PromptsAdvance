@@ -38,6 +38,46 @@ Se `PRODUCT_DEFINITION.md` não existir, estiver vazio ou não for rastreável a
 - que métricas determinam continuar, corrigir ou parar;
 - quais são as limitações de orçamento, prazo e competências.
 
+## Triagem de pendências sem ciclo de prompts
+
+O prompt 04 é também o ponto de recolha das decisões mínimas necessárias para
+fechar o Gate A. Quando a auditoria encontrar uma lacuna, separa primeiro
+`evidência/decisão em falta` de `definição a alterar`:
+
+| Lacuna | Ação correta | Prompt atual |
+|---|---|---|
+| DOR-03/DOR-08 sem investigação ou teste direto | mantém `REWORK`, regista método, participantes, limiar, owner e caminho da evidência; pede autorização para o contacto/ensaio exato, ingestão de evidência já recolhida ou uma exceção limitada | 04 |
+| DOR-09 sem orçamento, horizonte ou competências | pede apenas teto/faixa de investimento, horizonte-alvo, capacidade/competências disponíveis e restrições duras; avalia a plausibilidade sem inventar estimativas | 04 |
+| DOR-12 sem aprovação | pede aprovação explícita da versão auditada apenas depois de DOR-01 a DOR-11 passarem | 04 |
+| Problema, público, oportunidade ou sinal de mudança material | reabre 01 apenas para corrigir essa definição, não para executar entrevistas nem recolher orçamento | 01 |
+| Nome de trabalho ou posicionamento inválido | reabre 02 | 02 |
+| Jornada, âmbito, requisitos, dados, permissões ou critérios de aceitação incompletos | reabre 03 | 03 |
+
+Enquanto faltar apenas autorização, execução externa, evidência a incorporar,
+viabilidade ou aprovação, conserva `currentPrompt = 04`, resultado `partial` ou
+`blocked` e `nextAction = resolve_current_prompt`. Não declares que é preciso
+“repetir o prompt 01” para entrevistar utilizadores, executar concierge/pilotos
+ou confirmar orçamento, prazo e equipa: essas ações contradizem o contrato de
+descoberta inicial e criam um ciclo impossível.
+
+Não contactes participantes, publiques um recrutamento, cries contas, compres
+incentivos nem executes um piloto externo sem alvo e autorização explícitos.
+Quando a autorização não existir, prepara localmente o guião/material e mostra
+uma decisão curta. Agrupa as perguntas numa única resposta e omite tudo o que já
+estiver confirmado:
+
+1. validação — `autorizo <método/público/alvo>`; `vou fornecer evidência`; ou
+   `quero avaliar uma exceção`;
+2. viabilidade — teto/faixa de investimento, horizonte-alvo e
+   equipa/competências disponíveis;
+3. aprovação — `aprovo a versão <versão>` apenas quando os restantes DOR
+   estiverem a passar.
+
+Evidência nova que apenas confirma a definição é incorporada e re-auditada no
+prompt 04. Só uma conclusão que altere materialmente a fonte canónica reabre o
+prompt proprietário 01, 02 ou 03; depois dessa correção, o lifecycle regressa
+ao prompt 04 para nova auditoria.
+
 ## Auditoria
 
 1. Confirma que os prompts 01, 02 e 03 estão registados em `IMPLEMENTATION_STATUS.md`, com estado, fontes, decisões e evidências.
@@ -117,7 +157,7 @@ Não transformes uma condição bloqueante em pressuposto para conseguir avança
 Produz exatamente uma destas decisões:
 
 - `GO` — a definição está aprovada, DOR-01 a DOR-12 passaram com evidência e a etapa 2 pode iniciar no prompt 05;
-- `REWORK` — existe uma oportunidade plausível, mas faltam elementos concretos; identifica os DOR falhados e manda repetir apenas os prompts 01, 02 ou 03 necessários;
+- `REWORK` — existe uma oportunidade plausível, mas faltam elementos concretos; mantém o prompt 04 para evidência, viabilidade ou aprovação em falta e só reabre 01, 02 ou 03 quando a respetiva definição tiver de mudar;
 - `NO-GO` — a oportunidade deixou de satisfazer os critérios de problema, procura, viabilidade, legalidade ou adequação.
 
 Só no caso `GO` atualiza:
@@ -140,7 +180,8 @@ Nos restantes casos mantém a etapa 2 `bloqueada`. Não executes o prompt 05 com
    - estado e evidência dos prompts 01–04;
    - resumo DOR-01 a DOR-12;
    - decisão do Gate A;
-   - bloqueios e prompt exato a repetir;
+   - bloqueios e ação mínima; indica um prompt anterior apenas quando a fonte
+     canónica desse prompt tiver realmente de mudar;
    - próximo lote, que só pode ser o prompt 05 quando a decisão for `GO`.
 4. Não marques o Gate B como iniciado.
 5. Depois de gravar todas as atualizações, executa:
@@ -179,6 +220,8 @@ Apresenta:
 - contagens reconciliadas de `APP/PAGE/FNC/RF-P/requisitos/AC` e lista exata de
   órfãos, duplicados ou divergências;
 - prompts que devem ser repetidos, quando aplicável;
+- quando o prompt 04 permanecer ativo, no máximo três decisões curtas que
+  desbloqueiam evidência, viabilidade e aprovação, sem repetir o relatório;
 - ficheiros atualizados;
 - áreas não verificáveis e riscos residuais;
 - próximo prompt autorizado ou confirmação de que a etapa 2 permanece bloqueada.

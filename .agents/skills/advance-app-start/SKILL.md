@@ -1,34 +1,24 @@
 ---
 name: advance-app-start
-description: Create and initialize a new greenfield Advance software initiative as an isolated gated lifecycle, then execute only discovery prompt 01. Use when Codex is asked to create, start, or initialize a brand-new Advance application or initiative. Do not use for an existing application, lifecycle, or filesystem project path; use advance-app-continue for those cases.
+description: Create and initialize a brand-new greenfield Advance initiative, execute only prompt 01, report its result, and wait for the programmer before moving to prompt 02. Use only when no application or lifecycle already exists.
 ---
 
 # Advance App Start
 
-Create the lifecycle instance first. Do not create the application repository,
-copy the boilerplate into an application, or skip product discovery and gates.
+Create an isolated lifecycle and execute only discovery prompt 01. The
+programmer controls every later transition.
 
-## Establish the inputs
+## Initialize
 
-1. Locate the nearest `PROCESS_MANIFEST.json` and `software-lifecycle.ps1` and
-   treat that directory as the catalog root.
+1. Locate the catalog `PROCESS_MANIFEST.json` and `software-lifecycle.ps1`.
 2. Read `AGENTS.md`, `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`,
-   `APP_CONTEXT.md`, `IMPLEMENTATION_STATUS.md`, and prompt 01 completely. Read
-   `HELP_AND_ACADEMY.md` when contextual help, task videos, or an Academy is in
-   the approved or proposed scope.
-3. Require the initiative name and product owner. Normalize a user-facing
-   initiative label such as `Minha App` to a safe lowercase slug such as
-   `minha-app`; report the normalization and do not present it as approved
-   product naming.
-4. Use the sibling `BoilerPlateAdvance` only when it exists. Otherwise require
-   its exact path. Never infer or create an external repository.
-5. If the request points to an existing application or lifecycle, stop this
-   workflow and use `$advance-app-continue`.
-
-## Initialize one isolated lifecycle
-
-Discover the available PowerShell executable and run the catalog script. On
-PowerShell 7 environments, use:
+   `APP_CONTEXT.md`, `IMPLEMENTATION_STATUS.md`, and prompt 01 completely.
+   Read `HELP_AND_ACADEMY.md` when contextual help, task videos, or an Academy
+   is in scope.
+3. Require an initiative name and owner; normalize only the filesystem slug.
+4. Use the existing sibling `BoilerPlateAdvance` or an exact supplied path.
+5. If an application or lifecycle already exists, stop and use
+   `$advance-app-continue`.
 
 ```powershell
 pwsh -NoProfile -File ./software-lifecycle.ps1 start `
@@ -37,41 +27,27 @@ pwsh -NoProfile -File ./software-lifecycle.ps1 start `
   -BoilerplatePath "/exact/path/BoilerPlateAdvance"
 ```
 
-Pass `-ProcessRoot` only when the user supplied or approved a different safe
-destination. Never initialize inside the catalog or boilerplate, overwrite an
-existing destination, or perform GitHub, commit, push, financial, destructive,
-or production actions.
+Never initialize inside the catalog or boilerplate and never overwrite an
+existing destination. Do not perform GitHub, commit, push, destructive,
+financial, store, or production actions without exact authorization.
 
-The initializer must create an isolated process, prepare `NEXT_TASK.md`, and
-leave the application repository uncreated until the gated lifecycle reaches
-the authorized creation prompt.
+## Execute prompt 01 only
 
-## Execute only prompt 01
+Run `status`, `validate`, and `next`; read the generated `NEXT_TASK.md`; then
+execute only prompt 01 with a plan and validation proportional to the work.
+The task ledger is optional for complex work, not a routine blocker.
 
-Use the process root returned by the initializer:
+Record an honest result:
 
 ```powershell
-pwsh -NoProfile -File ./software-lifecycle.ps1 status -ProcessRoot .
-pwsh -NoProfile -File ./software-lifecycle.ps1 validate -ProcessRoot .
-pwsh -NoProfile -File ./software-lifecycle.ps1 next -ProcessRoot .
+.\software-lifecycle.ps1 record -ProcessRoot . -PromptId 01 `
+  -Result completed -Evidence "PRODUCT_DEFINITION.md" `
+  -Summary "Idea, audience, problem, value and MVP are defined"
 ```
 
-Confirm that the current prompt is `01`, then:
+For `partial` or `blocked`, add each specific missing item with
+`-RemainingWork`. After recording, report result, achieved scope, missing work,
+evidence, and the choices `next`, `repeat`, `correct`, or `skip and advance`.
 
-1. Read `NEXT_TASK.md` and every document it requires.
-2. Start the durable task ledger with `software-lifecycle.ps1 work-start`.
-3. Execute only prompt 01, including its zero-input discovery behavior,
-   evidence requirements, and separated review requirement.
-4. Checkpoint goals, record verification, register accepted adversarial issues
-   with `finding-add`, resolve them only with evidence, and run `finding-gate`.
-5. Close out the attempt and use `software-lifecycle.ps1 record` with
-   `completed`, `partial`, or `blocked` according to the observed evidence.
-
-Do not execute prompt 02, approve Gate A, create the application repository, or
-cross an external-action boundary in the same task.
-
-## Deliver
-
-Report the normalized initiative slug, product owner, boilerplate path, process
-root, current stage and prompt, task-ledger evidence, validation results,
-findings, lifecycle result, blockers, and the next authorized action.
+Do not execute prompt 02 and do not prepare it until the programmer explicitly says
+`next`.

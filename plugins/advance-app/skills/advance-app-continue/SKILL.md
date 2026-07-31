@@ -1,6 +1,6 @@
 ---
 name: advance-app-continue
-description: Continue, adopt, validate, or recover an Advance application's complete gated lifecycle from any Codex project. Use when the user provides an existing application, lifecycle, or filesystem path and asks Codex to determine or execute the next authorized Advance prompt without skipping gates.
+description: Continue, adopt, validate, recover, request, or rerun an Advance application lifecycle from any Codex project, exactly one prompt at a time and under explicit programmer control.
 ---
 
 # Advance App Continue
@@ -29,6 +29,17 @@ current working directory. Do not search the entire filesystem.
    `<catalog>/.agents/skills/advance-app-continue/SKILL.md` completely.
 4. Follow that canonical skill and use the resolved catalog's
    `software-lifecycle.ps1` for application-path discovery or adoption.
+5. When an existing lifecycle uses an older compatible catalog, first confirm
+   that the source manifest is `stable` and `PILOT_APPROVAL.md` is approved for
+   the exact version, then use the
+   canonical `software-lifecycle.ps1 upgrade -ProcessRoot <lifecycle-root>`
+   before continuing. Do not overwrite product artefacts or edit lifecycle
+   state directly.
+
+The canonical skill reports every prompt result and remaining implementation,
+then waits for `next`, `repeat`, `correct`, or `skip and advance`. It inspects
+history or brownfield overlap and obtains a concrete objective before repeating
+a prompt.
 
 If neither a lifecycle root nor a valid catalog can be resolved, stop before
 changing files and ask for the exact lifecycle, application, or catalog path.

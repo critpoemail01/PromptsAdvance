@@ -9,10 +9,16 @@ Antes de executar qualquer tarefa:
    ainda não tiver lifecycle, usa `software-lifecycle.ps1 continue
    -ProjectPath <caminho>` para criar uma instância brownfield isolada; não
    executes `start` dentro da aplicação nem copies o boilerplate por cima.
-2. Lê integralmente o [EXECUTION_CONTRACT.md](EXECUTION_CONTRACT.md) e aplica-o como contrato comum de planeamento, autonomia, validação adversarial e entrega.
-3. Se a tarefa afetar produto, requisitos, marca, conteúdo, UI, UX, jornadas, emails, monetização ou retenção, lê integralmente o [PRODUCT_EXCELLENCE.md](PRODUCT_EXCELLENCE.md).
-4. Antes de qualquer tarefa da etapa 2 ou posterior, lê o [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md) e executa `scripts/Test-ProductDefinitionGate.ps1`. Só prossegue se o comando terminar com exit code 0, confirmando documento `aprovado`, Gate A `GO`, DOR-01 a DOR-12 e prompts 01–04 concluídos com evidência. Se falhar ou estiver ausente, não preenchas a lacuna dentro da tarefa seguinte: termina `bloqueado` e remete para o prompt 01, 02, 03 ou 04 aplicável.
-5. Antes de aprovar arquitetura, UI, implementação, hardening, release ou operação, lê [QUALITY_GATES.md](QUALITY_GATES.md) e aplica o gate correspondente do [PROCESS_MANIFEST.json](PROCESS_MANIFEST.json).
+2. Numa instância, usa a secção `Required context` de `NEXT_TASK.md` como
+   routing auditável e lê integralmente os documentos aí listados; os hashes
+   confirmam a versão usada. No catálogo canónico ou sem task packet, lê
+   integralmente o [EXECUTION_CONTRACT.md](EXECUTION_CONTRACT.md) e aplica-o
+   como contrato comum. Não carregues recursivamente todos os documentos apenas
+   por estarem ligados: abre os adicionais quando o prompt, uma decisão em falta
+   ou a superfície alterada os tornar materiais.
+3. Se a tarefa afetar produto, requisitos, marca, conteúdo, UI, UX, jornadas, emails, monetização ou retenção, o task packet deve incluir e o executor lê integralmente o [PRODUCT_EXCELLENCE.md](PRODUCT_EXCELLENCE.md).
+4. Antes de uma tarefa da etapa 2 ou posterior, lê o [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md) e executa `scripts/Test-ProductDefinitionGate.ps1` quando aplicável. Trata uma falha como diagnóstico e comunica o que falta; não bloqueies um `próximo` explícito salvo quando a lacuna tornar o objetivo tecnicamente impossível ou inseguro.
+5. Antes de avaliar arquitetura, UI, implementação, hardening, release ou operação, lê [QUALITY_GATES.md](QUALITY_GATES.md) e usa o gate correspondente como checklist de qualidade.
    Para G06–G10, atualiza e valida `LIFECYCLE_GATE_EVIDENCE.json`; texto livre em `GateEvidence` não substitui identidades, hashes, candidata, autorização ou artefactos exigidos.
 6. Para tarefas de produto ou experiência posteriores à descoberta, lê também o [PRODUCT_QUALITY_BASELINE.md](PRODUCT_QUALITY_BASELINE.md) e usa a versão aprovada como gate mensurável.
    Quando ajuda contextual, vídeos de utilização ou Academia estiverem em
@@ -20,20 +26,22 @@ Antes de executar qualquer tarefa:
    o perfil de produção, os limites de publicação e a Definition of Done.
 7. Lê o `APP_CONTEXT.md` quando existir e resolve apenas os valores necessários ao prompt atual.
 8. Lê o `IMPLEMENTATION_STATUS.md` quando existir para conhecer decisões, evidências, bloqueios e trabalho já concluído.
-9. Antes de concluir o Gate G03 ou depois de alterar materialmente este processo, lê e executa o `PROMPT_EVALUATION.md` numa cópia descartável. Exige `PILOT_APPROVAL.md` aprovado para a mesma `catalogVersion` e executa `scripts/Test-ImplementationReadinessGate.ps1`; uma revisão estática não aprova o piloto.
+9. Depois de alterar materialmente este processo, lê e executa a avaliação aplicável de `PROMPT_EVALUATION.md` numa cópia descartável. O piloto avalia o catálogo; não bloqueia o desenvolvimento local de uma aplicação.
 10. Lê os `AGENTS.md` ou `AGENTS.override.md` mais próximos dos ficheiros afetados. Regras locais mais específicas complementam estas instruções.
-11. Depois de existir uma definição aprovada, lê `CHANGE_CONTROL.md` antes de
-    alterar requisitos, arquitetura, contratos, baselines, segurança, operação
-    ou comportamento lançado. Numa instância concluída, inicia um novo ciclo
-    apenas com `software-lifecycle.ps1 cycle-start` e proposta `CHG` aprovada.
+11. Usa `CHANGE_CONTROL.md` para baselines de release aprovadas e comportamento
+    já lançado. Durante o desenvolvimento normal, atualiza a fonte canónica e a
+    rastreabilidade sem obrigar um novo ciclo formal.
 
-Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações: limita-te a identificar a falta e termina como `bloqueado`. Aplica o mesmo comportamento a uma tarefa de produto/experiência se `PRODUCT_EXCELLENCE.md` estiver ausente. A etapa 2 e todas as posteriores ficam bloqueadas se `PRODUCT_DEFINITION.md` estiver ausente, incompleto ou sem `GO`. Depois da descoberta, uma tarefa que altere uma experiência crítica fica igualmente bloqueada se `PRODUCT_QUALITY_BASELINE.md` estiver ausente ou sem critérios aprovados para essa superfície. Se outro ficheiro referenciado estiver ausente, não inventes o seu conteúdo; prossegue apenas quando a tarefa continuar segura e verificável.
+Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações. Aplica o mesmo comportamento a uma tarefa de produto/experiência se `PRODUCT_EXCELLENCE.md` estiver ausente. Para outros documentos em falta, não inventes conteúdo: regista a lacuna no resultado e bloqueia apenas quando ela impedir execução segura/verificável ou uma ação externa/release.
 
 ## Regras duradouras
 
 - Usa código, configuração executada, testes, documentação aprovada e decisões registadas como fontes de verdade.
 - Trata valores entre `[COLCHETES]` como entradas a resolver, não como texto decorativo.
 - Executa um único lote coerente por tarefa e mantém alterações fora do âmbito intactas.
+- Executa exatamente um prompt por tarefa. No fim, regista o resultado, resume
+  o que foi alcançado, lista tudo o que falta implementar e para. Só prepara
+  outro prompt depois de `próximo`, `repetir`, `corrigir` ou `ignorar e avançar`.
 - Preserva alterações locais e distingue falhas introduzidas pela tarefa de falhas preexistentes.
 - Não coloques segredos, credenciais, dados pessoais ou configuração privada em prompts, código, logs ou documentação versionada.
 - Não inventes comandos. Descobre e usa os comandos reais do repositório.
@@ -45,13 +53,12 @@ Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações: limita-te
 - Em alterações de UI, mantém acessibilidade automatizada contínua e regressão visual dos componentes/estados estáveis; baselines só mudam com revisão explícita.
 - Criar repositórios remotos, adicionar ou substituir `origin`, fazer commit/push e alterar regras do GitHub são ações externas: exige alvo exato e autorização explícita, verifica conflitos e nunca uses `force push`.
 - A candidata de produção exige revisão final independente, read-only e sobre commit/artefacto imutável. O revisor não corrige a própria candidata; findings regressam ao implementador e uma nova candidata exige nova revisão.
-- Quando existir uma instância do lifecycle, não alteres `currentPrompt`, gates ou estados diretamente para contornar validações. Regista cada resultado com `software-lifecycle.ps1 record` e evidência durável. Deixa as transições determinísticas ao orquestrador e usa `select` apenas nas decisões permitidas por `status`.
-- Feedback, métricas e findings não alteram diretamente a fonte canónica:
-  captura o delta e aplica o workflow de `CHANGE_CONTROL.md`.
-- Em cada prompt de uma instância, inicia o task ledger com
-  `software-lifecycle.ps1 work-start`, checkpointa goals e verificações, regista
-  findings aceites e fecha-os com evidência. `record completed` só é válido
-  depois do closeout da mesma tentativa e com zero findings abertos/bloqueados.
+- Quando existir uma instância do lifecycle, não alteres estados diretamente. Usa `record`, `advance`, `request` e `repeat`.
+- Antes de repetir um prompt ou aplicá-lo a uma aplicação existente, mostra o
+  histórico/evidência ou a sobreposição detetada, confirma se é para repetir e
+  exige o objetivo concreto da repetição.
+- Usa o task ledger, checkpoints e findings quando forem úteis para trabalho
+  complexo; não são um bloqueio obrigatório do desenvolvimento normal.
 
 ## Documentação específica da aplicação
 

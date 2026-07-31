@@ -1,6 +1,9 @@
 # Gates profissionais de qualidade
 
-Este documento define o mínimo observável para o processo declarar que uma aplicação está pronta para a etapa seguinte. Complementa os prompts; não substitui os critérios específicos, `PRODUCT_DEFINITION.md`, `PRODUCT_QUALITY_BASELINE.md` ou a evidência executável.
+Este documento define o mínimo observável para avaliar a prontidão. No fluxo
+padrão, G01–G08 e G10 são checklists consultivas: uma lacuna é reportada, não
+força a repetição nem impede um `próximo` explícito. Autorizações externas e G09
+release/produção continuam bloqueantes.
 
 Estados permitidos: `passou`, `falhou`, `não verificável` e `não aplicável com justificação`. Um critério bloqueante só passa com evidência ligada à versão atual.
 
@@ -56,12 +59,15 @@ Bloqueia quando um serviço, framework, provider ou módulo é escolhido sem req
 - contratos e primeira vertical slice selecionados;
 - task ledger e findings gate da versão atual exercitados no piloto, sem bypass
   de `record completed`;
-- piloto da versão atual sem falha crítica e com avaliação exigida;
+- canal e versão do manifesto identificados; `candidate` versus `stable`
+  controla a promoção/upgrade do catálogo, não o desenvolvimento local;
+- piloto da versão atual usado para avaliar o processo, sem bloquear a aplicação;
 - nenhuma vulnerabilidade crítica/alta aceite silenciosamente.
 
-Executa `scripts/Test-ImplementationReadinessGate.ps1`. O gate permanece
-bloqueado se `PILOT_APPROVAL.md` não indicar 15/15 na mesma `catalogVersion`,
-zero falhas críticas, avaliação humana e revisor separado.
+Executa `scripts/Test-ImplementationReadinessGate.ps1` para obter o diagnóstico.
+Uma falha lista evidência em falta; não impede o programador de continuar o
+desenvolvimento local. A promoção automática do catálogo para `stable` continua
+a exigir a avaliação de processo definida em `PILOT_APPROVAL.md`.
 
 ## G04 — Direção profissional da primeira slice
 
@@ -195,9 +201,9 @@ SHA e digest autorizados e exige smoke tests, rollback e critérios de aborto.
 ## Integridade
 
 - O executor faz revisão adversarial antes de concluir.
-- `record completed` exige objetivos concluídos, verificação observável,
-  autorrevisão adversarial registada e zero findings `open`/`blocked` na mesma
-  tentativa.
+- `record completed` exige que o objetivo do prompt esteja realmente satisfeito
+  e que não exista trabalho em falta; quando o ledger governado estiver ativo,
+  exige também o respetivo closeout.
 - “Independente” exige outra tarefa/revisor e separação comprovada.
 - Falha de ferramenta não equivale a sucesso; usa `não verificável`.
 - Aprovação não transita para outra versão, SHA, digest, baseline ou ambiente.

@@ -44,6 +44,7 @@ jobs:
         shell: powershell
         run: |
           .\scripts\Test-SoftwareLifecycle.ps1
+          .\scripts\Test-ProgrammerControlledLifecycle.ps1
 
   disposable-copy:
     name: Disposable-copy regression

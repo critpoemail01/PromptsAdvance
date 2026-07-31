@@ -1,12 +1,14 @@
 # Processo profissional de desenvolvimento com Codex
 
-Coleção de 73 prompts autónomos para criar, adotar, publicar e operar uma
-aplicação Advance. Iniciativas `greenfield` são derivadas do
-`BoilerPlateAdvance`; iniciativas `brownfield` ligam um processo isolado a uma
-aplicação existente sem copiar a base sobre ela. A ordem global é obrigatória
-para os gates, mas a implementação do produto é iterativa: depois da fundação,
-cada lote é uma pequena fatia vertical funcional, não uma fase extensa de
-layout ou backend isolado.
+Catálogo de prompts para criar, adotar, publicar e operar uma aplicação
+Advance. O fluxo padrão é controlado pelo programador: executa um prompt,
+apresenta o resultado e tudo o que falta implementar, e para. Só prepara outro
+prompt depois de `próximo`, `repetir`, `corrigir` ou `ignorar e avançar`.
+
+Iniciativas `greenfield` partem do `BoilerPlateAdvance`; iniciativas
+`brownfield` ligam um processo isolado à aplicação existente sem copiar a base
+por cima dela. Os 73 prompts ficam disponíveis como catálogo detalhado, mas não
+formam uma cadeia automática nem obrigam a executar trabalho que não se aplica.
 
 Este catálogo é deliberadamente opinativo para Advance/.NET, Bit, Blazor,
 MAUI, GitHub e o boilerplate indicado. Não é um lifecycle universal para todas
@@ -27,7 +29,7 @@ adicionando-os à aplicação existente apenas num lote explícito e sem colisõ
   invalidação de gates e novos ciclos depois da release;
 - [CLAUDE.md](CLAUDE.md): ponte mínima para Claude Code importar `AGENTS.md`;
 - [PRODUCT_EXCELLENCE.md](PRODUCT_EXCELLENCE.md): benchmark, crítica profissional e critérios de produto/UX;
-- [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md): definição aprovada e gate bloqueante entre as etapas 1 e 2;
+- [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md): definição e lacunas conhecidas do produto;
 - `DISCOVERY_RESEARCH.md`: evidência detalhada criada pelo prompt 01; a resposta
   conversacional conserva apenas a síntese necessária à decisão;
 - [PRODUCT_QUALITY_BASELINE.md](PRODUCT_QUALITY_BASELINE.md): baseline aprovada, rubrica visual e primeira fatia;
@@ -36,7 +38,8 @@ adicionando-os à aplicação existente apenas num lote explícito e sem colisõ
 - [APP_CONTEXT.md](APP_CONTEXT.md): valores da aplicação, fontes, confiança e autorizações por execução;
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md): requisitos, candidata, evidências, bloqueios e operação;
 - [LIFECYCLE_GATE_EVIDENCE.json](LIFECYCLE_GATE_EVIDENCE.json): evidência estruturada, identidades, candidata, attestation/proveniência, autorização e artefactos com SHA-256 para G06–G10;
-- [PILOT_APPROVAL.md](PILOT_APPROVAL.md): decisão bloqueante do piloto para a versão exata do catálogo;
+- [PILOT_APPROVAL.md](PILOT_APPROVAL.md): avaliação do próprio catálogo; não bloqueia o desenvolvimento local da aplicação;
+- [EVALUATION_IMPACT_MAP.json](EVALUATION_IMPACT_MAP.json): regressão dirigida por ficheiros alterados; a suite completa continua obrigatória para promoção a `stable`;
 - [PROMPT_EVALUATION.md](PROMPT_EVALUATION.md): avaliação piloto executável do próprio processo.
 - [pilot/README.md](pilot/README.md): runner, isolamento e casos reproduzíveis de `PILOT-001`.
 - [pilot/PILOT-001-EXECUTION.md](pilot/PILOT-001-EXECUTION.md): resultados, SHAs, consistência, pontuação provisória e limitações da execução atual.
@@ -45,7 +48,14 @@ Valores entre `[COLCHETES]` são entradas. Resolve-os por `APP_CONTEXT.md`, cód
 
 ## Como começar uma nova aplicação
 
-Usa preferencialmente [START_HERE.md](START_HERE.md) e as skills `$advance-app-start` e `$advance-app-continue`. A primeira cria uma instância isolada; a segunda valida o estado e executa apenas o próximo prompt autorizado.
+Usa [START_HERE.md](START_HERE.md) e as skills `$advance-app-start` e
+`$advance-app-continue`. A primeira cria uma instância isolada e executa apenas
+o prompt 01; a segunda executa apenas o prompt preparado e para no fim.
+
+O catálogo é publicado primeiro como `candidate`. Projetos existentes só
+recebem upgrade automático de uma versão `stable` cujo piloto esteja aprovado
+para a mesma `catalogVersion`; uma candidata pode ser exercitada em instâncias
+isoladas, mas nunca bloqueia silenciosamente uma aplicação existente.
 
 Para que as skills apareçam em todos os projetos, instala o catálogo como um
 plugin Codex, no mesmo modelo de um marketplace Git:
@@ -72,24 +82,14 @@ altera a árvore da aplicação, `.git`, histórico, alterações locais ou remo
 durante a inicialização. O prompt 07 executa a baseline de adoção; código
 existente só satisfaz requisitos e gates quando houver evidência verificável.
 
-1. Cria uma tarefa por prompt; não juntes os 73 prompts num único pedido.
-2. Executa 1–4 no workspace de preparação. Os prompts constroem progressivamente [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md), mas só o prompt 04 pode fechar o Gate A.
-3. Não executes o prompt 05 enquanto `PRODUCT_DEFINITION.md` não estiver `aprovado`, com decisão `GO`, DOR-01 a DOR-12 em `passou` e evidência da aprovação do responsável de produto.
-4. Executa 5–6 para definir arquitetura, módulos e threat model. Se a etapa 1 estiver incompleta, estes prompts devem terminar `bloqueado`, sem preencher as lacunas por inferência.
-5. No prompt 7, cria a aplicação numa pasta nova quando o modo for `greenfield`
-   ou captura a baseline/gaps do repositório existente quando for `brownfield`.
-   A adoção preserva Git e remotes. Apenas no modo greenfield, e quando
-   `[AUTORIZAR_CRIACAO_GITHUB_E_PUSH_INICIAL]` estiver explicitamente aprovado,
-   cria o repositório remoto autorizado, configura `origin` e confirma os SHAs.
-6. Executa o prompt 8 sobre o repositório novo ou adotado, usando a raiz
-   registada no lifecycle.
-7. Executa integralmente o piloto de [PROMPT_EVALUATION.md](PROMPT_EVALUATION.md) numa cópia Git descartável. Revisão documental não substitui este teste.
-8. Completa 9–12 e seleciona a primeira `[VERTICAL_SLICE_ATUAL]`.
-9. Implementa a fatia com backend mínimo e um dos pares 25/26 ou 27/28; aplica apenas o prompt visual 13, 15 ou 17 da superfície usada.
-10. Faz revisão humana de design e engenharia, valida usabilidade, acessibilidade e regressão visual da primeira fatia antes de propagar padrões.
-11. Repete o ciclo até todas as jornadas `Must` passarem. Só então executa 14, 16 ou 18 para fechar globalmente as superfícies aplicáveis.
-12. Conclui hardening, preparação operacional, documentação, aceitação e revisão independente. O prompt 64 só publica a candidata com o mesmo SHA/digest/attestation aprovado e com autorização de release explícita.
-13. Depois da publicação, executa 65–73 nas respetivas cadências.
+1. Cria uma tarefa por prompt.
+2. Executa o prompt atual, valida-o e regista um resultado honesto.
+3. Se ficar incompleto, lista concretamente o que falta implementar.
+4. Para e aguarda a decisão do programador.
+5. `próximo` avança; `repetir/corrigir` exige um objetivo; `ignorar e avançar`
+   conserva as lacunas e a razão.
+6. Numa aplicação existente, mostra histórico ou sobreposição antes de repetir.
+7. Mantém autorizações externas, Git e produção como limites bloqueantes.
 
 Para trabalho complexo ou ambíguo, usa Plan mode para refinar resultado, restrições, etapas e verificação; depois executa o plano. Para trabalho longo suportado pela interface, Goal mode pode manter a execução persistente. Nenhum modo amplia autorização para GitHub, produção, operações destrutivas ou custos.
 
@@ -101,15 +101,23 @@ Usa $advance-app-start. Inicia uma nova iniciativa chamada "nome-da-iniciativa",
 
 ## Gates do processo
 
+No fluxo padrão, estes gates são checklists de qualidade e prontidão. Uma falha
+aparece no resultado e em `Falta para terminar`, mas não impede o programador de
+pedir `próximo`. Só ações externas, destrutivas, financeiras, Git, lojas,
+release e produção mantêm bloqueios de autorização obrigatórios.
+
 ### Gate A — definição do produto
 
-Os prompts 1–4 constroem e auditam a definição. O Gate A só permite iniciar o
-prompt 05 quando `PRODUCT_DEFINITION.md` estiver `aprovado`, a decisão for `GO`,
+Os prompts 1–4 constroem e auditam a definição. O Gate A considera a definição
+pronta quando `PRODUCT_DEFINITION.md` estiver `aprovado`, a decisão for `GO`,
 DOR-01 a DOR-12 tiverem `passou`, existir evidência direta do problema e teste
 da solução com utilizadores representativos — ou exceção aprovada e limitada —
 e os prompts 01–04 estiverem concluídos em `IMPLEMENTATION_STATUS.md`. Se faltar
-qualquer critério, o prompt 04 decide `REWORK`, identifica o prompt a repetir e
-mantém a etapa 2 bloqueada.
+qualquer critério, o prompt 04 decide `REWORK`, permanece ativo para recolher
+evidência, viabilidade ou aprovação e só identifica um prompt anterior quando
+a respetiva fonte canónica tiver realmente de ser alterada. Não envia
+entrevistas, pilotos, orçamento ou equipa para o prompt 01 e mantém a etapa 2
+bloqueada.
 
 A passagem é também validada mecanicamente:
 
@@ -117,7 +125,9 @@ A passagem é também validada mecanicamente:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-ProductDefinitionGate.ps1
 ```
 
-Exit code 0 autoriza apenas o início da etapa 2; não aprova arquitetura, criação do repositório ou qualquer ação externa. Qualquer outro resultado mantém o processo bloqueado.
+Exit code 0 prova que o checklist passou; não aprova arquitetura, criação do
+repositório ou qualquer ação externa. Outro resultado identifica trabalho em
+falta e não força automaticamente a repetição do prompt.
 
 ### Gate B — criação ou adoção
 
@@ -128,10 +138,10 @@ alvo, autenticação e autorização explícitos; a adoção preserva o Git exis
 
 ### Gate C — implementação
 
-Permite 9–54 quando o repositório novo/adotado está ligado aos documentos
+Considera 9–54 prontos quando o repositório novo/adotado está ligado aos documentos
 obrigatórios, possui baseline Git, comandos reais confirmados, primeira fatia
-selecionada e piloto sem falhas críticas. `PILOT-001` pendente bloqueia este
-gate.
+selecionada. `PILOT-001` avalia o catálogo e não bloqueia a implementação local
+da aplicação.
 
 A passagem é validada por
 `scripts/Test-ImplementationReadinessGate.ps1`; texto livre em `GateEvidence`
@@ -159,7 +169,9 @@ janela e identidade autorizadora. A conclusão do prompt 64 volta a validar no
 mesmo ficheiro o ambiente/artefacto implantado, smoke tests, rollback e
 critérios de aborto.
 
-Um gate incompleto termina `bloqueado`; não se transforma silenciosamente num pressuposto ou exceção.
+Um gate incompleto é comunicado sem ser transformado silenciosamente em
+aprovação. O programador escolhe corrigir, repetir ou avançar com a lacuna
+registada; autorizações de release não podem ser ignoradas.
 
 ## Mudanças depois de uma release
 
@@ -212,7 +224,7 @@ Validação e navegação de uma instância:
 .\software-lifecycle.ps1 next -ProcessRoot C:\Caminho\Processo
 ```
 
-Cada prompt usa uma tentativa estruturada no próprio lifecycle:
+Para trabalho complexo, um prompt pode usar uma tentativa estruturada:
 
 ```powershell
 .\software-lifecycle.ps1 work-start -ProcessRoot C:\Caminho\Processo
@@ -225,11 +237,11 @@ Cada prompt usa uma tentativa estruturada no próprio lifecycle:
 .\software-lifecycle.ps1 finding-gate -ProcessRoot C:\Caminho\Processo
 ```
 
-Usa `finding-add` para cada problema aceite durante a revisão e
+Quando o ledger estiver em uso, usa `finding-add` para cada problema aceite durante a revisão e
 `finding-resolve` apenas depois da correção e de uma verificação com exit code
-zero. `record completed` falha sem goals concluídos, verificação, autorrevisão
-adversarial ou enquanto existir um finding aberto/bloqueado. `partial` e
-`blocked` continuam disponíveis para conservar um resultado honesto.
+zero. No fluxo governado legado, o closeout pode ser obrigatório. No fluxo
+padrão, `partial` e `blocked` conservam o resultado e `RemainingWork` sem prender
+o programador ao mesmo prompt.
 
 ## Ciclo de implementação por fatias verticais
 

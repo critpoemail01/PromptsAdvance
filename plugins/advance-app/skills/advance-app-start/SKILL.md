@@ -1,6 +1,6 @@
 ---
 name: advance-app-start
-description: Create and initialize a new greenfield Advance software initiative as an isolated gated lifecycle, then execute only discovery prompt 01. Use from any Codex project when the user asks to create, start, or initialize a brand-new Advance application or initiative. Do not use for an existing application or lifecycle; use advance-app-continue instead.
+description: Create a new greenfield Advance initiative from any Codex project, execute only prompt 01, report result and remaining work, then wait for the programmer. Do not use for an existing application or lifecycle; use advance-app-continue instead.
 ---
 
 # Advance App Start
