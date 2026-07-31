@@ -29,12 +29,18 @@ current working directory. Do not search the entire filesystem.
    `<catalog>/.agents/skills/advance-app-continue/SKILL.md` completely.
 4. Follow that canonical skill and use the resolved catalog's
    `software-lifecycle.ps1` for application-path discovery or adoption.
-5. When an existing lifecycle uses an older compatible catalog, first confirm
-   that the source manifest is `stable` and `PILOT_APPROVAL.md` is approved for
-   the exact version, then use the
-   canonical `software-lifecycle.ps1 upgrade -ProcessRoot <lifecycle-root>`
-   before continuing. Do not overwrite product artefacts or edit lifecycle
-   state directly.
+5. When an existing lifecycle uses an older compatible catalog, use the
+   canonical `software-lifecycle.ps1` as the migration entry point. Automatic
+   upgrades still require a `stable` source and exact approved pilot. If the
+   programmer explicitly requested continuation and the old embedded script
+   predates `advance`, that same request authorizes a controlled local
+   migration with `upgrade -ConfirmMigration -AcceptCandidateCatalog
+   -Objective "<continuation reason>"`, followed by `advance` in the migrated
+   instance. Do not ask for a duplicate confirmation, overwrite product
+   artefacts, edit lifecycle state directly, or treat a pending catalog pilot
+   as a blocker to local application development. Preserve and report all gaps.
+   External, destructive, Git, release, store, financial, and production
+   actions retain their specific authorization requirements.
 
 The canonical skill reports every prompt result and remaining implementation,
 then waits for `next`, `repeat`, `correct`, or `skip and advance`. It inspects

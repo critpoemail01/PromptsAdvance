@@ -87,6 +87,7 @@ $requiredScripts = @(
     'scripts/Test-LifecycleGateEvidence.ps1',
     'scripts/Test-ProductQualityGate.ps1',
     'scripts/Test-SoftwareLifecycle.ps1',
+    'scripts/Test-LifecycleMigration.ps1',
     'scripts/Test-ProcessInDisposableCopy.ps1',
     'scripts/Get-PromptEvaluationScope.ps1',
     'software-lifecycle.ps1'
@@ -345,14 +346,19 @@ Require-Pattern 'software-lifecycle.ps1' "Command -eq 'gate'" 'O lifecycle nao p
 Require-Pattern 'software-lifecycle.ps1' 'Test-GatePrerequisites' 'Os pre-requisitos declarados dos gates nao sao aplicados.'
 Require-Pattern 'software-lifecycle.ps1' 'Concurrent lifecycle update detected' 'O estado nao usa controlo de concorrencia otimista.'
 Require-Pattern 'software-lifecycle.ps1' 'State catalogVersion.*does not match manifest' 'A validacao nao deteta catalogVersion corrompida.'
-Require-Pattern 'software-lifecycle.ps1' '(?s)catalog-upgrade:.*Product content, prompt results, gates and attempts: preserved.*Embedded lifecycle routing rules' 'O lifecycle nao fornece upgrade controlado para instancias congeladas.'
-Require-Pattern 'software-lifecycle.ps1' '(?s)Compare-CatalogVersion.*refuses to downgrade.*prompt ID set changed' 'O upgrade nao impede downgrade ou mudanca silenciosa dos prompts.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)catalog-migration:.*Product content, prompt results, gates and attempts: preserved.*Embedded lifecycle routing rules' 'O lifecycle nao fornece migracao controlada para instancias congeladas.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)Compare-CatalogVersion.*refuses to downgrade.*refuses to remove prompt state or evidence' 'A migracao nao impede downgrade ou remocao silenciosa de prompts/evidencia.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)Assert-CatalogEligibleForAutomaticUpgrade.*releaseChannel.*stable.*PILOT_APPROVAL\.md.*15/15.*Human evaluator.*Independent reviewer' 'O upgrade nao exige canal stable e piloto aprovado para a versao exata.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)ConfirmMigration.*AcceptCandidateCatalog.*Merge-CatalogPromptsIntoState.*Convert-LegacyStateToProgrammerControlled.*awaiting_programmer' 'A migracao explicita nao preserva/expande o estado legado para o fluxo controlado.'
+Require-Pattern 'scripts/Test-LifecycleMigration.ps1' '(?s)legacyVersion.*prompt-04-partial.*controlled legacy migration.*preservedHistory.*skip-incomplete-and-advance:04->07' 'O teste de migracao nao prova preservacao de evidencia e avancar com gaps aceites.'
 Require-Pattern 'PROCESS_MANIFEST.json' '"releaseChannel"\s*:\s*"candidate"' 'O catalogo ainda nao distingue a candidata da versao stable.'
 Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"executionProfiles".*"fast".*"standard".*"deep".*"contextRouting"' 'O manifesto nao define perfis proporcionais e routing progressivo de contexto.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)(?=.*Execution profile:)(?=.*## Required context)(?=.*SHA-256)(?=.*execute only this prompt)(?=.*After recording, stop)' 'NEXT_TASK nao gera perfil, contexto auditavel e paragem obrigatoria.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'software-lifecycle\.ps1 upgrade.*lifecycle-root' 'A skill canonica nao atualiza instancias compativeis antes de continuar.'
-Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)source manifest is `stable`.*PILOT_APPROVAL\.md.*Candidate catalogs' 'A skill permite upgrade automatico de uma candidata nao aprovada.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)automatic lifecycle upgrade.*stable.*PILOT_APPROVAL\.md.*explicitly asks.*ConfirmMigration' 'A skill nao separa upgrade automatico estavel de migracao candidata explicitamente autorizada.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)old lifecycle must not trap.*ConfirmMigration.*AcceptCandidateCatalog.*do not ask for a second confirmation.*does not authorize external' 'A skill nao permite migrar uma instancia antiga depois da decisao explicita do programador.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '(?s)predates `advance`.*ConfirmMigration.*AcceptCandidateCatalog.*Do not ask for a duplicate confirmation' 'A skill global nao encaminha a migracao explicita de instancias antigas.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)ConfirmMigration.*AcceptCandidateCatalog.*Merge-CatalogPromptsIntoState.*Convert-LegacyStateToProgrammerControlled.*controlled migration' 'O lifecycle nao suporta a migracao explicita e conservadora para o fluxo controlado pelo programador.'
 Require-Pattern 'software-lifecycle.ps1' 'Assert-ApplicabilityDecisions' 'O routing nao bloqueia saidas com opcionais por decidir.'
 Require-Pattern 'software-lifecycle.ps1' 'AcceptanceCriteria' 'O lifecycle nao preserva criterios de aceitacao da slice.'
 Require-Pattern 'software-lifecycle.ps1' 'Required progress:' 'O estado nao distingue progresso obrigatorio de opcionais.'

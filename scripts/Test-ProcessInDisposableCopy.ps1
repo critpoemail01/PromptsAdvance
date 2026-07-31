@@ -99,6 +99,12 @@ try {
         throw 'Disposable programmer-controlled lifecycle test failed.'
     }
 
+    & $powerShellExe -NoProfile -ExecutionPolicy Bypass `
+        -File (Join-Path $catalogCopy 'scripts\Test-LifecycleMigration.ps1')
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Disposable lifecycle migration test failed.'
+    }
+
     $afterSha = [string]@(& git -C $catalogCopy rev-parse HEAD)[0]
     $afterStatus = @(& git -C $catalogCopy status --porcelain=v1)
     if ($beforeSha -ne $afterSha -or $afterStatus.Count -ne 0) {

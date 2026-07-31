@@ -123,10 +123,30 @@ The legacy governed profile may still use `work-start`, `checkpoint`,
 approval, and `software-lifecycle.ps1 record` closeout. Those controls are
 optional and are not the default application-development flow.
 
-For a compatible lifecycle upgrade, keep the existing safety rule: the source manifest is `stable` and `PILOT_APPROVAL.md` is approved for the exact version
-before running `software-lifecycle.ps1 upgrade -ProcessRoot <lifecycle-root>`.
-Candidate catalogs may be tested in isolation but never auto-upgrade an
-existing lifecycle.
+For a compatible automatic lifecycle upgrade, keep the existing safety rule:
+the source manifest is `stable` and `PILOT_APPROVAL.md` is approved for the
+exact version before running
+`software-lifecycle.ps1 upgrade -ProcessRoot <lifecycle-root>`.
+
+An old lifecycle must not trap an explicit programmer decision merely because
+its embedded script predates `advance`. When the programmer explicitly asks to
+continue or accepts incomplete work, use the canonical script to perform the
+controlled local migration, preserve history/evidence, and then advance:
+
+```powershell
+<canonical>/software-lifecycle.ps1 upgrade -ProcessRoot <lifecycle-root> `
+  -ConfirmMigration -AcceptCandidateCatalog `
+  -Objective "Programmer requested continuation with recorded gaps"
+<lifecycle-root>/software-lifecycle.ps1 advance -ProcessRoot <lifecycle-root> `
+  -AcceptIncomplete -Objective "Gaps accepted by the programmer for this iteration"
+```
+
+The programmer's explicit continuation request is the authorization for this
+local lifecycle migration; do not ask for a second confirmation and do not
+report the catalog pilot as an application-development blocker. Never rewrite
+state JSON by hand. Report the candidate status and preserved gaps honestly.
+This exception does not authorize external, destructive, Git, release, store,
+financial, or production actions.
 
 ## Deliver each prompt result
 

@@ -710,6 +710,16 @@ deltas rastreáveis e segue a ordem explícita do manifesto, incluindo o salto d
 prompts `not_selected`. EVAL-05, EVAL-06, EVAL-11, EVAL-15 e a suite completa
 devem ser repetidos; o piloto permanece pendente.
 
+Na `catalogVersion` `2026-07-31.15`, uma decisão explícita de continuar deixa
+de ficar presa numa instância cujo orquestrador incorporado antecede o comando
+`advance`. O catálogo canónico suporta uma migração local e explícita de uma
+candidata, preserva resultados/evidência, adiciona prompts sem remover estado e
+converte resultados incompletos antigos em `awaiting_programmer`; depois,
+`advance -AcceptIncomplete` conserva os gaps e prepara exatamente um prompt.
+O upgrade automático mantém o requisito `stable` + piloto aprovado, e os hard
+stops externos/release não mudam. EVAL-03, EVAL-04, EVAL-11, EVAL-12, EVAL-13
+e a suite completa devem ser repetidos; o piloto permanece pendente.
+
 ## Referências
 
 - https://developers.openai.com/api/docs/guides/evaluation-best-practices

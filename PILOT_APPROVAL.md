@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-31.14 |
+| Catalog version | 2026-07-31.15 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -216,3 +216,13 @@ estáveis; a ordem é definida pelo manifesto, e `advance` segue essa ordem
 saltando apenas prompts explicitamente `not_selected`. EVAL-05, EVAL-06,
 EVAL-11, EVAL-15 e a suite completa devem ser repetidos. O piloto permanece
 `pending` e o canal permanece `candidate`.
+
+A versão 2026-07-31.15 elimina o bloqueio de compatibilidade que impedia uma
+instância antiga de respeitar a decisão explícita do programador. O catálogo
+canónico pode agora migrar localmente uma instância antiga e candidata mediante
+essa autorização, adicionando apenas prompts novos, preservando histórico,
+evidência e lacunas, e convertendo o estado antigo para o fluxo controlado pelo
+programador. O upgrade automático continua reservado a catálogos `stable` com
+piloto aprovado; ações externas e de produção mantêm os respetivos hard stops.
+EVAL-03, EVAL-04, EVAL-11, EVAL-12, EVAL-13 e a suite completa devem ser
+repetidos. O piloto permanece `pending` e o canal permanece `candidate`.

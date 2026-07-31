@@ -24,6 +24,8 @@ param(
     [string]$Objective,
     [switch]$ConfirmRepeat,
     [switch]$AcceptIncomplete,
+    [switch]$ConfirmMigration,
+    [switch]$AcceptCandidateCatalog,
 
     [string]$GateId,
     [ValidateSet('passed', 'failed', 'pending')]
@@ -425,6 +427,154 @@ function Test-ProgrammerControlledWorkflow {
     return $null -ne $policy -and
         $null -ne $policy.PSObject.Properties['workflowMode'] -and
         [string]$policy.workflowMode -eq 'programmer_controlled'
+}
+
+function Get-CatalogPromptMetadata {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)]$Manifest,
+        [Parameter(Mandatory)][string]$Id
+    )
+
+    $file = Get-PromptFile -Root $Root -Id $Id
+    $stage = Get-PromptStage -Manifest $Manifest -Id $Id
+    $isConditional = $file.FullName -match '[\\/]Optional[\\/]'
+    if ($stage.PSObject.Properties.Name -contains 'conditionalPromptIds') {
+        $isConditional = $isConditional -or (@($stage.conditionalPromptIds) -contains $Id)
+    }
+    $title = (Get-Content -Encoding UTF8 -LiteralPath $file.FullName -TotalCount 1) -replace '^#\s*', ''
+    return [pscustomobject][ordered]@{
+        title = $title
+        path = $file.FullName.Substring($Root.Length + 1).Replace('\', '/')
+        stage = [string]$stage.id
+        applicability = $(if ($isConditional) { 'conditional' } else { 'required' })
+        initialStatus = $(if ($isConditional) { 'not_selected' } else { 'pending' })
+    }
+}
+
+function Merge-CatalogPromptsIntoState {
+    param(
+        [Parameter(Mandatory)]$State,
+        [Parameter(Mandatory)]$SourceManifest,
+        [Parameter(Mandatory)][string]$SourceRoot
+    )
+
+    $added = [System.Collections.Generic.List[string]]::new()
+    foreach ($id in @(Get-OrderedPromptIds -Manifest $SourceManifest)) {
+        $metadata = Get-CatalogPromptMetadata -Root $SourceRoot -Manifest $SourceManifest -Id $id
+        $existing = $State.prompts.PSObject.Properties[$id]
+        if ($null -eq $existing) {
+            $State.prompts | Add-Member -NotePropertyName $id -NotePropertyValue ([pscustomobject][ordered]@{
+                title = $metadata.title
+                path = $metadata.path
+                stage = $metadata.stage
+                applicability = $metadata.applicability
+                status = $metadata.initialStatus
+                evidence = $null
+                attempts = @()
+            })
+            $added.Add($id)
+            continue
+        }
+
+        $prompt = $existing.Value
+        $prompt | Add-Member -NotePropertyName 'title' -NotePropertyValue $metadata.title -Force
+        $prompt | Add-Member -NotePropertyName 'path' -NotePropertyValue $metadata.path -Force
+        $prompt | Add-Member -NotePropertyName 'stage' -NotePropertyValue $metadata.stage -Force
+        $hasHistory = @(Get-PromptResultHistory -State $State -Id $id).Count -gt 0
+        $hasEvidence = -not [string]::IsNullOrWhiteSpace([string]$prompt.evidence)
+        $hasAttempts = @($prompt.attempts).Count -gt 0
+        if (-not $hasHistory -and -not $hasEvidence -and -not $hasAttempts -and
+            [string]$prompt.status -in @('pending', 'not_selected')) {
+            $prompt.applicability = $metadata.applicability
+            $prompt.status = $metadata.initialStatus
+        }
+    }
+    return @($added)
+}
+
+function Remove-StaleCatalogPromptFiles {
+    param(
+        [Parameter(Mandatory)][string]$SourceRoot,
+        [Parameter(Mandatory)][string]$TargetRoot,
+        [Parameter(Mandatory)][string[]]$SourcePromptIds
+    )
+
+    $sourcePromptRoot = Join-Path $SourceRoot 'prompts'
+    $targetPromptRoot = Join-Path $TargetRoot 'prompts'
+    $sourceRelativePaths = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($file in @(Get-ChildItem -LiteralPath $sourcePromptRoot -Recurse -File -Filter '*.md')) {
+        [void]$sourceRelativePaths.Add(
+            $file.FullName.Substring($sourcePromptRoot.Length + 1).Replace('\', '/'))
+    }
+
+    $removed = [System.Collections.Generic.List[string]]::new()
+    foreach ($file in @(Get-ChildItem -LiteralPath $targetPromptRoot -Recurse -File -Filter '*.md')) {
+        $relativePath = $file.FullName.Substring($targetPromptRoot.Length + 1).Replace('\', '/')
+        if ($sourceRelativePaths.Contains($relativePath)) {
+            continue
+        }
+        if ($file.Name -notmatch '^(\d{2})-') {
+            throw "Migration refuses to delete unrecognized target prompt file: $relativePath"
+        }
+        $promptId = [string]$Matches[1]
+        if ($promptId -notin $SourcePromptIds) {
+            throw "Migration refuses to delete unrecognized target prompt file: $relativePath"
+        }
+        $replacementCount = @(Get-ChildItem -LiteralPath $sourcePromptRoot -Recurse -File -Filter "$promptId-*.md").Count
+        if ($replacementCount -ne 1) {
+            throw "Migration cannot prove one source replacement for stale prompt $relativePath."
+        }
+        Remove-Item -LiteralPath $file.FullName -Force
+        $removed.Add($relativePath)
+    }
+    return @($removed)
+}
+
+function Convert-LegacyStateToProgrammerControlled {
+    param(
+        [Parameter(Mandatory)]$State,
+        [Parameter(Mandatory)]$TargetManifest,
+        [Parameter(Mandatory)]$SourceManifest
+    )
+
+    if ((Test-ProgrammerControlledWorkflow -Manifest $TargetManifest) -or
+        -not (Test-ProgrammerControlledWorkflow -Manifest $SourceManifest)) {
+        return $false
+    }
+
+    if ([string]$State.status -in @('partial', 'blocked', 'waiting_decision')) {
+        $lastId = Get-LastRecordedPromptId -State $State
+        if ($null -eq $lastId) {
+            throw 'Legacy incomplete-state migration requires a recorded prompt result.'
+        }
+        $lastResult = @(Get-PromptResultHistory -State $State -Id $lastId)[-1]
+        $prompt = Get-PromptState -State $State -Id $lastId
+        $summary = $(if ($prompt.PSObject.Properties.Name -contains 'summary' -and
+            -not [string]::IsNullOrWhiteSpace([string]$prompt.summary)) {
+            [string]$prompt.summary
+        } elseif (-not [string]::IsNullOrWhiteSpace([string]$prompt.evidence)) {
+            [string]$prompt.evidence
+        } else {
+            "Prompt $lastId recorded as $($lastResult.result)."
+        })
+        $remaining = @($State.blockers | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
+        if ($remaining.Count -eq 0 -and [string]$lastResult.result -in @('partial', 'blocked')) {
+            $remaining = @("Resolve the recorded $($lastResult.result) work for prompt $lastId.")
+        }
+        $prompt | Add-Member -NotePropertyName 'summary' -NotePropertyValue $summary -Force
+        $prompt | Add-Member -NotePropertyName 'remainingWork' -NotePropertyValue @($remaining) -Force
+        $prompt | Add-Member -NotePropertyName 'finishedAt' -NotePropertyValue ([string]$lastResult.at) -Force
+        $State | Add-Member -NotePropertyName 'lastPrompt' -NotePropertyValue $lastId -Force
+        $State.currentPrompt = $null
+        $State.status = 'awaiting_programmer'
+        $State.nextAction = 'next | repeat | correct | skip_and_advance'
+        $State.blockers = @()
+        return $true
+    }
+
+    return $false
 }
 
 function Get-LastRecordedPromptId {
@@ -2462,27 +2612,68 @@ if ($Command -eq 'upgrade') {
     if ([string]$targetState.catalogVersion -ne [string]$targetManifest.catalogVersion) {
         throw 'upgrade requires the existing state and manifest to match before migration.'
     }
-    if ([string]$targetManifest.catalogVersion -eq [string]$sourceManifest.catalogVersion) {
-        $unchangedPacket = New-TaskPacket -Root $ProcessRoot -State $targetState -Manifest $targetManifest
+    $sameCatalogVersion = [string]$targetManifest.catalogVersion -eq [string]$sourceManifest.catalogVersion
+    if ($sameCatalogVersion -and -not $ConfirmMigration) {
+        $unchangedPacket = $(if (-not [string]::IsNullOrWhiteSpace([string]$targetState.currentPrompt)) {
+            New-TaskPacket -Root $ProcessRoot -State $targetState -Manifest $targetManifest
+        } else { $null })
         Write-Host "PASS: lifecycle already uses catalog $($sourceManifest.catalogVersion)." -ForegroundColor Green
-        Write-Host " - Task packet: $unchangedPacket"
+        if ($null -ne $unchangedPacket) {
+            Write-Host " - Task packet: $unchangedPacket"
+        }
+        else {
+            Write-Host " - Waiting for programmer: $($targetState.nextAction)"
+        }
         exit 0
     }
-    Assert-CatalogEligibleForAutomaticUpgrade -Root $catalogRoot -Manifest $sourceManifest
     if ((Compare-CatalogVersion `
             -Left ([string]$sourceManifest.catalogVersion) `
             -Right ([string]$targetManifest.catalogVersion)) -lt 0) {
         throw "upgrade refuses to downgrade catalog $($targetManifest.catalogVersion) to $($sourceManifest.catalogVersion)."
     }
-    if ([int]$targetManifest.promptCount -ne [int]$sourceManifest.promptCount -or
-        [int]$targetManifest.schemaVersion -ne [int]$sourceManifest.schemaVersion) {
-        throw 'upgrade requires an explicit migration because catalog schema or prompt count changed.'
+
+    $sourceChannel = $(if ($sourceManifest.PSObject.Properties.Name -contains 'releaseChannel') {
+        [string]$sourceManifest.releaseChannel
+    } else { 'candidate' })
+    $explicitMigration = $ConfirmMigration -and $AcceptCandidateCatalog
+    if ($sourceChannel -eq 'stable') {
+        Assert-CatalogEligibleForAutomaticUpgrade -Root $catalogRoot -Manifest $sourceManifest
+    }
+    elseif (-not $explicitMigration) {
+        throw "upgrade only accepts a stable catalog automatically; source $($sourceManifest.catalogVersion) is '$sourceChannel'. Use -ConfirmMigration -AcceptCandidateCatalog -Objective only after the programmer explicitly accepts a controlled candidate migration."
+    }
+    if ($ConfirmMigration) {
+        Require-SafeText -Value $Objective -Label 'Objective'
+    }
+
+    if ([int]$targetManifest.schemaVersion -ne [int]$sourceManifest.schemaVersion) {
+        throw 'upgrade does not support a schema-version change; provide a dedicated schema migrator.'
     }
     $sourcePromptIds = @($sourceManifest.stages | ForEach-Object { @($_.promptIds) } | Sort-Object -Unique)
     $targetPromptIds = @($targetState.prompts.PSObject.Properties.Name | Sort-Object -Unique)
-    if (($sourcePromptIds -join ',') -ne ($targetPromptIds -join ',')) {
-        throw 'upgrade requires an explicit migration because the prompt ID set changed.'
+    $removedPromptIds = @($targetPromptIds | Where-Object { $_ -notin $sourcePromptIds })
+    if ($removedPromptIds.Count -gt 0) {
+        throw "upgrade refuses to remove prompt state or evidence: $($removedPromptIds -join ', ')."
     }
+    $addedPromptIds = @($sourcePromptIds | Where-Object { $_ -notin $targetPromptIds })
+    if (($addedPromptIds.Count -gt 0 -or
+        [int]$targetManifest.promptCount -ne [int]$sourceManifest.promptCount) -and
+        -not $ConfirmMigration) {
+        throw 'upgrade requires -ConfirmMigration and an Objective because the prompt catalog expands.'
+    }
+    if ((Test-ProgrammerControlledWorkflow -Manifest $sourceManifest) -and
+        -not (Test-ProgrammerControlledWorkflow -Manifest $targetManifest) -and
+        -not $ConfirmMigration) {
+        throw 'upgrade requires -ConfirmMigration and an Objective because the workflow mode changes.'
+    }
+
+    $mergedPromptIds = @(Merge-CatalogPromptsIntoState `
+        -State $targetState -SourceManifest $sourceManifest -SourceRoot $catalogRoot)
+    $convertedWorkflow = Convert-LegacyStateToProgrammerControlled `
+        -State $targetState -TargetManifest $targetManifest -SourceManifest $sourceManifest
+
+    $removedStalePromptPaths = @(Remove-StaleCatalogPromptFiles `
+        -SourceRoot $catalogRoot -TargetRoot $ProcessRoot -SourcePromptIds $sourcePromptIds)
 
     foreach ($directory in @('prompts', 'scripts', '.agents')) {
         Copy-Item -LiteralPath (Join-Path $catalogRoot $directory) `
@@ -2552,8 +2743,16 @@ if ($Command -eq 'upgrade') {
     $oldCatalogVersion = [string]$targetState.catalogVersion
     $targetState.catalogVersion = [string]$sourceManifest.catalogVersion
     Add-LifecycleHistoryAction -State $targetState `
-        -Action "catalog-upgrade:$oldCatalogVersion->$($sourceManifest.catalogVersion)" `
-        -Evidence 'canonical prompt catalog; product content and lifecycle results preserved'
+        -Action $(if ($sameCatalogVersion) {
+            "catalog-migration-repair:$($sourceManifest.catalogVersion)"
+        } else {
+            "catalog-migration:$oldCatalogVersion->$($sourceManifest.catalogVersion)"
+        }) `
+        -Evidence $(if ($ConfirmMigration) {
+            "controlled migration; added prompts=$($mergedPromptIds -join ','); removed stale prompt paths=$($removedStalePromptPaths -join ','); programmer-controlled=$convertedWorkflow; objective=$Objective; product content, results, gates, attempts and evidence preserved"
+        } else {
+            'canonical prompt catalog; product content and lifecycle results preserved'
+        })
     Save-State -State $targetState -Root $ProcessRoot
 
     $upgradedManifest = Get-Manifest $ProcessRoot
@@ -2561,11 +2760,25 @@ if ($Command -eq 'upgrade') {
     if (-not (Test-Lifecycle -Root $ProcessRoot)) {
         throw 'Lifecycle upgrade copied the catalog but final validation failed.'
     }
-    $upgradedPacket = New-TaskPacket -Root $ProcessRoot -State $upgradedState -Manifest $upgradedManifest
-    Write-Host "PASS: lifecycle upgraded from $oldCatalogVersion to $($sourceManifest.catalogVersion)." -ForegroundColor Green
+    $upgradedPacket = $(if (-not [string]::IsNullOrWhiteSpace([string]$upgradedState.currentPrompt)) {
+        New-TaskPacket -Root $ProcessRoot -State $upgradedState -Manifest $upgradedManifest
+    } else { $null })
+    Write-Host $(if ($sameCatalogVersion) {
+        "PASS: lifecycle migration repaired at $($sourceManifest.catalogVersion)."
+    } else {
+        "PASS: lifecycle migrated from $oldCatalogVersion to $($sourceManifest.catalogVersion)."
+    }) -ForegroundColor Green
     Write-Host ' - Product content, prompt results, gates and attempts: preserved'
+    Write-Host " - Added prompt states: $(if ($mergedPromptIds.Count -eq 0) { 'none' } else { $mergedPromptIds -join ', ' })"
+    Write-Host " - Removed stale prompt paths: $(if ($removedStalePromptPaths.Count -eq 0) { 'none' } else { $removedStalePromptPaths -join ', ' })"
+    Write-Host " - Programmer-controlled waiting state: $convertedWorkflow"
     Write-Host ' - Embedded lifecycle routing rules: migrated when recognized'
-    Write-Host " - Task packet: $upgradedPacket"
+    if ($null -ne $upgradedPacket) {
+        Write-Host " - Task packet: $upgradedPacket"
+    }
+    else {
+        Write-Host " - Waiting for programmer: $($upgradedState.nextAction)"
+    }
     exit 0
 }
 

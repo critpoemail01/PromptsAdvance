@@ -45,6 +45,7 @@ jobs:
         run: |
           .\scripts\Test-SoftwareLifecycle.ps1
           .\scripts\Test-ProgrammerControlledLifecycle.ps1
+          .\scripts\Test-LifecycleMigration.ps1
 
   disposable-copy:
     name: Disposable-copy regression

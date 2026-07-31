@@ -204,6 +204,7 @@ bloqueio de `NextPrompt` arbitrário, G02/G03, seleção contextual de fatia e G
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-SoftwareLifecycle.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-LifecycleMigration.ps1
 ```
 
 Depois de alterar materialmente o catálogo, repete as duas verificações numa
