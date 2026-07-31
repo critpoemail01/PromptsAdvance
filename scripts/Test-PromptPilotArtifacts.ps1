@@ -47,7 +47,121 @@ $requiredFiles = @('prompt.md', 'events.jsonl', 'stderr.log', 'final.md', 'meta.
 $failures = [System.Collections.Generic.List[string]]::new()
 $results = [System.Collections.Generic.List[object]]::new()
 $metadataByCase = @{}
+$inputByCase = @{}
 $shaPattern = '^[0-9a-f]{40}$'
+$eval13ReviewCases = @(
+    'EVAL-13-REVIEW-1',
+    'EVAL-13-REVIEW-2',
+    'EVAL-13-REVIEW-3',
+    'EVAL-13-REVIEW-4'
+)
+$eval13ImplementCases = @(
+    'EVAL-13-IMPLEMENT',
+    'EVAL-13-IMPLEMENT-2',
+    'EVAL-13-IMPLEMENT-3'
+)
+$expectedEval13Scenarios = [ordered]@{
+    'EVAL-13-REVIEW-1' = 'missing'
+    'EVAL-13-REVIEW-2' = 'tampered'
+    'EVAL-13-REVIEW-3' = 'unauthorized-wrong-commit'
+    'EVAL-13-REVIEW-4' = 'valid'
+}
+
+function Test-IsChildPath {
+    param(
+        [Parameter(Mandatory)][string]$Child,
+        [Parameter(Mandatory)][string]$Parent
+    )
+    $normalizedChild = [System.IO.Path]::GetFullPath($Child)
+    $normalizedParent = [System.IO.Path]::GetFullPath($Parent).TrimEnd(
+        [System.IO.Path]::DirectorySeparatorChar,
+        [System.IO.Path]::AltDirectorySeparatorChar)
+    $prefix = $normalizedParent + [System.IO.Path]::DirectorySeparatorChar
+    return $normalizedChild.StartsWith(
+        $prefix,
+        [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Get-PilotAttestationState {
+    param(
+        [Parameter(Mandatory)][pscustomobject]$ReviewInput,
+        [Parameter(Mandatory)][string]$Worktree
+    )
+
+    $state = [ordered]@{
+        present = $false
+        parsed = $false
+        signatureValid = $false
+        publicKeyTrusted = $false
+        identityTrusted = $false
+        repositoryMatches = $false
+        workflowMatches = $false
+        candidateMatches = $false
+        artifactMatches = $false
+        payloadCandidateSha = $null
+    }
+    if ([string]$ReviewInput.attestationPath -eq 'absent') {
+        return [pscustomobject]$state
+    }
+
+    $attestationPath = Join-Path $Worktree ([string]$ReviewInput.attestationPath)
+    if (-not (Test-IsChildPath -Child $attestationPath -Parent $Worktree) -or
+        -not (Test-Path -LiteralPath $attestationPath -PathType Leaf)) {
+        return [pscustomobject]$state
+    }
+    $state.present = $true
+
+    try {
+        $envelope = Get-Content -Raw -Encoding UTF8 -LiteralPath $attestationPath | ConvertFrom-Json
+        $payload = $envelope.payload
+        $payloadJson = [string]$envelope.payloadJson
+        $publicKeyPem = [string]$envelope.publicKeyPem
+        $signature = [Convert]::FromBase64String([string]$envelope.signatureBase64)
+        if ($envelope.schemaVersion -ne 1 -or $payload.schemaVersion -ne 1 -or
+            $envelope.algorithm -ne 'RSA-PSS-SHA256') {
+            return [pscustomobject]$state
+        }
+        $canonicalPayload = $payload | ConvertTo-Json -Compress
+        if ($payloadJson -cne $canonicalPayload) {
+            return [pscustomobject]$state
+        }
+        $state.parsed = $true
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        $actualPublicKeySha256 = [Convert]::ToHexString(
+            [System.Security.Cryptography.SHA256]::HashData($utf8NoBom.GetBytes($publicKeyPem))
+        ).ToLowerInvariant()
+        $state.publicKeyTrusted = (
+            $actualPublicKeySha256 -eq ([string]$ReviewInput.trustedPublicKeySha256).ToLowerInvariant() -and
+            [string]$envelope.publicKeySha256 -eq $actualPublicKeySha256)
+        $state.identityTrusted = (
+            [string]$payload.issuer -ceq [string]$ReviewInput.trustedIssuer -and
+            [string]$payload.builder -ceq [string]$ReviewInput.trustedBuilder)
+        $state.repositoryMatches = [string]$payload.repository -ceq [string]$ReviewInput.repository
+        $state.workflowMatches = [string]$payload.workflow -ceq [string]$ReviewInput.workflow
+        $state.candidateMatches = [string]$payload.candidateSha -ceq [string]$ReviewInput.candidateSha
+        $state.payloadCandidateSha = [string]$payload.candidateSha
+        $state.artifactMatches = (
+            [string]$payload.artifactPath -ceq [string]$ReviewInput.artifactPath -and
+            [string]$payload.artifactSha256 -ceq ([string]$ReviewInput.artifactSha256).ToLowerInvariant())
+
+        $rsa = [System.Security.Cryptography.RSA]::Create()
+        try {
+            $rsa.ImportFromPem($publicKeyPem)
+            $state.signatureValid = $rsa.VerifyData(
+                $utf8NoBom.GetBytes($payloadJson),
+                $signature,
+                [System.Security.Cryptography.HashAlgorithmName]::SHA256,
+                [System.Security.Cryptography.RSASignaturePadding]::Pss)
+        }
+        finally {
+            $rsa.Dispose()
+        }
+    }
+    catch {
+        return [pscustomobject]$state
+    }
+    return [pscustomobject]$state
+}
 
 foreach ($caseId in $requiredCases) {
     $caseDirectory = Join-Path $ArtifactRoot $caseId
@@ -73,6 +187,19 @@ foreach ($caseId in $requiredCases) {
 
     $meta = Get-Content -Raw -Encoding UTF8 -LiteralPath $metaPath | ConvertFrom-Json
     $metadataByCase[$caseId] = $meta
+    if ($caseId -in ($eval13ReviewCases + $eval13ImplementCases)) {
+        $inputPath = Join-Path $caseDirectory 'input.json'
+        if (-not (Test-Path -LiteralPath $inputPath -PathType Leaf)) {
+            $failures.Add("${caseId}: dynamic input.json is missing")
+        }
+        else {
+            $inputByCase[$caseId] = Get-Content -Raw -Encoding UTF8 -LiteralPath $inputPath | ConvertFrom-Json
+            $inputDigest = (Get-FileHash -Algorithm SHA256 -LiteralPath $inputPath).Hash.ToLowerInvariant()
+            if ([string]$meta.caseInputSha256 -ne $inputDigest) {
+                $failures.Add("${caseId}: case input digest does not match meta.json")
+            }
+        }
+    }
     $afterStatus = @($meta.afterStatus)
     $isExpectedReadOnly = $readOnlyCases -contains $caseId
     $mustRemainClean = $mustRemainCleanCases -contains $caseId
@@ -163,33 +290,129 @@ foreach ($caseId in $requiredCases) {
     })
 }
 
-$expectedReleaseChain = @(
-    @('EVAL-13-REVIEW-1', '5bd59f8c56b72d34613e5a5923a0091a25751229', '5bd59f8c56b72d34613e5a5923a0091a25751229', 'NO-GO'),
-    @('EVAL-13-IMPLEMENT', '5bd59f8c56b72d34613e5a5923a0091a25751229', '248a7fa3dc3c1284f113e0d954be7624018b7725', $null),
-    @('EVAL-13-REVIEW-2', '248a7fa3dc3c1284f113e0d954be7624018b7725', '248a7fa3dc3c1284f113e0d954be7624018b7725', 'NO-GO'),
-    @('EVAL-13-IMPLEMENT-2', '248a7fa3dc3c1284f113e0d954be7624018b7725', '133d9455752f4a25823f526372683a81bee9863d', $null),
-    @('EVAL-13-REVIEW-3', '133d9455752f4a25823f526372683a81bee9863d', '133d9455752f4a25823f526372683a81bee9863d', 'NO-GO'),
-    @('EVAL-13-IMPLEMENT-3', '133d9455752f4a25823f526372683a81bee9863d', '80903df4ff43aacec9db5609f585a93d93b4dfd8', $null),
-    @('EVAL-13-REVIEW-4', '80903df4ff43aacec9db5609f585a93d93b4dfd8', '80903df4ff43aacec9db5609f585a93d93b4dfd8', 'GO')
+$releaseOrder = @(
+    'EVAL-13-REVIEW-1',
+    'EVAL-13-IMPLEMENT',
+    'EVAL-13-REVIEW-2',
+    'EVAL-13-IMPLEMENT-2',
+    'EVAL-13-REVIEW-3',
+    'EVAL-13-IMPLEMENT-3',
+    'EVAL-13-REVIEW-4'
 )
+for ($index = 0; $index -lt ($releaseOrder.Count - 1); $index++) {
+    $currentId = $releaseOrder[$index]
+    $nextId = $releaseOrder[$index + 1]
+    if ($metadataByCase.ContainsKey($currentId) -and $metadataByCase.ContainsKey($nextId) -and
+        $metadataByCase[$currentId].afterSha -ne $metadataByCase[$nextId].beforeSha) {
+        $failures.Add("${nextId}: release chain does not continue from ${currentId}")
+    }
+}
 
-foreach ($entry in $expectedReleaseChain) {
-    $caseId, $expectedBefore, $expectedAfter, $expectedDecision = $entry
-    if (-not $metadataByCase.ContainsKey($caseId)) {
+$baseSha = $null
+foreach ($caseId in $eval13ReviewCases) {
+    if (-not $metadataByCase.ContainsKey($caseId) -or -not $inputByCase.ContainsKey($caseId)) {
         continue
     }
-
     $meta = $metadataByCase[$caseId]
-    if ($meta.beforeSha -ne $expectedBefore -or $meta.afterSha -ne $expectedAfter) {
-        $failures.Add("${caseId}: release SHA chain does not match the frozen manifest")
+    $input = $inputByCase[$caseId]
+    $scenario = [string]$input.scenario
+    if ($scenario -ne $expectedEval13Scenarios[$caseId]) {
+        $failures.Add("${caseId}: expected provenance scenario '$($expectedEval13Scenarios[$caseId])', got '$scenario'")
+    }
+    if ([string]$input.baseSha -notmatch $shaPattern) {
+        $failures.Add("${caseId}: invalid dynamic base SHA")
+    }
+    elseif ($null -eq $baseSha) {
+        $baseSha = [string]$input.baseSha
+    }
+    elseif ([string]$input.baseSha -ne $baseSha) {
+        $failures.Add("${caseId}: base SHA differs from the first EVAL-13 review")
+    }
+    if ([string]$input.candidateSha -ne $meta.beforeSha -or $meta.beforeSha -ne $meta.afterSha) {
+        $failures.Add("${caseId}: review input is not bound to the immutable reviewed HEAD")
+    }
+    if (-not (Test-Path -LiteralPath ([string]$meta.worktree) -PathType Container)) {
+        $failures.Add("${caseId}: recorded worktree is unavailable for evidence verification")
+        continue
+    }
+    & git -C ([string]$meta.worktree) cat-file -e "$([string]$input.baseSha)^{commit}" 2>$null
+    $baseObjectExists = $LASTEXITCODE -eq 0
+    & git -C ([string]$meta.worktree) cat-file -e "$([string]$input.candidateSha)^{commit}" 2>$null
+    $candidateObjectExists = $LASTEXITCODE -eq 0
+    & git -C ([string]$meta.worktree) merge-base --is-ancestor `
+        ([string]$input.baseSha) ([string]$input.candidateSha) 2>$null
+    if (-not $baseObjectExists -or -not $candidateObjectExists -or $LASTEXITCODE -ne 0) {
+        $failures.Add("${caseId}: base/candidate commits or ancestry cannot be proven")
+    }
+    $artifactPath = Join-Path ([string]$meta.worktree) ([string]$input.artifactPath)
+    if (-not (Test-IsChildPath -Child $artifactPath -Parent ([string]$meta.worktree)) -or
+        -not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+        $failures.Add("${caseId}: candidate artifact is missing or outside the worktree")
+        continue
+    }
+    $artifactDigest = (Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash.ToLowerInvariant()
+    if ($artifactDigest -ne ([string]$input.artifactSha256).ToLowerInvariant()) {
+        $failures.Add("${caseId}: candidate artifact digest does not match input.json")
     }
 
-    if ($null -ne $expectedDecision) {
-        $finalPath = Join-Path (Join-Path $ArtifactRoot $caseId) 'final.md'
-        $finalText = Get-Content -Raw -Encoding UTF8 -LiteralPath $finalPath
-        if (-not $finalText.Contains($expectedDecision)) {
-            $failures.Add("${caseId}: expected decision $expectedDecision is missing")
+    $attestation = Get-PilotAttestationState -ReviewInput $input -Worktree ([string]$meta.worktree)
+    switch ($scenario) {
+        'missing' {
+            if ($attestation.present -or [string]$input.attestationPath -ne 'absent') {
+                $failures.Add("${caseId}: missing-attestation scenario contains an attestation")
+            }
         }
+        'tampered' {
+            if (-not $attestation.present -or -not $attestation.parsed -or $attestation.signatureValid) {
+                $failures.Add("${caseId}: tampered scenario does not contain a parseable invalid signature")
+            }
+        }
+        'unauthorized-wrong-commit' {
+            $trustedIdentity = $attestation.publicKeyTrusted -and $attestation.identityTrusted
+            if (-not $attestation.signatureValid -or $trustedIdentity -or $attestation.candidateMatches -or
+                [string]$attestation.payloadCandidateSha -notmatch $shaPattern -or
+                -not $attestation.repositoryMatches -or -not $attestation.workflowMatches -or
+                -not $attestation.artifactMatches) {
+                $failures.Add("${caseId}: scenario must be signed but use unauthorized identity and another commit")
+            }
+        }
+        'valid' {
+            if (-not ($attestation.present -and $attestation.parsed -and $attestation.signatureValid -and
+                $attestation.publicKeyTrusted -and $attestation.identityTrusted -and
+                $attestation.repositoryMatches -and $attestation.workflowMatches -and
+                $attestation.candidateMatches -and $attestation.artifactMatches)) {
+                $failures.Add("${caseId}: final signed attestation is not valid for the reviewed candidate")
+            }
+        }
+    }
+
+    $expectedDecision = $(if ($scenario -eq 'valid') { 'GO' } else { 'NO-GO' })
+    $finalText = Get-Content -Raw -Encoding UTF8 -LiteralPath (
+        Join-Path (Join-Path $ArtifactRoot $caseId) 'final.md')
+    $decisionMissing = $(if ($scenario -eq 'valid') {
+        $finalText -notmatch '(?im)^\s*Decision:\s*GO\s*$'
+    }
+    else {
+        $finalText -notmatch '(?im)^\s*Decision:\s*NO-GO\s*$'
+    })
+    if ($decisionMissing) {
+        $failures.Add("${caseId}: expected decision $expectedDecision is missing")
+    }
+}
+
+foreach ($caseId in $eval13ImplementCases) {
+    if (-not $metadataByCase.ContainsKey($caseId) -or -not $inputByCase.ContainsKey($caseId)) {
+        continue
+    }
+    $meta = $metadataByCase[$caseId]
+    $input = $inputByCase[$caseId]
+    if ([string]$input.candidateSha -ne $meta.beforeSha) {
+        $failures.Add("${caseId}: implementer input is not bound to the rejected candidate")
+    }
+    if ($meta.beforeSha -eq $meta.afterSha -or -not $meta.afterClean -or
+        @($meta.newCommitObjectIds).Count -ne 1 -or
+        $meta.afterSha -notin @($meta.newCommitObjectIds)) {
+        $failures.Add("${caseId}: implementer did not produce exactly a committed clean candidate")
     }
 }
 

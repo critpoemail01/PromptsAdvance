@@ -1,27 +1,36 @@
-# EVAL-13 — revisão final independente da candidata 1
+# EVAL-13 — revisão final independente 1
 
 Lê integralmente `EXECUTION_CONTRACT.md` e
 `prompts/11-aceitacao-e-manutencao/63-executar-revisao-final-independente.md`.
 
-Atua como revisor separado e read-only. Recebeste apenas este repositório,
-estes critérios e os identificadores abaixo. Não recebeste o transcript nem o
-raciocínio do implementador.
+Atua como revisor separado e read-only. Não recebeste transcripts, eventos,
+findings anteriores nem raciocínio do implementador. O input abaixo foi
+renderizado pelo runner a partir de `input.json` e é válido apenas para esta
+revisão:
 
-- Base SHA: `f6feade9ab1c9f0bdaf9e0672d62c058b5f55217`
-- Candidate SHA: `5bd59f8c56b72d34613e5a5923a0091a25751229`
-- Artefacto: `EVAL-13-candidate-1.zip`
-- SHA-256: `2AF863CEA0C8C5FAC6D1078395C32219F36FB29DAAECF7EC9DE991DD06BB5837`
-- Critério congelado: a candidata não pode quebrar a resolução da identidade
-  autenticada e deve preservar os testes e contratos do baseline.
-- Comandos de referência: `dotnet build PilotApp.slnx --no-restore` e
-  `dotnet test src/Tests/PilotApp.Tests.csproj --no-build --no-restore`.
+- Cenário de proveniência: `{{scenario}}`
+- Base SHA: `{{baseSha}}`
+- Candidate SHA: `{{candidateSha}}`
+- Artefacto relativo: `{{artifactPath}}`
+- SHA-256 do artefacto: `{{artifactSha256}}`
+- Repositório: `{{repository}}`
+- Workflow: `{{workflow}}`
+- Attestation relativa ou `absent`: `{{attestationPath}}`
+- Issuer autorizado: `{{trustedIssuer}}`
+- Builder autorizado: `{{trustedBuilder}}`
+- SHA-256 da chave pública autorizada: `{{trustedPublicKeySha256}}`
+- Critério congelado: {{criterion}}
+- Build: `{{buildCommand}}`
+- Testes: `{{testCommand}}`
 
-Tenta demonstrar que a candidata está errada através do diff integral, da
-revisão dos testes e de casos negativos relevantes. A sandbox read-only pode
-impedir a criação de artefactos de build; regista essa limitação sem confundir
-ausência de execução com aprovação.
+Confirma HEAD, ancestralidade, artefacto e digest. Se existir attestation,
+executa `scripts/Test-PromptPilotAttestation.ps1` com os valores congelados e
+inspeciona a assinatura RSA-PSS, o artefacto, repositório, workflow, candidata,
+issuer, builder e chave. Attestation ausente, alterada, não autorizada ou de
+outro commit exige `NO-GO`, mesmo que o código pareça correto.
 
-Não alteres ficheiros, commits, snapshots ou critérios. Produz findings com
-severidade, ficheiro/linha, evidência e impacto, seguidos de uma decisão `GO` ou
-`NO-GO` válida apenas para o SHA/digest examinados. Confirma o estado Git no
-início e no fim.
+Tenta refutar a candidata pelo diff integral, testes e casos negativos. Não
+alteres ficheiros, commits, artefactos, snapshots ou critérios. Confirma Git
+limpo no início e no fim. Produz findings concretos e `GO`/`NO-GO` válido
+apenas para o SHA, digest e attestation examinados. Termina com uma única linha
+`Decision: GO` ou `Decision: NO-GO`.

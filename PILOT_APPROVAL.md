@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-31.5 |
+| Catalog version | 2026-07-31.6 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -158,3 +158,14 @@ manual. A triagem pública de associação e as provas OVHcloud/RDAP permanecem;
 a validação jurídica formal passa para depois da decisão do nome de trabalho.
 Esta alteração material exige repetir EVAL-14 e a suite completa, com avaliação
 humana e revisão separada; o estado permanece `pending`.
+
+A versão 2026-07-31.6 corrige a infraestrutura que impedia iniciar o piloto no
+macOS: a baseline descartável passa a normalizar lockfiles e a validar o perfil
+`BoilerPlateAdvance.Web.slnf`, sem exigir workloads/signing MAUI num piloto Web.
+O EVAL-13 deixa de depender dos SHAs e paths da execução Windows histórica;
+inputs renderizados ligam a cadeia Git atual a artefactos locais e a uma
+attestation RSA-PSS verificável para repositório, workflow, candidate SHA,
+issuer, builder e chave autorizada. Os cenários ausente, adulterado, não
+autorizado/outro commit e válido são fail-closed. Esta correção permite repetir
+o piloto, mas não o aprova: suite completa, avaliação humana e revisão separada
+continuam pendentes.

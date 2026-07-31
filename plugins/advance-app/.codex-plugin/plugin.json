@@ -1,6 +1,6 @@
 {
   "name": "advance-app",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260731173912",
   "description": "Start, adopt, and continue gated Advance application lifecycles from any Codex project.",
   "author": {
     "name": "PromptsAdvance Maintainers",

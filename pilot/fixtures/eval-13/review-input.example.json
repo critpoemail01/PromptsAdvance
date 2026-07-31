@@ -1,0 +1,16 @@
+{
+  "scenario": "valid",
+  "baseSha": "BASE_SHA_FROM_CURRENT_DISPOSABLE_REPOSITORY",
+  "candidateSha": "CANDIDATE_SHA_FROM_CURRENT_DISPOSABLE_REPOSITORY",
+  "artifactPath": "artifacts/eval-13/candidate.zip",
+  "artifactSha256": "LOWERCASE_SHA256_FROM_CURRENT_ARTIFACT",
+  "repository": "local://advance-pilot",
+  "workflow": "pilot/eval-13",
+  "attestationPath": "artifacts/eval-13/attestation.json",
+  "trustedIssuer": "advance-pilot-issuer",
+  "trustedBuilder": "advance-pilot-builder",
+  "trustedPublicKeySha256": "LOWERCASE_SHA256_FROM_ATTESTATION_GENERATOR",
+  "criterion": "The seeded defect is fixed and the portable baseline remains intact.",
+  "buildCommand": "dotnet build BoilerPlateAdvance.Web.slnf --no-restore --nologo",
+  "testCommand": "dotnet test --project src/Tests/BoilerPlateAdvance.Tests.csproj --no-build --no-restore -v:q --no-progress --no-ansi"
+}

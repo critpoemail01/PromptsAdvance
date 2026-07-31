@@ -1,0 +1,6 @@
+{
+  "candidateSha": "REJECTED_CANDIDATE_SHA_FROM_CURRENT_DISPOSABLE_REPOSITORY",
+  "findings": "Copy only the accepted findings from the preceding independent final.md.",
+  "buildCommand": "dotnet build BoilerPlateAdvance.Web.slnf --no-restore --nologo",
+  "testCommand": "dotnet test --project src/Tests/BoilerPlateAdvance.Tests.csproj --no-build --no-restore -v:q --no-progress --no-ansi"
+}

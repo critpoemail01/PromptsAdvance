@@ -8,7 +8,8 @@ param(
     [Parameter(Mandatory)][string]$ArtifactRoot,
     [ValidateSet('read-only', 'workspace-write', 'danger-full-access')][string]$Sandbox = 'workspace-write',
     [switch]$AllowDangerFullAccess,
-    [string]$IsolationRoot
+    [string]$IsolationRoot,
+    [string]$CaseInputFile
 )
 
 Set-StrictMode -Version Latest
@@ -58,6 +59,18 @@ foreach ($path in @($CodexPath, $Worktree, $PromptFile)) {
     }
 }
 
+$caseInput = $null
+if (-not [string]::IsNullOrWhiteSpace($CaseInputFile)) {
+    if (-not (Test-Path -LiteralPath $CaseInputFile -PathType Leaf)) {
+        throw "Case input file does not exist: $CaseInputFile"
+    }
+    $CaseInputFile = [System.IO.Path]::GetFullPath($CaseInputFile)
+    $caseInput = Get-Content -Raw -Encoding UTF8 -LiteralPath $CaseInputFile | ConvertFrom-Json
+    if ($caseInput -isnot [pscustomobject]) {
+        throw 'Case input must be a JSON object.'
+    }
+}
+
 $resolvedWorktree = [System.IO.Path]::GetFullPath($Worktree).TrimEnd(
     [System.IO.Path]::DirectorySeparatorChar,
     [System.IO.Path]::AltDirectorySeparatorChar)
@@ -104,8 +117,29 @@ $stderrPath = Join-Path $caseDirectory 'stderr.log'
 $finalPath = Join-Path $caseDirectory 'final.md'
 $metaPath = Join-Path $caseDirectory 'meta.json'
 $promptCopyPath = Join-Path $caseDirectory 'prompt.md'
+$inputCopyPath = Join-Path $caseDirectory 'input.json'
 
-Copy-Item -LiteralPath $PromptFile -Destination $promptCopyPath
+$prompt = Get-Content -Raw -Encoding UTF8 -LiteralPath $PromptFile
+if ($null -ne $caseInput) {
+    foreach ($property in $caseInput.PSObject.Properties) {
+        if ($null -eq $property.Value -or
+            $property.Value -is [pscustomobject] -or
+            ($property.Value -is [System.Collections.IEnumerable] -and
+             $property.Value -isnot [string])) {
+            throw "Case input '$($property.Name)' must be a non-null scalar value."
+        }
+        $token = '{{' + $property.Name + '}}'
+        $prompt = $prompt.Replace($token, [string]$property.Value)
+    }
+    if ($prompt -match '\{\{[A-Za-z][A-Za-z0-9]*\}\}') {
+        throw "Rendered prompt still contains unresolved token: $($Matches[0])"
+    }
+    $caseInput | ConvertTo-Json -Depth 8 | Set-Content -Encoding UTF8 -LiteralPath $inputCopyPath
+}
+elseif ($prompt -match '\{\{[A-Za-z][A-Za-z0-9]*\}\}') {
+    throw "Prompt requires -CaseInputFile; unresolved token: $($Matches[0])"
+}
+$prompt | Set-Content -Encoding UTF8 -LiteralPath $promptCopyPath
 
 $startedAt = [DateTimeOffset]::Now
 $arguments = @(
@@ -121,7 +155,6 @@ $arguments = @(
     '-'
 )
 
-$prompt = Get-Content -Raw -Encoding UTF8 -LiteralPath $PromptFile
 $previousErrorActionPreference = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
 $prompt | & $CodexPath @arguments 2> $stderrPath | Set-Content -Encoding UTF8 -LiteralPath $eventsPath
@@ -168,6 +201,10 @@ $metadata = [ordered]@{
     isolationRoot = $resolvedIsolationRoot
     worktree = $resolvedWorktree
     promptFile = [System.IO.Path]::GetFullPath($PromptFile)
+    caseInputFile = $(if ($null -eq $caseInput) { $null } else { $CaseInputFile })
+    caseInputSha256 = $(if ($null -eq $caseInput) { $null } else {
+        (Get-FileHash -Algorithm SHA256 -LiteralPath $inputCopyPath).Hash.ToLowerInvariant()
+    })
     exitCode = $exitCode
     beforeSha = $beforeSha
     afterSha = $afterSha

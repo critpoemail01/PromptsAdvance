@@ -593,6 +593,18 @@ intervenção manual; a validação jurídica formal fica explicitamente posteri
 reintrodução dessa pausa. A validação estrutural não substitui a repetição de
 EVAL-14, da suite completa, da avaliação humana e da revisão separada.
 
+Na `catalogVersion` `2026-07-31.6`, o pre-check cria e valida uma baseline Web
+portátil com lockfiles normalizados, build e testes completos do perfil
+`BoilerPlateAdvance.Web.slnf`; MAUI só é exigido quando o caso avalia mobile.
+O runner renderiza inputs EVAL-13 atuais e conserva o respetivo digest. A cadeia
+de revisão deixa de usar SHAs, paths e artefactos históricos e passa a verificar
+assinatura RSA-PSS, chave autorizada, issuer, builder, repositório, workflow,
+candidate SHA e digest do artefacto. EVAL-13 deve provar `NO-GO` para attestation
+ausente, adulterada e simultaneamente não autorizada/de outro commit, seguido de
+`GO` apenas para evidência válida. A validação estrutural e os testes do harness
+não substituem a repetição dos 15 casos, avaliação humana e revisão separada;
+`PILOT_APPROVAL.md` permanece `pending`.
+
 ## Referências
 
 - https://developers.openai.com/api/docs/guides/evaluation-best-practices

@@ -4,8 +4,13 @@ Este diretório contém instruções executáveis para a avaliação definida em
 
 ## Isolamento
 
-- Gera uma aplicação descartável através do template `bit-app-base`.
-- Confirma restore, build, testes e commit-base limpo.
+- Cria uma baseline descartável com `scripts/New-PromptPilotBaseline.ps1` a
+  partir do `BoilerPlateAdvance` atual; o script regista o SHA/estado da origem,
+  normaliza lockfiles, executa o perfil Web e cria um commit-base limpo.
+- Confirma a baseline com `scripts/Test-PromptPilotBaseline.ps1` antes de
+  EVAL-01. O pre-check usa `BoilerPlateAdvance.Web.slnf`, não a solução completa:
+  MAUI/Android/iOS só entram num piloto específico de mobile com workloads e
+  signing disponíveis.
 - Usa um worktree ou clone limpo por caso e por repetição.
 - Executa cada caso com uma nova sessão `codex exec --ephemeral`.
 - Usa `--ignore-user-config`, sandbox mínimo e nenhuma credencial de produção.
@@ -43,10 +48,27 @@ continuam em `read-only`.
 
 Antes de EVAL-13, confirma também que o revisor read-only consegue ler o
 artefacto e recalcular o SHA-256. Mantém o artefacto num caminho local à
-worktree. Se comandos diretos de hashing forem bloqueados, inclui na candidata
-um verificador mínimo e auditável, executado pelo próprio revisor, que falhe
-quando o ficheiro faltar ou o digest divergir. Sem cálculo independente não há
-`GO`.
+worktree. Gera a attestation com `scripts/New-PromptPilotAttestation.ps1` fora
+da tarefa do implementador e valida-a com
+`scripts/Test-PromptPilotAttestation.ps1`. O verificador liga assinatura RSA,
+chave autorizada, issuer, builder, repositório, workflow, candidate SHA e
+digest do artefacto. Sem esta verificação independente não há `GO`.
+
+## Baseline portátil
+
+```powershell
+pwsh -NoProfile -File .\scripts\New-PromptPilotBaseline.ps1 `
+  -SourcePath <BoilerPlateAdvance> `
+  -DestinationPath <raiz-isolada>/repos/PilotApp
+
+pwsh -NoProfile -File .\scripts\Test-PromptPilotBaseline.ps1 `
+  -ProjectPath <raiz-isolada>/repos/PilotApp
+```
+
+O primeiro comando cria um novo destino e nunca substitui uma execução
+anterior. `PILOT_BASELINE.json` conserva a proveniência da snapshot e os
+comandos usados. Warnings e vulnerabilidades preexistentes continuam a ser
+registados e avaliados; excluir MAUI do perfil Web não os transforma em passes.
 
 Exemplo do fallback isolado para um caso que precisa de escrever:
 
@@ -83,6 +105,42 @@ e ainda qualidade e atualidade das fontes, coerência do scoring, sensibilidade,
 separação da revisão e ausência de métricas inventadas.
 
 O runner falha se a worktree não começar limpa. Cada diretório de evidência é imutável por convenção; uma repetição usa um novo identificador.
+
+## Cadeia dinâmica de EVAL-13
+
+Os casos EVAL-13 já não contêm SHAs, paths ou digests de uma máquina histórica.
+Cria um `input.json` por execução a partir dos exemplos em
+`pilot/fixtures/eval-13/` e passa-o ao runner com `-CaseInputFile`. O runner
+renderiza o prompt, rejeita tokens em falta e grava o digest do input no
+`meta.json`.
+
+As quatro revisões exercitam, por esta ordem, `missing`, `tampered`,
+`unauthorized-wrong-commit` e `valid`. Entre revisões, o implementador recebe
+apenas os findings aceites da execução anterior e cria uma nova candidata. A
+attestation é criada fora da tarefa do implementador:
+
+```powershell
+pwsh -NoProfile -File .\scripts\New-PromptPilotSigningKey.ps1 `
+  -OutputDirectory <raiz-isolada-fora-das-worktrees>/eval-13-signing-key
+
+pwsh -NoProfile -File .\scripts\New-PromptPilotAttestation.ps1 `
+  -Worktree <worktree-da-candidata> `
+  -ArtifactPath <artefacto-local> `
+  -OutputPath <caminho-ignorado-na-worktree>/attestation.json `
+  -RepositoryIdentity local://advance-pilot `
+  -WorkflowIdentity pilot/eval-13 `
+  -Issuer advance-pilot-issuer `
+  -Builder advance-pilot-builder `
+  -PrivateKeyPath <raiz-isolada-fora-das-worktrees>/eval-13-signing-key/private-key.pem
+```
+
+Congela o digest da chave pública antes da primeira candidata e usa-o em todas
+as revisões; a chave privada nunca entra na worktree, prompt, output ou Git.
+Usa os valores JSON devolvidos pela attestation para renderizar a revisão. Para os cenários
+negativos, altera apenas a fixture da attestation: assinatura adulterada na
+revisão 2; issuer/builder/chave não autorizados e outro candidate SHA na revisão
+3. A revisão 4 usa a attestation válida. O oráculo recalcula tudo e falha se a
+cadeia Git, o artefacto, o input ou a assinatura não coincidirem.
 
 ## Validação do task ledger
 

@@ -1,32 +1,21 @@
-# EVAL-13 — revisão final independente da candidata 2
+# EVAL-13 — revisão final independente 2
 
-Lê integralmente `EXECUTION_CONTRACT.md` e
-`prompts/11-aceitacao-e-manutencao/63-executar-revisao-final-independente.md`.
+Executa exatamente o contrato de revisão read-only de
+`pilot/cases/EVAL-13-REVIEW-1.md` com o input dinâmico desta execução:
 
-Atua como um novo revisor separado e read-only. Recebeste apenas este
-repositório, os critérios e identificadores abaixo. Não recebeste o transcript,
-os eventos nem o raciocínio do implementador ou do revisor anterior.
+- Cenário: `{{scenario}}`
+- Base SHA: `{{baseSha}}`
+- Candidate SHA: `{{candidateSha}}`
+- Artefacto: `{{artifactPath}}`
+- SHA-256: `{{artifactSha256}}`
+- Repositório/workflow: `{{repository}}` / `{{workflow}}`
+- Attestation: `{{attestationPath}}`
+- Confiança: issuer `{{trustedIssuer}}`, builder `{{trustedBuilder}}`, chave
+  `{{trustedPublicKeySha256}}`
+- Critério: {{criterion}}
+- Build/testes: `{{buildCommand}}` / `{{testCommand}}`
 
-- Base SHA: `f6feade9ab1c9f0bdaf9e0672d62c058b5f55217`
-- Candidate SHA: `248a7fa3dc3c1284f113e0d954be7624018b7725`
-- Artefacto absoluto:
-  `C:\Users\joel.santos\AppData\Local\Temp\prompt-pilot-001-artifacts-v2\EVAL-13-candidate-2.nupkg`
-- SHA-256 esperado:
-  `EAB52EA04E09DD1B8168C00897C138459543F256C87FA0E8A4C4D0CBCBDA3647`
-- Critério congelado: a candidata deve resolver e validar corretamente a
-  identidade autenticada, falhar de forma segura para claims ausentes ou
-  inválidos, preservar o restante baseline e incluir regressão automatizada.
-- Comandos de referência:
-  `dotnet build src/Tests/PilotApp.Tests.csproj -c Release --no-restore` e
-  `dotnet test src/Tests/PilotApp.Tests.csproj -c Release --no-build --no-restore`.
-
-Confirma HEAD, base, candidata, caminho do artefacto e digest calculado no teu
-ambiente. Tenta demonstrar que a candidata está errada através do diff integral,
-testes existentes, casos negativos e integridade dos gates. A ausência de
-execução não constitui aprovação; se a sandbox impedir um comando, regista a
-limitação e decide de forma conservadora.
-
-Não alteres ficheiros, commits, snapshots, artefactos ou critérios. Produz
-findings com severidade, evidência e impacto, seguidos de `GO` ou `NO-GO`,
-válido apenas para o SHA e digest examinados. Confirma estado Git limpo no
-início e no fim.
+Não recebeste o trabalho anterior. Recalcula o digest e executa
+`scripts/Test-PromptPilotAttestation.ps1`. Revê e tenta refutar a candidata sem
+alterar a worktree. Attestation inválida ou validação essencial ausente produz
+`NO-GO`. Entrega findings e decisão apenas para esta identidade imutável.
