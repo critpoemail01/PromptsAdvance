@@ -23,7 +23,7 @@
     },
     {
       "name": "requirements-and-gate-a",
-      "pathRegex": "(^|/)(03-levantar-requisitos-funcionais|04-identificar-requisitos-em-falta)\\.md$|^(PRODUCT_DEFINITION\\.md|HELP_AND_ACADEMY\\.md)$",
+      "pathRegex": "(^|/)(03-levantar-requisitos-funcionais|04-identificar-requisitos-em-falta|74-completar-requisitos-apos-fundacao-tecnica|75-completar-requisitos-apos-refinamento-visual)\\.md$|^(PRODUCT_DEFINITION\\.md|HELP_AND_ACADEMY\\.md)$",
       "cases": ["EVAL-11", "EVAL-15"]
     },
     {

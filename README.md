@@ -7,7 +7,7 @@ prompt depois de `próximo`, `repetir`, `corrigir` ou `ignorar e avançar`.
 
 Iniciativas `greenfield` partem do `BoilerPlateAdvance`; iniciativas
 `brownfield` ligam um processo isolado à aplicação existente sem copiar a base
-por cima dela. Os 73 prompts ficam disponíveis como catálogo detalhado, mas não
+por cima dela. Os 75 prompts ficam disponíveis como catálogo detalhado, mas não
 formam uma cadeia automática nem obrigam a executar trabalho que não se aplica.
 
 Este catálogo é deliberadamente opinativo para Advance/.NET, Bit, Blazor,
@@ -279,12 +279,13 @@ Os prompts 23/24 tratam requisitos globais quando já existe base funcional sufi
 
 ### 2 — Arquitetura e fundação
 
-5. [Definir arquitetura e módulos](prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md)
-6. [Modelar ameaças e requisitos de segurança](prompts/02-arquitetura-e-fundacao/06-modelar-ameacas-e-requisitos-de-seguranca.md)
+5. [Definir arquitetura e módulos (opcional)](prompts/02-arquitetura-e-fundacao/Optional/05-definir-arquitetura-e-selecionar-modulos.md)
+6. [Modelar ameaças e requisitos de segurança (opcional)](prompts/02-arquitetura-e-fundacao/Optional/06-modelar-ameacas-e-requisitos-de-seguranca.md)
 7. [Criar ou adotar o projeto da iniciativa](prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md)
 8. [Otimizar o projeto para Codex](prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md)
-9. [Configurar ambientes, segredos e configuração](prompts/02-arquitetura-e-fundacao/09-configurar-ambientes-segredos-e-configuracao.md)
-10. [Definir contratos API e compatibilidade](prompts/02-arquitetura-e-fundacao/10-definir-contratos-api-versionamento-e-compatibilidade.md)
+74. [Completar requisitos após observar a fundação técnica](prompts/02-arquitetura-e-fundacao/74-completar-requisitos-apos-fundacao-tecnica.md)
+9. [Configurar ambientes, segredos e configuração (opcional)](prompts/02-arquitetura-e-fundacao/Optional/09-configurar-ambientes-segredos-e-configuracao.md)
+10. [Definir contratos API e compatibilidade (opcional)](prompts/02-arquitetura-e-fundacao/Optional/10-definir-contratos-api-versionamento-e-compatibilidade.md)
 
 ### 3 — Fundação visual e gates de superfície
 
@@ -296,6 +297,7 @@ Os prompts 23/24 tratam requisitos globais quando já existe base funcional sufi
 16. [Concluir Client.Web após jornadas Must](prompts/03-marca-e-layout/16-concluir-layout-client-web.md)
 17. [Melhorar a fatia em Client.Maui](prompts/03-marca-e-layout/17-melhorar-layout-client-maui.md)
 18. [Concluir Client.Maui após jornadas Must](prompts/03-marca-e-layout/18-concluir-layout-client-maui.md)
+75. [Completar requisitos após o refinamento visual](prompts/03-marca-e-layout/75-completar-requisitos-apos-refinamento-visual.md)
 
 ### 4 — Backend e funcionalidades
 

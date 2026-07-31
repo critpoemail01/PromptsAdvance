@@ -44,6 +44,21 @@ try {
         '-ProcessRoot', $process, '-BoilerplatePath', $boilerplate
     )) 0 'start'
 
+    $initialState = Read-State $process
+    foreach ($optionalPromptId in @('05', '06', '09', '10')) {
+        $optionalPrompt = $initialState.prompts.$optionalPromptId
+        if ($optionalPrompt.applicability -ne 'conditional' -or
+            $optionalPrompt.status -ne 'not_selected') {
+            throw "Stage 2 optional prompt $optionalPromptId was not initialized as conditional."
+        }
+    }
+    if ($initialState.prompts.'74'.applicability -ne 'required' -or
+        $initialState.prompts.'74'.status -ne 'pending' -or
+        $initialState.prompts.'75'.applicability -ne 'conditional' -or
+        $initialState.prompts.'75'.status -ne 'not_selected') {
+        throw 'Requirements reconciliation prompts 74/75 have invalid initial applicability.'
+    }
+
     Assert-ExitCode (Invoke-Lifecycle @(
         'record', '-ProcessRoot', $process, '-PromptId', '01', '-Result', 'completed',
         '-Evidence', 'fixture://prompt-01', '-Summary', 'Prompt 01 objective achieved'
@@ -112,6 +127,32 @@ try {
         throw 'Confirmed repeat did not preserve its objective.'
     }
     Assert-ExitCode (Invoke-Lifecycle @('validate', '-ProcessRoot', $process)) 0 'final greenfield validate'
+
+    $orderingProcess = Join-Path $temporaryRoot 'manifest-order-process'
+    Assert-ExitCode (Invoke-Lifecycle @(
+        'start', '-Name', 'manifest-order-test', '-Owner', 'Fixture owner',
+        '-ProcessRoot', $orderingProcess, '-BoilerplatePath', $boilerplate
+    )) 0 'manifest-order start'
+    foreach ($transition in @(
+        @{ Current = '01'; Next = '02' },
+        @{ Current = '02'; Next = '03' },
+        @{ Current = '03'; Next = '04' },
+        @{ Current = '04'; Next = '07' },
+        @{ Current = '07'; Next = '08' },
+        @{ Current = '08'; Next = '74' },
+        @{ Current = '74'; Next = '11' }
+    )) {
+        Assert-ExitCode (Invoke-Lifecycle @(
+            'record', '-ProcessRoot', $orderingProcess, '-PromptId', $transition.Current,
+            '-Result', 'completed', '-Evidence', "fixture://prompt-$($transition.Current)",
+            '-Summary', "Completed prompt $($transition.Current)"
+        )) 0 "manifest-order record $($transition.Current)"
+        Assert-ExitCode (Invoke-Lifecycle @('advance', '-ProcessRoot', $orderingProcess)) 0 `
+            "manifest-order advance $($transition.Current)"
+        if ((Read-State $orderingProcess).currentPrompt -ne $transition.Next) {
+            throw "Manifest order routed prompt $($transition.Current) to the wrong next prompt."
+        }
+    }
 
     $application = Join-Path $temporaryRoot 'existing-application'
     New-Item -ItemType Directory -Path $application | Out-Null

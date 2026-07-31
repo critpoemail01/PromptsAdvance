@@ -702,6 +702,14 @@ consultivos; autorizações externas/release continuam bloqueantes. EVAL-11 e a
 regressão estrutural devem cobrir este contrato; a promoção para `stable`, a
 avaliação humana e a revisão separada continuam pendentes.
 
+Na `catalogVersion` `2026-07-31.14`, os prompts 74 e 75 repetem de forma focada
+o levantamento do prompt 03 nos dois momentos em que já existe evidência mais
+forte: depois da fundação técnica e depois do refinamento visual. A regressão
+deve confirmar que o processo preserva IDs e decisões anteriores, regista apenas
+deltas rastreáveis e segue a ordem explícita do manifesto, incluindo o salto de
+prompts `not_selected`. EVAL-05, EVAL-06, EVAL-11, EVAL-15 e a suite completa
+devem ser repetidos; o piloto permanece pendente.
+
 ## Referências
 
 - https://developers.openai.com/api/docs/guides/evaluation-best-practices

@@ -39,8 +39,8 @@ not enough.
 | Stage | Prompts/work | Quality checkpoint |
 |---|---|---|
 | Product definition | 01–04 | G01 product clarity and requirements |
-| Architecture/foundation | 05–10 | G02 architecture and repository foundation |
-| Design/surfaces | 11–18 | G03/G04 implementation and experience quality |
+| Architecture/foundation | 05–10, then 74 after the repository foundation | G02 architecture and repository foundation |
+| Design/surfaces | 11–18 and repeatable 75 after surface refinement | G03/G04 implementation and experience quality |
 | Backend/functions | 19–37 | G05 complete user journeys |
 | Security/public/hardening | 38–54 | G06 security and quality |
 | Delivery/operations | 55–60 | G07 operational readiness |
@@ -66,9 +66,10 @@ continue numerically or request the next useful page/feature prompt. A typical
 slice remains:
 
 ```text
+technical requirements reconciliation: 07 -> 08 -> 74
 foundation when needed: 19 -> 20 -> 21 -> 22
-page: 25 -> 13|15|17 -> 26
-feature: 27 -> 13|15|17 -> 28
+page: 25 -> 13|15|17 -> 75 -> 26
+feature: 27 -> 13|15|17 -> 75 -> 28
 ```
 
 This is guidance, not an automatic route. Conditional prompts may be marked not

@@ -880,7 +880,7 @@ try {
     }
     $results.Add('arbitrary NextPrompt -> blocked')
 
-    foreach ($id in @('05', '06', '07', '08', '09')) {
+    foreach ($id in @('05', '06', '07', '08', '74', '09')) {
         $record = Invoke-Lifecycle @(
             'record',
             '-ProcessRoot', $fixtureRoot,
@@ -1013,7 +1013,8 @@ try {
 
     foreach ($transition in @(
         @{ Id = '25'; Expected = '15' },
-        @{ Id = '15'; Expected = '26' }
+        @{ Id = '15'; Expected = '75' },
+        @{ Id = '75'; Expected = '26' }
     )) {
         $record = Invoke-Lifecycle @(
             'record',

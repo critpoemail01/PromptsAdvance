@@ -351,8 +351,8 @@ function Normalize-PromptId {
         throw "Prompt id must contain one or two digits: $Value"
     }
     $number = [int]$Value
-    if ($number -lt 1 -or $number -gt 73) {
-        throw "Prompt id is outside 01-73: $Value"
+    if ($number -lt 1 -or $number -gt 75) {
+        throw "Prompt id is outside 01-75: $Value"
     }
     return '{0:D2}' -f $number
 }
@@ -379,6 +379,16 @@ function Get-PromptStage {
         throw "Prompt $Id must belong to exactly one stage; found $($matches.Count)."
     }
     return $matches[0]
+}
+
+function Get-OrderedPromptIds {
+    param([Parameter(Mandatory)]$Manifest)
+
+    return @(
+        $Manifest.stages |
+            ForEach-Object { @($_.promptIds) } |
+            ForEach-Object { [string]$_ }
+    )
 }
 
 function Get-PromptState {
@@ -736,7 +746,7 @@ function Test-EntryGate {
         throw "Prompt $NextId cannot start because entry gate $entryGate is '$($gate.status)'."
     }
 
-    if ([int]$NextId -ge 13 -and [int]$NextId -le 18) {
+    if (([int]$NextId -ge 13 -and [int]$NextId -le 18) -or $NextId -eq '75') {
         $g03 = Get-GateState -State $State -Id 'G03'
         if ($g03.status -ne 'passed') {
             throw "Prompt $NextId cannot start because implementation gate G03 is '$($g03.status)'."
@@ -972,7 +982,16 @@ function Get-AutomaticNextPrompt {
     )
 
     $numericId = [int]$CompletedId
-    if ($numericId -ge 1 -and $numericId -le 11) {
+    if ($numericId -ge 1 -and $numericId -le 7) {
+        return '{0:D2}' -f ($numericId + 1)
+    }
+    if ($CompletedId -eq '08') {
+        return '74'
+    }
+    if ($CompletedId -eq '74') {
+        return '09'
+    }
+    if ($numericId -ge 9 -and $numericId -le 11) {
         return '{0:D2}' -f ($numericId + 1)
     }
     if ($numericId -ge 19 -and $numericId -le 21) {
@@ -993,8 +1012,11 @@ function Get-AutomaticNextPrompt {
         return $surfaceMap[[string]$State.activeSlice.surface]
     }
     if ($CompletedId -in @('13', '15', '17')) {
+        return '75'
+    }
+    if ($CompletedId -eq '75') {
         if ($null -eq $State.activeSlice -or [string]::IsNullOrWhiteSpace([string]$State.activeSlice.kind)) {
-            throw "Surface prompt $CompletedId cannot route without an active slice kind."
+            throw 'Requirements reconciliation prompt 75 cannot route without an active slice kind.'
         }
         return $(if ($State.activeSlice.kind -eq 'page') { '26' } else { '28' })
     }
@@ -1532,13 +1554,13 @@ function Test-Lifecycle {
         }
         $numbers += [int]$Matches[1]
     }
-    foreach ($number in 1..73) {
+    foreach ($number in 1..75) {
         if ($number -notin $numbers) {
             $issues.Add("Missing prompt id: $('{0:D2}' -f $number)")
         }
     }
 
-    foreach ($id in 1..73 | ForEach-Object { '{0:D2}' -f $_ }) {
+    foreach ($id in 1..75 | ForEach-Object { '{0:D2}' -f $_ }) {
         if ($null -eq $state.prompts.PSObject.Properties[$id]) {
             $issues.Add("State is missing prompt $id.")
         }
@@ -3112,8 +3134,21 @@ if ($Command -eq 'advance') {
         $skippedIncomplete = $true
     }
 
-    $nextNumber = [int]$lastId + 1
-    if ($nextNumber -gt [int]$manifest.promptCount) {
+    $orderedPromptIds = @(Get-OrderedPromptIds -Manifest $manifest)
+    $lastIndex = [Array]::IndexOf([string[]]$orderedPromptIds, [string]$lastId)
+    if ($lastIndex -lt 0) {
+        throw "Last prompt $lastId is absent from the manifest order."
+    }
+    $nextId = $null
+    for ($index = $lastIndex + 1; $index -lt $orderedPromptIds.Count; $index++) {
+        $candidateId = [string]$orderedPromptIds[$index]
+        $candidateState = Get-PromptState -State $state -Id $candidateId
+        if ($candidateState.status -ne 'not_selected') {
+            $nextId = $candidateId
+            break
+        }
+    }
+    if ($null -eq $nextId) {
         $state.status = 'completed'
         $state.nextAction = 'none'
         $state.blockers = @()
@@ -3130,7 +3165,6 @@ if ($Command -eq 'advance') {
         exit 0
     }
 
-    $nextId = '{0:D2}' -f $nextNumber
     $nextState = Get-PromptState -State $state -Id $nextId
     $previousRuns = @(Get-PromptResultHistory -State $state -Id $nextId)
     if ($previousRuns.Count -gt 0) {

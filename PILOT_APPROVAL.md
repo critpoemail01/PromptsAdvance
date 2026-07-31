@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-31.13 |
+| Catalog version | 2026-07-31.14 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -208,3 +208,11 @@ impacto. Acrescenta ainda configuração Codex por projeto e revisão Codex Acti
 apenas como opções autorizadas. Estas alterações são materiais: os casos
 dirigidos e depois a suite completa, a avaliação humana e a revisão separada
 continuam pendentes. O canal permanece `candidate`.
+
+A versão 2026-07-31.14 acrescenta duas repetições focadas do levantamento de
+requisitos: o prompt 74 reconcilia a definição depois da fundação técnica e o
+prompt 75 reconcilia-a depois do refinamento visual. Os IDs anteriores mantêm-se
+estáveis; a ordem é definida pelo manifesto, e `advance` segue essa ordem
+saltando apenas prompts explicitamente `not_selected`. EVAL-05, EVAL-06,
+EVAL-11, EVAL-15 e a suite completa devem ser repetidos. O piloto permanece
+`pending` e o canal permanece `candidate`.

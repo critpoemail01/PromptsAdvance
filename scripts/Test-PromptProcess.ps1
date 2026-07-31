@@ -120,8 +120,8 @@ foreach ($portablePath in @(
 
 $promptRoot = Join-Path $root 'prompts'
 $promptFiles = @(Get-ChildItem -LiteralPath $promptRoot -Recurse -File -Filter '*.md')
-if ($promptFiles.Count -ne 73) {
-    Add-Failure "Esperados 73 prompts; encontrados $($promptFiles.Count)."
+if ($promptFiles.Count -ne 75) {
+    Add-Failure "Esperados 75 prompts; encontrados $($promptFiles.Count)."
 }
 
 $numbers = foreach ($file in $promptFiles) {
@@ -137,7 +137,7 @@ foreach ($duplicate in $duplicates) {
     Add-Failure "Numero de prompt duplicado: $($duplicate.Name)"
 }
 
-foreach ($expected in 1..73) {
+foreach ($expected in 1..75) {
     if ($expected -notin $numbers) {
         Add-Failure "Numero de prompt em falta: $expected"
     }
@@ -147,11 +147,11 @@ $manifestPath = Join-Path $root 'PROCESS_MANIFEST.json'
 if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
     try {
         $manifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath | ConvertFrom-Json
-        if ([int]$manifest.promptCount -ne 73) {
-            Add-Failure "PROCESS_MANIFEST.json declara $($manifest.promptCount) prompts em vez de 73."
+        if ([int]$manifest.promptCount -ne 75) {
+            Add-Failure "PROCESS_MANIFEST.json declara $($manifest.promptCount) prompts em vez de 75."
         }
         $manifestPromptIds = @($manifest.stages | ForEach-Object { @($_.promptIds) })
-        foreach ($expected in 1..73 | ForEach-Object { '{0:D2}' -f $_ }) {
+        foreach ($expected in 1..75 | ForEach-Object { '{0:D2}' -f $_ }) {
             if ($expected -notin $manifestPromptIds) {
                 Add-Failure "Prompt $expected ausente do PROCESS_MANIFEST.json."
             }
@@ -285,7 +285,7 @@ Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)^---.*name: 
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'software-lifecycle\.ps1 record' 'A skill nao regista resultados no estado do lifecycle.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'continue -ProjectPath' 'A skill nao resolve continuacao/adocao a partir da raiz da aplicacao.'
 Forbid-Pattern '.agents/skills/advance-app-continue/SKILL.md' '## Start a new initiative|software-lifecycle\.ps1 start -Name' 'A skill de continuacao voltou a acumular a criacao de iniciativas.'
-Require-Pattern '.agents/skills/advance-app-continue/references/workflow.md' 'page: 25 -> 13\|15\|17 -> 26' 'A skill nao define routing de vertical slices.'
+Require-Pattern '.agents/skills/advance-app-continue/references/workflow.md' 'page: 25 -> 13\|15\|17 -> 75 -> 26' 'A skill nao define routing de vertical slices.'
 Require-Pattern '.agents/plugins/marketplace.json' '"name": "promptsadvance"' 'O marketplace Advance nao tem identidade estavel.'
 Require-Pattern '.agents/plugins/marketplace.json' '"path": "\./plugins/advance-app"' 'O marketplace Advance nao aponta para o plugin empacotado.'
 Require-Pattern '.agents/plugins/marketplace.json' '(?s)"installation": "AVAILABLE".*"authentication": "ON_INSTALL"' 'O marketplace Advance nao declara as politicas de instalacao.'
@@ -565,9 +565,15 @@ if ((Test-Path -LiteralPath $prompt03Path -PathType Leaf) -and
     (Get-Content -Encoding UTF8 -LiteralPath $prompt03Path).Count -gt 430) {
     Add-Failure 'O prompt 03 autocontido excede o budget de 430 linhas.'
 }
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'PRODUCT_DEFINITION\.md' 'O prompt 05 nao verifica o artefacto da etapa 1.'
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'termina com estado `bloqueado`' 'O prompt 05 nao bloqueia quando o Gate A falha.'
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'Test-ProductDefinitionGate\.ps1' 'O prompt 05 nao executa o gate mecanico.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/05-definir-arquitetura-e-selecionar-modulos.md' 'PRODUCT_DEFINITION\.md' 'O prompt 05 nao verifica o artefacto da etapa 1.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/05-definir-arquitetura-e-selecionar-modulos.md' 'termina com estado `bloqueado`' 'O prompt 05 nao bloqueia quando o Gate A falha.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/05-definir-arquitetura-e-selecionar-modulos.md' 'Test-ProductDefinitionGate\.ps1' 'O prompt 05 nao executa o gate mecanico.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"id": "02".*"conditionalPromptIds": \["05", "06", "09", "10"\]' 'Os prompts opcionais da etapa 2 nao estao declarados como condicionais.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"promptIds": \["05", "06", "07", "08", "74", "09", "10"\].*"promptIds": \["11", "12", "13", "14", "15", "16", "17", "18", "75"\]' 'Os prompts complementares 74/75 nao estao ordenados nas fases corretas.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/74-completar-requisitos-apos-fundacao-tecnica.md' '(?s)prompt 03.*preserva.*IDs.*Reconcilia mecanicamente' 'O prompt 74 nao completa os requisitos tecnicos preservando a fonte canonica.'
+Require-Pattern 'prompts/03-marca-e-layout/75-completar-requisitos-apos-refinamento-visual.md' '(?s)prompt 03.*prompts 13, 15 ou 17.*antes do prompt 26 ou 28.*Reconcilia' 'O prompt 75 nao completa os requisitos depois do refinamento visual.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)CompletedId -eq ''08''.*return ''74''.*CompletedId -eq ''74''.*return ''09''' 'O lifecycle nao executa o complemento tecnico na posicao pretendida.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)CompletedId -in @\(''13'', ''15'', ''17''\).*return ''75''.*CompletedId -eq ''75''.*''26''.*''28''' 'O lifecycle nao reconcilia requisitos entre layout e implementacao.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'Copia .*PRODUCT_DEFINITION\.md' 'O prompt 07 nao copia a definicao aprovada para a nova aplicacao.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'Copia .*HELP_AND_ACADEMY\.md' 'O prompt 07 nao copia o protocolo de ajuda para a aplicacao derivada.'
 Require-Pattern 'software-lifecycle.ps1' "'HELP_AND_ACADEMY\.md'" 'O inicializador nao copia o protocolo de ajuda para cada instancia.'
@@ -606,10 +612,10 @@ Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)compar.veis diretos.*adjacente.*fo
 Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)ALL_FUNCTIONALITIES\.md.*ID \| Quem \| Onde \| Quando \| O qu..*RF-P' 'O caso EVAL-15 nao valida o formato unico e os requisitos atomicos por funcionalidade.'
 Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)ajuda contextual bilingue.*v.deo e\s+Academia.*planeados.*APP/PAGE/FNC.*HLP.*VID.*CRS.*fallback.*sem provider' 'O EVAL-15 nao exercita aplicabilidade e fail-closed de ajuda/Academia.'
 Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' '(?s)contextual-help and academy matrix.*first help unit.*invent an external video provider' 'O oraculo EVAL-15 nao valida matriz de ajuda nem publicacao externa inventada.'
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' '(?s)HELP_AND_ACADEMY\.md.*APP/PAGE/FNC.*pesquisa.*cursos/.*progresso.*n.o listado' 'A arquitetura nao decide fronteiras e riscos da ajuda/Academia.'
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/06-modelar-ameacas-e-requisitos-de-seguranca.md' '(?s)ajuda multim.dia/Academia.*embeds.*OAuth/upload.*n.o listados.*controlo de acesso' 'O threat model nao cobre os ativos e fronteiras do fornecedor de video.'
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/09-configurar-ambientes-segredos-e-configuracao.md' '(?s)ajuda multim.dia/Academia.*player.*gest.o/upload.*dom.nios/CSP.*sem o fornecedor' 'A configuracao nao separa player, credenciais e fallback por ambiente.'
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/10-definir-contratos-api-versionamento-e-compatibilidade.md' '(?s)ajuda/Academia.*APP/PAGE/FNC.*progresso.*IDs/URLs do fornecedor.*evento do player.*n.o prova sozinho aprendizagem' 'Os contratos API nao cobrem contexto, progresso e limites do provider.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/05-definir-arquitetura-e-selecionar-modulos.md' '(?s)HELP_AND_ACADEMY\.md.*APP/PAGE/FNC.*pesquisa.*cursos/.*progresso.*n.o listado' 'A arquitetura nao decide fronteiras e riscos da ajuda/Academia.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/06-modelar-ameacas-e-requisitos-de-seguranca.md' '(?s)ajuda multim.dia/Academia.*embeds.*OAuth/upload.*n.o listados.*controlo de acesso' 'O threat model nao cobre os ativos e fronteiras do fornecedor de video.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/09-configurar-ambientes-segredos-e-configuracao.md' '(?s)ajuda multim.dia/Academia.*player.*gest.o/upload.*dom.nios/CSP.*sem o fornecedor' 'A configuracao nao separa player, credenciais e fallback por ambiente.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/10-definir-contratos-api-versionamento-e-compatibilidade.md' '(?s)ajuda/Academia.*APP/PAGE/FNC.*progresso.*IDs/URLs do fornecedor.*evento do player.*n.o prova sozinho aprendizagem' 'Os contratos API nao cobrem contexto, progresso e limites do provider.'
 Require-Pattern 'prompts/04-backend-e-funcionalidades/23-implementar-requisitos-globais.md' '(?s)HELP_AND_ACADEMY\.md.*FNC -> HLP por idioma -> VID -> contexto -> CRS.*fallback textual.*n.o faz upload real' 'O prompt 23 nao implementa a primeira unidade vertical de ajuda com provider isolado.'
 Require-Pattern 'prompts/04-backend-e-funcionalidades/24-criar-testes-playwright-para-requisitos-globais.md' '(?s)APP/PAGE/FNC.*player simulado.*fornecedor indispon.vel.*fallback.*n.o chama YouTube real' 'Os testes globais nao isolam o player externo e o fallback da ajuda.'
 Require-Pattern 'prompts/04-backend-e-funcionalidades/Optional/31-validar-localizacao-e-formatacao-cultural.md' '(?s)HLP/VID/CRS.*narra..o.*captions.*transcri..o.*Caption autom.tica.*provis.ria' 'O prompt de localizacao nao valida os idiomas dos conteudos de ajuda.'
@@ -887,7 +893,7 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Host 'PASS: processo documental coerente.' -ForegroundColor Green
-Write-Host " - Prompts: $($promptFiles.Count), numeracao continua 01-73."
+Write-Host " - Prompts: $($promptFiles.Count), numeracao continua 01-75."
 Write-Host " - Links locais: validos em $($markdownFiles.Count) ficheiros Markdown."
 Write-Host ' - Placeholders: declarados no APP_CONTEXT.md.'
 Write-Host ' - Gate da definicao: fixture valida aceite e fixture invalida bloqueada.'
