@@ -2,11 +2,12 @@
 
 ## Resultado obrigatório
 
-Entrega um memorando de decisão, baseado em pesquisa online atual, que permita
-escolher uma única oportunidade de aplicação para aprofundar nos prompts
-seguintes. Começa a resposta pela recomendação e pela decisão `avançar`,
-`não avançar ainda` ou `não avançar`; sustenta-a depois com evidência,
-alternativas, riscos e um experimento falsificável.
+Produz um memorando de decisão durável, baseado em pesquisa online atual, e uma
+resposta curta que permita escolher rapidamente uma única oportunidade para
+aprofundar nos prompts seguintes. Começa a resposta pela recomendação e pela
+decisão `avançar`, `não avançar ainda` ou `não avançar`; conserva a análise
+extensa no artefacto e mostra na conversa apenas as hipóteses comparáveis, a
+evidência determinante, os riscos e a decisão seguinte.
 
 Neste prompt, `avançar` significa exclusivamente **avançar para validação com
 utilizadores e solução**, não “mercado validado”, `GO` do Gate A nem autorização
@@ -28,8 +29,8 @@ O trabalho só fica `concluído` quando:
 - a recomendação sobreviver a validação adversarial independente realmente
   separada, todos os findings materiais estiverem resolvidos e os riscos
   residuais não materiais estiverem identificados;
-- `PRODUCT_DEFINITION.md` e `IMPLEMENTATION_STATUS.md` refletirem o mesmo
-  resultado, sem aprovar o Gate A.
+- `DISCOVERY_RESEARCH.md`, `PRODUCT_DEFINITION.md` e
+  `IMPLEMENTATION_STATUS.md` refletirem o mesmo resultado, sem aprovar o Gate A.
 
 ## Protocolo de execução obrigatório
 
@@ -88,7 +89,7 @@ tem de persistir os artefactos autorizados antes da entrega.
 
 ## Objetivo
 
-Como primeiro passo de produto, parte de uma folha em branco e identifica autonomamente oportunidades de aplicações web/mobile que o mercado atual demonstre necessitar. Pesquisa procura, adoção, queixas, fragmentação e mudanças recentes; recomenda aplicações novas com um problema claro, melhoria defensável e adequação preliminar ao `BoilerPlateAdvance` localizado em `C:\Work\BoilerPlateAdvance`. Não implementes código.
+Como primeiro passo de produto, parte de uma folha em branco e identifica autonomamente oportunidades de aplicações web/mobile que o mercado atual demonstre necessitar. Pesquisa procura, adoção, queixas, fragmentação e mudanças recentes; recomenda aplicações novas com um problema claro, melhoria defensável e adequação preliminar ao `BoilerPlateAdvance` localizado em `[PASTA_ORIGEM_BOILERPLATE]`, resolvida pelo lifecycle e confirmada em `APP_CONTEXT.md`. Não implementes código.
 
 Este prompt inicia, mas não aprova, `PRODUCT_DEFINITION.md`. Mesmo quando a recomendação for `avançar`, o Gate A permanece `PENDENTE` até o prompt 04 validar toda a definição.
 
@@ -118,7 +119,7 @@ Não solicites, estimes nem uses `[ORÇAMENTO]` ou `[PRAZO]` nesta fase. Serão 
 2. Usa pesquisa web para amplitude e abre a fonte original antes de a citar.
    Usa browser apenas quando uma página dinâmica ou interação read-only for
    necessária. Inspeciona também, read-only, os manifests e documentos técnicos
-   relevantes de `C:\Work\BoilerPlateAdvance`; não infiras capacidades apenas
+   relevantes de `[PASTA_ORIGEM_BOILERPLATE]`; não infiras capacidades apenas
    pelo nome da base.
 3. Começa com pesquisas amplas, usando termos curtos e discriminativos, e passa
    para consultas dirigidas apenas quando faltar uma prova material. Se um
@@ -238,58 +239,71 @@ Recomenda uma ideia só se houver evidência atual de problema/procura, fragilid
 
 Usa `não avançar` para uma oportunidade quando existir impedimento material de legalidade, distribuição, dados ou dependência externa; usa `não avançar ainda` quando a evidência dessa oportunidade for insuficiente. Mesmo que nenhuma ideia mereça `avançar`, conclui a exploração, apresenta as melhores oportunidades observadas e explica que evidência adicional falta; não devolvas um questionário inicial. Separa factos, inferências e pressupostos e não substituas dados em falta por confiança retórica.
 
-## Formato obrigatório da entrega
+## Artefacto detalhado obrigatório
 
-Entrega, por esta ordem:
+Cria ou atualiza `DISCOVERY_RESEARCH.md` e conserva nele, por esta ordem:
 
-1. recomendação executiva, decisão e confiança, com as três razões determinantes
-   e os três maiores riscos;
-2. âmbito, data, janela, geografias, estratégia de pesquisa, fontes inacessíveis
-   e limitações;
-3. mapa conciso dos 12–20 espaços de problema e motivo de exclusão ou promoção;
-4. lista comparável das cinco aplicações possíveis, usando exatamente a mesma
-   estrutura para cada uma:
-   - **Aplicação:** nome descritivo de trabalho e frase simples sobre o que faz;
-   - **Problema:** quem sofre, em que situação, com que frequência e impacto;
-   - **Solução:** como a aplicação resolve o problema e qual é a jornada central;
-   - **Modelo de negócio:** quem paga, pelo quê, mecanismo de receita e evidência
-     ou proxy de disposição para pagar, sem estimar orçamento ou prazo;
-   - **O que traz de novo:** diferença concreta perante aplicações, integrações
-     e processos atuais; não uses adjetivos vagos como “melhor” ou “inovador”;
-   - **Porque apostar nesta:** motivos evidenciados para a preferir às restantes
-     oportunidades, principal vantagem, maior risco e condição que a faria perder;
-   - **Evidência e confiança:** sinais determinantes, limitações e nível
-     `alto`, `médio` ou `baixo`;
-5. matriz de evidência que liga cada afirmação material à fonte, data, região,
-   tipo de sinal, independência, limitação e oportunidade suportada;
-6. ranking reproduzível das cinco oportunidades, com pontuação por critério,
-   total ponderado, confiança, gates eliminatórios e análise de sensibilidade;
-7. top 3 aprofundado e benchmark inicial de produto/experiência;
-8. para cada finalista: segmento/JTBD, procura/aceitação observada, aplicações
-   existentes, fragilidades, fragmentação, melhoria defensável, MVP,
-   monetização, distribuição, riscos, adequação ao boilerplate, experimento,
-   fontes e nível de confiança;
-9. recibo da revisão independente: tarefa/revisor, separação, âmbito read-only,
-   decisão, findings, correções e eventual risco residual;
-10. recomendação final, principal hipótese por provar e próxima ação reversível.
+1. âmbito, data, janela, geografias, estratégia, fontes inacessíveis e limites;
+2. mapa dos 12–20 espaços de problema e motivo de exclusão ou promoção;
+3. cinco hipóteses de aplicação com a mesma estrutura: aplicação, problema,
+   solução, modelo de negócio, novidade concreta, razão comparativa, evidência,
+   confiança, maior risco e condição que a faria perder;
+4. matriz de claims e fontes com data, região, tipo de sinal, independência,
+   limitação e oportunidade suportada;
+5. scoring reproduzível, gates eliminatórios e análises de sensibilidade;
+6. top 3 aprofundado e benchmark inicial de produto/experiência;
+7. uma subsecção por finalista com segmento/JTBD, procura observada,
+   alternativas, fragilidades, fragmentação, vantagem, MVP, monetização,
+   distribuição, riscos, adequação ao boilerplate, experimento e fontes;
+8. recibo da revisão independente, findings, correções e risco residual;
+9. recomendação final, principal hipótese por provar e próxima ação reversível.
 
-Usa linguagem direta, títulos previsíveis, tabelas apenas quando facilitarem a
-comparação e parágrafos curtos. O resultado deve ser objetivo, claro e fácil de
-interpretar: o leitor deve perceber cada aplicação e a diferença entre elas sem
-consultar a matriz de scoring. Evita introduções genéricas, repetição, jargão de
-startups e conclusões escondidas no fim.
+Não fundas nem omitas os itens 6 e 7. Na matriz, usa uma linha por claim
+material e inclui o URL canónico; nomes de organizações sem URL não satisfazem
+o requisito. Na pontuação, liga cada nota aos IDs dos claims que satisfazem a
+respetiva âncora.
 
-Antes de entregar, verifica os itens 1–10 um a um. Não fundas nem omitas os
-itens 7 e 8: cada finalista corrente tem uma subsecção própria com todos os
-campos pedidos. Na matriz, usa uma linha por claim material e inclui o URL
-canónico; nomes de organizações sem URL não satisfazem o requisito. Na
-pontuação, liga cada nota aos IDs dos claims que satisfazem a respetiva âncora.
+## Resposta obrigatória ao programador
+
+Apresenta apenas a síntese necessária para decidir, nesta ordem:
+
+1. bloco `Decisão` com estado, hipótese recomendada, `avançar`/`não avançar
+   ainda`/`não avançar`, confiança, principal hipótese por provar e decisão
+   mínima pedida ao responsável;
+2. até três razões determinantes e três riscos que podem alterar a escolha;
+3. tabela das cinco hipóteses com exatamente estas colunas:
+
+   | # | Hipótese | Utilizador e problema | Proposta em uma frase | Pontuação/confiança | Risco decisivo |
+   |---|---|---|---|---|---|
+
+   O nome de cada hipótese tem no máximo 12 palavras. `Utilizador e problema` e
+   `Proposta` têm uma frase curta cada. Não uses slogans, jargão ou adjetivos
+   vagos; qualquer programador deve perceber quem usa, o que dói e o que a
+   aplicação faria sem abrir o artefacto detalhado;
+4. top 3 com um trade-off por finalista e indicação explícita de por que a
+   primeira vence;
+5. próxima ação reversível e três respostas rápidas permitidas:
+   `aprovar recomendação`, `escolher hipótese #N` ou `pedir rework com uma
+   restrição concreta`.
+
+Liga `DISCOVERY_RESEARCH.md` e os documentos atualizados, mas não transcrevas na
+resposta o mapa completo, a matriz de fontes, os cálculos ou o benchmark. Usa
+linguagem direta, títulos previsíveis e parágrafos curtos. Evita introduções
+genéricas, repetição, jargão de startups e conclusões escondidas no fim.
+
+Antes de entregar, confirma que a decisão e as cinco linhas da tabela podem ser
+compreendidas sem consultar o scoring, e que todo o detalhe omitido da conversa
+continua rastreável no artefacto.
 
 Não prometas que “o mercado necessita” ou que existirá “grande aceitação” sem evidência proporcional. Indica claramente o que foi observado, o que é proxy, o que é inferência e o que continua desconhecido.
 
-Atualiza apenas as secções 1–3, 5, 7 e 8 aplicáveis de `PRODUCT_DEFINITION.md`, mantendo o documento como `rascunho` ou `em validação` e a decisão do Gate A como `PENDENTE`. Atualiza também o prompt 01 em `IMPLEMENTATION_STATUS.md`. Se não existir uma oportunidade recomendada como `avançar`, regista o bloqueio e não autorizes o prompt 02.
+Atualiza `DISCOVERY_RESEARCH.md`, apenas as secções 1–3, 5, 7 e 8 aplicáveis de
+`PRODUCT_DEFINITION.md`, mantendo o documento como `rascunho` ou `em validação`
+e a decisão do Gate A como `PENDENTE`, e o prompt 01 em
+`IMPLEMENTATION_STATUS.md`. Se não existir uma oportunidade recomendada como
+`avançar`, regista o bloqueio e não autorizes o prompt 02.
 
-Estas duas atualizações são obrigatórias quando a tarefa executora tiver
+Estas três atualizações são obrigatórias quando a tarefa executora tiver
 `workspace-write` ou capacidade equivalente. Uma rejeição isolada de um comando
 shell não demonstra que a workspace é read-only: tenta a ferramenta de edição
 local suportada antes de declarar indisponibilidade. Só termines `parcial` por

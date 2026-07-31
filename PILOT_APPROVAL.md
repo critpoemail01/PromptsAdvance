@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-31.1 |
+| Catalog version | 2026-07-31.3 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -126,3 +126,18 @@ sujeitas a alvo e autorização explícitos. O prompt proíbe configuração
 silenciosa de MCPs/plugins/hooks, segredos versionados e um segundo lifecycle
 concorrente. A validação estrutural desta integração não substitui os 15 casos,
 a avaliação humana nem a revisão separada; o estado permanece `pending`.
+
+A versão 2026-07-31.2 remove caminhos Windows fixos dos prompts ativos e faz o
+runner descartável excluir explicitamente os metadados `.git` da origem antes
+de criar a candidata isolada. Esta correção de portabilidade exige repetir os
+casos afetados e a suite completa; não fornece a avaliação humana nem a revisão
+separada exigidas. O estado permanece `pending`.
+
+A versão 2026-07-31.3 introduz um contrato comum de respostas orientadas
+primeiro à decisão para os 73 prompts: conclusão no início, até três razões e
+riscos, opções comparáveis, prova curta e uma única próxima ação. O prompt 01
+passa a conservar pesquisa, fontes e cálculos em `DISCOVERY_RESEARCH.md` e a
+mostrar ao programador apenas uma tabela curta das cinco hipóteses, a recomendação
+e respostas rápidas. O caso EVAL-01 e o oráculo exigem agora essa separação e os
+três artefactos duráveis. Esta alteração material exige repetir EVAL-01 e a suite
+completa, com avaliação humana e revisão separada; o estado permanece `pending`.

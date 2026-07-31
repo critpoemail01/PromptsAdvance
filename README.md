@@ -28,6 +28,8 @@ adicionando-os à aplicação existente apenas num lote explícito e sem colisõ
 - [CLAUDE.md](CLAUDE.md): ponte mínima para Claude Code importar `AGENTS.md`;
 - [PRODUCT_EXCELLENCE.md](PRODUCT_EXCELLENCE.md): benchmark, crítica profissional e critérios de produto/UX;
 - [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md): definição aprovada e gate bloqueante entre as etapas 1 e 2;
+- `DISCOVERY_RESEARCH.md`: evidência detalhada criada pelo prompt 01; a resposta
+  conversacional conserva apenas a síntese necessária à decisão;
 - [PRODUCT_QUALITY_BASELINE.md](PRODUCT_QUALITY_BASELINE.md): baseline aprovada, rubrica visual e primeira fatia;
 - [APP_CONTEXT.md](APP_CONTEXT.md): valores da aplicação, fontes, confiança e autorizações por execução;
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md): requisitos, candidata, evidências, bloqueios e operação;
@@ -92,7 +94,7 @@ Para trabalho complexo ou ambíguo, usa Plan mode para refinar resultado, restri
 Prompt inicial recomendado para uma aplicação nova:
 
 ```text
-Usa $advance-app-start. Inicia uma nova iniciativa chamada "nome-da-iniciativa", com o responsável de produto indicado. Usa o BoilerPlateAdvance em C:\Work\BoilerPlateAdvance, inicializa uma instância isolada e executa apenas o primeiro prompt. Não declares o Gate A concluído.
+Usa $advance-app-start. Inicia uma nova iniciativa chamada "nome-da-iniciativa", com o responsável de produto indicado. Usa o BoilerPlateAdvance no caminho absoluto existente desta máquina, inicializa uma instância isolada e executa apenas o primeiro prompt. Não declares o Gate A concluído.
 ```
 
 ## Gates do processo

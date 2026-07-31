@@ -127,6 +127,37 @@ O revisor produz apenas findings e uma decisão `GO` ou `NO-GO`; não corrige a 
 
 ## 7. Entregar evidências e um estado honesto
 
+### Resposta conversacional orientada à decisão
+
+A resposta ao programador é uma interface de decisão, não a reprodução do
+relatório completo. Começa sempre pelo resultado e usa esta ordem, adaptando
+apenas os campos não aplicáveis:
+
+1. `Decisão` — estado (`concluído`, `parcial`, `bloqueado` ou `não aplicável`),
+   recomendação em uma frase, confiança e decisão humana necessária;
+2. `Porquê` — no máximo três razões determinantes, uma frase por razão;
+3. `Opções` — apenas quando existir escolha material, entre duas e cinco opções
+   comparáveis por `opção | ganho | custo/risco | evidência/confiança`, com uma
+   opção explicitamente recomendada;
+4. `Prova` — alterações, verificações e resultados indispensáveis para confiar
+   na recomendação, sem despejar logs;
+5. `Riscos e bloqueios` — no máximo três riscos materiais e a condição concreta
+   para os resolver;
+6. `Próximo passo` — uma única ação recomendada; se depender do utilizador,
+   formula a decisão mínima em linguagem que permita responder rapidamente.
+
+O primeiro bloco deve caber normalmente em 8–12 linhas e permitir compreender
+o resultado sem ler o restante. Usa `Decisão necessária: nenhuma` quando não
+for exigida intervenção humana. Não listes alternativas que não recomendarias,
+não repitas contexto já aprovado e não escondas a conclusão no fim.
+
+Conserva matrizes, investigação, requisitos, logs, cálculos, findings e outra
+evidência extensa nos artefactos duráveis exigidos pelo prompt. Se o prompt não
+nomear um artefacto para um relatório material, cria um ficheiro de evidência
+com nome explícito dentro do âmbito autorizado e liga-o na resposta. A síntese
+conversacional referencia esses artefactos e não os transcreve. Um formato curto
+nunca autoriza omitir evidência, incerteza, estado do gate ou bloqueios.
+
 Na entrega, apresenta de forma concisa:
 
 - âmbito e etapas efetivamente executadas;

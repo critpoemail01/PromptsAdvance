@@ -21,8 +21,8 @@ concluído sem o verificar.
 
 - Modo da iniciativa: `[MODO_INICIATIVA]` (`greenfield` ou `brownfield`)
 - Pasta de origem: `[PASTA_ORIGEM_BOILERPLATE]`
-- Localização canónica da origem nesta workspace:
-  `C:\Work\BoilerPlateAdvance`
+- Localização canónica da origem: caminho absoluto registado no lifecycle,
+  confirmado em `APP_CONTEXT.md` e existente no sistema de ficheiros
 - Pasta de destino nova: `[PASTA_DESTINO]`, quando `greenfield`
 - Raiz da aplicação existente: `[RAIZ_APLICACAO_EXISTENTE]`, quando `brownfield`
 - Nome técnico válido para assemblies/namespaces: `[NOME_TECNICO]`
@@ -142,7 +142,7 @@ salta as secções greenfield.
 5. Mantém por defeito a fundação indicada em `MODULES.md`: API/OpenAPI/ProblemDetails, SSR público, Web/PWA, EF Core/migrations, Identity, configuração validada, health, rate limiting, headers de segurança, logging e resiliência. Remove uma capacidade apenas quando `[DECISAO_DE_MODULOS]` o determinar.
 6. Para cada capacidade removida, elimina o conjunto completo descrito em `MODULES.md`: código, serviços, middleware/endpoints, configuração, recursos, packages e testes. Compila após cada remoção relevante.
 7. Mantém integrações opcionais inativas enquanto não houver configuração real. Usa placeholders, User Secrets, variáveis de ambiente ou cofre de segredos; nunca copies credenciais para `appsettings*.json`.
-8. Copia `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`, `PRODUCT_DEFINITION.md`, `PRODUCT_QUALITY_BASELINE.md`, `CHANGE_CONTROL.md`, `CLAUDE.md`, `PILOT_APPROVAL.md`, `LIFECYCLE_GATE_EVIDENCE.json`, `QUALITY_GATES.md`, `PROCESS_MANIFEST.json` e `PROMPT_EVALUATION.md` para a raiz do destino, bem como `software-lifecycle.ps1`, `scripts/Test-ProductDefinitionGate.ps1`, `scripts/Test-ImplementationReadinessGate.ps1`, `scripts/Test-ProductQualityGate.ps1`, `scripts/Test-LifecycleGateEvidence.ps1` e a skill `.agents/skills/advance-app-continue`. Cria ou atualiza o `AGENTS.md` para exigir as leituras aplicáveis. Mantém no `AGENTS.md` apenas regras duradouras, comandos comprovados e links para documentação detalhada; não dupliques ali os protocolos integrais.
+8. Copia `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`, `PRODUCT_DEFINITION.md`, `PRODUCT_QUALITY_BASELINE.md`, `CHANGE_CONTROL.md`, `CLAUDE.md`, `PILOT_APPROVAL.md`, `LIFECYCLE_GATE_EVIDENCE.json`, `QUALITY_GATES.md`, `PROCESS_MANIFEST.json` e `PROMPT_EVALUATION.md` para a raiz do destino, bem como `DISCOVERY_RESEARCH.md` quando existir e `software-lifecycle.ps1`, `scripts/Test-ProductDefinitionGate.ps1`, `scripts/Test-ImplementationReadinessGate.ps1`, `scripts/Test-ProductQualityGate.ps1`, `scripts/Test-LifecycleGateEvidence.ps1` e a skill `.agents/skills/advance-app-continue`. Cria ou atualiza o `AGENTS.md` para exigir as leituras aplicáveis. Mantém no `AGENTS.md` apenas regras duradouras, comandos comprovados e links para documentação detalhada; não dupliques ali os protocolos integrais.
 9. Se o destino já pertencer a um repositório Git pai, confirma que esse repositório é o alvo aprovado; não cries um repositório aninhado. Se for uma aplicação autónoma, inicializa Git localmente, configura a branch principal aprovada e verifica `.gitignore`.
 10. Copia `APP_CONTEXT.md` e `IMPLEMENTATION_STATUS.md` para o destino quando forem fornecidos como artefactos do processo, atualizando apenas valores comprovados. Atualiza também `README.md`, CI e documentação operacional para refletirem os nomes, projetos e comandos reais.
 11. Preserva o comportamento e os contratos da base que não estejam explicitamente no âmbito de personalização.

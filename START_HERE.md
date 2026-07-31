@@ -70,7 +70,7 @@ Abre esta pasta no Codex e envia:
 Usa $advance-app-start.
 Inicia uma nova iniciativa chamada "nome-da-iniciativa".
 O responsável de produto é "nome-do-responsável".
-Usa o `BoilerPlateAdvance` em `C:\Work\BoilerPlateAdvance`.
+Usa o `BoilerPlateAdvance` em `/caminho/absoluto/BoilerPlateAdvance`.
 Inicializa o processo e executa apenas o primeiro prompt.
 ```
 
@@ -97,9 +97,9 @@ Na raiz deste catálogo:
   -Owner "Nome do responsável"
 ```
 
-Por omissão, a instância é criada em `..\SoftwareProcesses\nome-da-iniciativa`
-e usa `C:\Work\BoilerPlateAdvance`, na pasta irmã deste catálogo. Para outro
-destino ou boilerplate:
+Por omissão, a instância é criada em `../SoftwareProcesses/nome-da-iniciativa`
+e usa a pasta irmã `../BoilerPlateAdvance`, resolvida para um caminho absoluto.
+Para outro destino ou boilerplate:
 
 ```powershell
 .\software-lifecycle.ps1 start `

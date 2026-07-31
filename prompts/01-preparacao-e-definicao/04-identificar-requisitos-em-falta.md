@@ -68,7 +68,7 @@ Se `PRODUCT_DEFINITION.md` não existir, estiver vazio ou não for rastreável a
    - nenhuma linha usa ações/atores/locais/tempos genéricos sem identificar a
      regra, fronteira, evento e efeito observável concretos.
 6. Confirma que o MVP contém uma jornada ponta a ponta coerente e pequena, com inclusões e exclusões explícitas.
-7. Confirma a viabilidade face ao `BoilerPlateAdvance` em `C:\Work\BoilerPlateAdvance`, orçamento, prazo, competências, dependências, legalidade, privacidade e acesso ao público. Limita-te a adequação e riscos; não escolhas ainda módulos ou topologia.
+7. Confirma a viabilidade face ao `BoilerPlateAdvance` em `[PASTA_ORIGEM_BOILERPLATE]`, resolvida pelo lifecycle e confirmada em `APP_CONTEXT.md`, bem como orçamento, prazo, competências, dependências, legalidade, privacidade e acesso ao público. Limita-te a adequação e riscos; não escolhas ainda módulos ou topologia.
 8. Confirma que existe uma métrica de resultado, baseline ou método para a obter, meta, horizonte temporal, métricas de proteção e critério de continuar/parar.
 9. Produz uma reconciliação mecânica com contagens e listas de IDs para
    `APP`, `PAGE`, `FNC`, `RF-P`, requisitos canónicos e `AC`; amostragem não

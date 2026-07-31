@@ -74,11 +74,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Invoke-PromptPilot
   -Sandbox workspace-write
 ```
 
-EVAL-01-R2 deve alterar, no máximo, `PRODUCT_DEFINITION.md` e
-`IMPLEMENTATION_STATUS.md`; deixar a worktree limpa já não é o resultado
-esperado, porque o prompt 01 conserva a descoberta nesses artefactos. A revisão
-humana confirma qualidade e atualidade das fontes, coerência do scoring,
-sensibilidade, decisão, separação da revisão e ausência de métricas inventadas.
+EVAL-01-R2 deve alterar exatamente `DISCOVERY_RESEARCH.md`,
+`PRODUCT_DEFINITION.md` e `IMPLEMENTATION_STATUS.md`; deixar a worktree limpa
+já não é o resultado esperado, porque o prompt 01 conserva a descoberta nesses
+artefactos. A revisão humana confirma que a resposta começa pela decisão, que
+as cinco hipóteses são curtas e comparáveis, que o detalhe ficou no artefacto,
+e ainda qualidade e atualidade das fontes, coerência do scoring, sensibilidade,
+separação da revisão e ausência de métricas inventadas.
 
 O runner falha se a worktree não começar limpa. Cada diretório de evidência é imutável por convenção; uma repetição usa um novo identificador.
 

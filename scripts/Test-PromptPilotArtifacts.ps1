@@ -115,7 +115,11 @@ foreach ($caseId in $requiredCases) {
         $failures.Add("${caseId}: case was expected to remain clean")
     }
     if ($caseId -eq 'EVAL-01-R2') {
-        $allowedPrompt01Paths = @('PRODUCT_DEFINITION.md', 'IMPLEMENTATION_STATUS.md')
+        $allowedPrompt01Paths = @(
+            'DISCOVERY_RESEARCH.md',
+            'PRODUCT_DEFINITION.md',
+            'IMPLEMENTATION_STATUS.md'
+        )
         if (-not ($meta.PSObject.Properties.Name -contains 'changedPaths')) {
             $failures.Add('EVAL-01-R2: metadata does not contain changedPaths')
             $changedPrompt01Paths = @()
@@ -133,8 +137,13 @@ foreach ($caseId in $requiredCases) {
                 "EVAL-01-R2: changed paths outside the prompt 01 contract: " +
                 ($unexpectedPrompt01Paths -join ', '))
         }
-        if ($meta.afterClean -or $changedPrompt01Paths.Count -eq 0) {
-            $failures.Add('EVAL-01-R2: expected durable prompt 01 evidence was not written')
+        $missingPrompt01Paths = @($allowedPrompt01Paths | Where-Object {
+            $_ -notin $changedPrompt01Paths
+        })
+        if ($missingPrompt01Paths.Count -gt 0) {
+            $failures.Add(
+                'EVAL-01-R2: required prompt 01 evidence was not written: ' +
+                ($missingPrompt01Paths -join ', '))
         }
         if ($meta.beforeSha -ne $meta.afterSha) {
             $failures.Add('EVAL-01-R2: prompt 01 must not create a commit')

@@ -12,16 +12,19 @@ não uses a ausência dessas preferências para terminar `blocked`.
 Usa a data real e pesquisa online atual. Exercita o plano, routing e fallbacks,
 a exploração de 12–20 espaços, a matriz claim/fonte, o scoring ponderado, a
 análise de sensibilidade, as stopping conditions, o top 3 e a recomendação.
-Apresenta as cinco aplicações possíveis com problema, solução, modelo de
-negócio, novidade perante o que já existe e motivo comparativo para apostar em
-cada uma, numa estrutura direta e fácil de interpretar. Não inventes métricas
-nem estimes orçamento ou prazo.
+Conserva a análise completa em `DISCOVERY_RESEARCH.md`. Na resposta, começa
+pela decisão e apresenta as cinco hipóteses numa tabela curta com utilizador e
+problema, proposta em uma frase, pontuação/confiança e risco decisivo. O nome
+de cada hipótese tem no máximo 12 palavras; explica por que a primeira vence e
+termina com as três respostas rápidas definidas no prompt. Não transcrevas a
+matriz de fontes, os cálculos ou o benchmark. Não inventes métricas nem estimes
+orçamento ou prazo.
 
 O executor principal está em `workspace-write`; apenas o revisor independente
-é read-only. Persiste obrigatoriamente `PRODUCT_DEFINITION.md` e
-`IMPLEMENTATION_STATUS.md`. Uma rejeição de um comando PowerShell não torna a
-workspace read-only: usa a ferramenta de edição local suportada. Se uma escrita
-real falhar, apresenta o erro exato.
+é read-only. Persiste obrigatoriamente `DISCOVERY_RESEARCH.md`,
+`PRODUCT_DEFINITION.md` e `IMPLEMENTATION_STATUS.md`. Uma rejeição de um
+comando PowerShell não torna a workspace read-only: usa a ferramenta de edição
+local suportada. Se uma escrita real falhar, apresenta o erro exato.
 
 Rejeita qualquer nota que não esteja ligada a evidência que satisfaça
 textualmente a respetiva âncora; proxy ou canal plausível não justificam nota 5.
@@ -35,7 +38,7 @@ e pede a revisão separada, read-only e sem transcript definida no prompt. Se
 essa capacidade não estiver disponível, executa a autorrevisão e termina
 `parcial`, nunca `concluído` ou `independente`.
 
-Atualiza apenas `PRODUCT_DEFINITION.md` e
+Atualiza apenas `DISCOVERY_RESEARCH.md`, `PRODUCT_DEFINITION.md` e
 `IMPLEMENTATION_STATUS.md`, mantendo o Gate A `PENDENTE`. Não executes prompts
 posteriores, não cries aplicação/repositório e não realizes ações externas além
 da pesquisa read-only. Entrega o estado final e as evidências exigidas pelo

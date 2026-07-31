@@ -101,6 +101,20 @@ foreach ($relativePath in $requiredScripts) {
     }
 }
 
+Require-Pattern 'scripts/Test-ProcessInDisposableCopy.ps1' "catalogItem\.Name -eq '\.git'" 'A copia descartavel nao exclui explicitamente os metadados Git da origem.'
+Require-Pattern 'scripts/Test-ProcessInDisposableCopy.ps1' 'must not inherit source Git metadata' 'A copia descartavel nao verifica a ausencia de metadados Git herdados.'
+foreach ($portablePath in @(
+    'APP_CONTEXT.md',
+    'README.md',
+    'START_HERE.md',
+    'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md',
+    'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md',
+    'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md',
+    'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md'
+)) {
+    Forbid-Pattern $portablePath 'C:\\Work\\BoilerPlateAdvance' 'Um documento ou prompt ativo conserva um caminho Windows fixo para o boilerplate.'
+}
+
 $promptRoot = Join-Path $root 'prompts'
 $promptFiles = @(Get-ChildItem -LiteralPath $promptRoot -Recurse -File -Filter '*.md')
 if ($promptFiles.Count -ne 73) {
@@ -299,6 +313,7 @@ Require-Pattern 'software-lifecycle.ps1' 'Active/latest slice:' 'O estado nao ap
 Require-Pattern 'software-lifecycle.ps1' 'Gate command first:' 'O estado nao orienta a passagem do gate antes de selecoes bloqueadas.'
 Require-Pattern 'PROCESS_MANIFEST.json' '"taskLedgerRequired": true' 'O manifesto nao exige o task ledger estruturado.'
 Require-Pattern 'PROCESS_MANIFEST.json' '"findingsGateRequired": true' 'O manifesto nao exige o findings gate.'
+Require-Pattern 'PROCESS_MANIFEST.json' '"decisionFirstResponsesRequired": true' 'O manifesto nao exige respostas orientadas primeiro a decisao.'
 Require-Pattern 'software-lifecycle.ps1' "Command -eq 'work-start'" 'O lifecycle nao inicia tentativas de trabalho estruturadas.'
 Require-Pattern 'software-lifecycle.ps1' "(?s)Command -eq 'finding-add'.*Command -eq 'finding-resolve'.*Command -eq 'finding-gate'" 'O lifecycle nao implementa o ciclo completo de findings.'
 Require-Pattern 'software-lifecycle.ps1' "(?s)Command -eq 'cycle-start'.*CHANGE_STATUS.*approved.*BASELINE_LIFECYCLE_STATE.*currentPrompt = '01'" 'O lifecycle nao inicia um novo ciclo apenas a partir de uma proposta aprovada e arquivada.'
@@ -306,6 +321,7 @@ Require-Pattern 'CHANGE_CONTROL.md' '(?s)CHANGE_ID.*CHANGE_STATUS.*Analisar impa
 Require-Pattern 'software-lifecycle.ps1' '(?s)Assert-WorkAttemptCanComplete.*open or blocked findings' 'O closeout nao bloqueia goals ou findings incompletos.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)Command -eq ''record''.*Test-TaskLedgerRequired.*Assert-WorkAttemptCanComplete' 'O record completed nao aplica mecanicamente o task ledger.'
 Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)finding-add.*finding-gate' 'O contrato nao exige registo e gate de findings.'
+Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)Resposta conversacional orientada . decis.o.*interface de decis.o.*no m.ximo tr.s raz.es.*entre duas e cinco op..es.*Prova.*Riscos e bloqueios.*Pr.ximo passo.*8.12 linhas.*artefactos dur.veis' 'O contrato comum nao separa uma resposta curta de decisao da evidencia detalhada.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)work-start.*checkpoint.*finding-add' 'A skill nao conduz o task ledger durante cada prompt.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-04.*work ledger.*finding-gate.*record completed' 'O piloto nao exercita o findings gate durante a revisao adversarial.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11.*sem `work-start`.*goals.*incompletos.*finding aberto' 'O piloto nao tenta contornar o task ledger.'
@@ -317,7 +333,7 @@ Require-Pattern 'AGENTS.md' '(?s)work-start.*checkpointa goals.*findings.*record
 Require-Pattern 'PRODUCT_DEFINITION.md' 'DOR-12' 'A definicao do produto nao contem a checklist completa do Gate A.'
 Require-Pattern 'PRODUCT_DEFINITION.md' 'Decis.o do Gate A: GO' 'A definicao do produto nao especifica a decisao GO.'
 Require-Pattern 'AGENTS.md' 'Test-ProductDefinitionGate\.ps1' 'As instrucoes duradouras nao executam o gate da definicao.'
-Require-Pattern 'APP_CONTEXT.md' 'C:\\Work\\BoilerPlateAdvance' 'O contexto nao fixa a localizacao canonica do BoilerPlateAdvance.'
+Require-Pattern 'APP_CONTEXT.md' 'Raiz do BoilerPlateAdvance.*A preencher.*pendente.*software-lifecycle\.ps1' 'O contexto nao delega no lifecycle a resolucao portavel do BoilerPlateAdvance.'
 Require-Pattern 'APP_CONTEXT.md' 'Entrada aut.noma da descoberta.*Prompt 01' 'O contexto ainda transforma preferências em entradas obrigatorias do prompt 01.'
 Require-Pattern 'software-lifecycle.ps1' 'Join-Path\s+\(Split-Path\s+\$catalogRoot\s+-Parent\)\s+.+BoilerPlateAdvance' 'O orquestrador nao usa o BoilerPlateAdvance irmao do catalogo.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'N.o existem entradas obrigat.rias do utilizador' 'O prompt 01 ainda exige um questionario inicial.'
@@ -333,9 +349,9 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-ap
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Usa pesquisa web para amplitude.*abre a fonte original.*resultado for vazio, parcial ou suspeitosamente estreito.*fontes ou formula..es alternativas' 'O prompt 01 nao define routing e fallback de pesquisa.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)usando apenas as notas inteiras.*valores decimais.*Intensidade do problema.*Todas as notas.*5 = oportunidade mais favor.vel.*remove individualmente cada fonte material.*maior queda.*URL can.nico em ordem' 'O prompt 01 nao possui scoring ponderado e reproduzivel.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Condi..es de paragem da pesquisa.*duas rondas dirigidas consecutivas.*N.o fa.as novas pesquisas apenas para melhorar a reda..o' 'O prompt 01 nao possui stopping conditions verificaveis.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Formato obrigat.rio da entrega.*recomenda..o executiva.*matriz de evid.ncia.*recibo da revis.o independente' 'O prompt 01 nao exige uma resposta orientada a decisao e auditavel.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)lista compar.vel das cinco aplica..es poss.veis.*\*\*Problema:\*\*.*\*\*Solu..o:\*\*.*\*\*Modelo de neg.cio:\*\*.*\*\*O que traz de novo:\*\*.*\*\*Porque apostar nesta:\*\*' 'O prompt 01 nao entrega uma lista objetiva e uniforme de aplicacoes possiveis.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)linguagem direta.*f.cil de\s+interpretar.*Evita introdu..es gen.ricas.*jarg.o de\s+startups' 'O prompt 01 nao exige clareza e facilidade de interpretacao.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Artefacto detalhado obrigat.rio.*DISCOVERY_RESEARCH\.md.*matriz de claims e fontes.*scoring reproduz.vel.*recibo da revis.o independente.*recomenda..o final' 'O prompt 01 nao conserva a investigacao detalhada num artefacto auditavel.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Resposta obrigat.ria ao programador.*bloco `Decis.o`.*at. tr.s raz.es.*\| # \| Hip.tese \| Utilizador e problema \| Proposta em uma frase \| Pontua..o/confian.a \| Risco decisivo \|.*m.ximo 12 palavras.*top 3 com um trade-off.*aprovar recomenda..o.*escolher hip.tese #N.*pedir rework' 'O prompt 01 nao entrega hipoteses curtas e comparaveis para decisao rapida.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Liga `DISCOVERY_RESEARCH\.md`.*n.o transcrevas.*linguagem direta.*t.tulos previs.veis.*Evita introdu.*gen.ricas.*jarg.o de startups' 'O prompt 01 nao separa a sintese clara do detalhe auditavel.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)proveni.ncia upstream diferente.*Republica..es, sindica..o.*contam como uma .nica fonte' 'O prompt 01 permite falsa independencia entre fontes derivadas da mesma origem.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)Todas as notas est.o orientadas para `5 = oportunidade mais favor.vel`.*quatro cen.rios.*total continuar 100%.*ranking como inst.vel' 'O scoring e a sensibilidade do prompt 01 nao sao deterministicos.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)proxy de pagamento n.o satisfaz a .ncora 5 de monetiza..o.*canal apenas\s+plaus.vel n.o satisfaz a .ncora 5 de distribui..o' 'O prompt 01 permite notas maximas contraditas pela propria evidencia.'
@@ -343,12 +359,13 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-ap
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)finding alterar uma fonte material, nota, shortlist, top 3 ou finalista.*regenera a matriz de evid.ncia.*cen.rios de pesos.*recomenda..o' 'O prompt 01 nao invalida derivados depois de findings materiais.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)m.trica observ.vel e\s+limiar expl.cito de decis.o definidos agora.*n.o adies a m.trica para o\s+prompt 02' 'O prompt 01 permite experimentos sem metrica e limiar atuais.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' '(?s)atualiza..es s.o obrigat.rias quando a tarefa executora tiver\s+`workspace-write`.*tentativa real falhar.*erro exato' 'O prompt 01 pode alegar read-only sem tentar persistir os artefactos.'
-Require-Pattern 'pilot/cases/EVAL-01.md' '(?s)Executa apenas o prompt 01.*n.o\s+forneceu mercado.*12.20 espa.os.*scoring ponderado.*cinco aplica..es poss.veis.*problema, solu..o, modelo de.*termina\s+`parcial`' 'O caso executavel EVAL-01 nao exercita a descoberta zero-input atual.'
+Require-Pattern 'pilot/cases/EVAL-01.md' '(?s)Executa apenas o prompt 01.*n.o\s+forneceu mercado.*12.20 espa.os.*scoring ponderado.*DISCOVERY_RESEARCH\.md.*tabela curta.*m.ximo 12 palavras.*tr.s respostas r.pidas.*termina\s+`parcial`' 'O caso executavel EVAL-01 nao exercita a descoberta zero-input com resposta concisa.'
 Require-Pattern 'pilot/cases/EVAL-01.md' '(?s)executor principal est. em `workspace-write`.*proxy ou canal plaus.vel n.o justificam nota 5.*top 3 final.*m.trica observ.vel e um limiar' 'O caso EVAL-01 nao exercita os fallbacks descobertos no ensaio comportamental.'
 Require-Pattern 'pilot/cases/EVAL-01.md' '(?s)\A(?!.*prompt 07)(?!.*07-criar-projeto).*\z' 'O caso executavel EVAL-01 ainda testa o prompt 07 antigo.'
 Require-Pattern 'pilot/cases/EVAL-11.md' '(?s)07-criar-projeto-a-partir-do-boilerplate.*greenfield.*brownfield.*missing-application.*nenhuma aplica..o, processo parcial' 'O caso executavel EVAL-11 nao conserva os bloqueios de entradas do prompt 07.'
 Require-Pattern 'scripts/Invoke-PromptPilotCase.ps1' '(?s)Get-IgnoredFileSnapshot.*Get-FileHash -Algorithm SHA256.*Get-GitCommitObjectIds.*batch-all-objects.*newCommitObjectIds.*changedIgnoredPaths.*diff --name-only --no-renames HEAD.*ls-files --others --exclude-standard.*changedPaths = \$changedPaths' 'O runner piloto nao captura caminhos e commits de forma fechada.'
-Require-Pattern 'scripts/Test-PromptPilotArtifacts.ps1' "(?s)newCommitObjectIds.*EVAL-01-R2.*PRODUCT_DEFINITION.md.*IMPLEMENTATION_STATUS.md.*changedPaths.*beforeSha -ne.*afterSha" 'O oraculo piloto nao limita todas as escritas e commits do prompt 01.'
+Require-Pattern 'scripts/Test-PromptPilotArtifacts.ps1' "(?s)newCommitObjectIds.*EVAL-01-R2.*DISCOVERY_RESEARCH.md.*PRODUCT_DEFINITION.md.*IMPLEMENTATION_STATUS.md.*missingPrompt01Paths.*beforeSha -ne.*afterSha" 'O oraculo piloto nao exige todos os artefactos e limita todas as escritas e commits do prompt 01.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'DISCOVERY_RESEARCH\.md.*quando existir' 'O prompt 07 nao conserva a evidencia detalhada da descoberta.'
 Require-Pattern 'scripts/Test-PromptPilotArtifacts.ps1' "(?s)readOnlyCases.*EVAL-11.*isExpectedReadOnly.*beforeSha -ne.*afterSha" 'O oraculo piloto permite que EVAL-11 esconda alteracoes num commit.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'N.o solicites, estimes nem uses `\[OR.AMENTO\]` ou `\[PRAZO\]` nesta fase' 'O prompt 01 voltou a depender de orcamento ou prazo durante a descoberta.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'validados no DOR-09 antes do Gate A' 'O prompt 01 nao encaminha orcamento e prazo para a validacao posterior correta.'
@@ -361,8 +378,8 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-ap
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'categoria dispersa.*combinar v.rias aplica..es' 'O prompt 01 nao deteta necessidades dispersas por varias ferramentas.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'pelo menos dois tipos de fonte' 'O prompt 01 nao exige triangulacao suficiente para a recomendacao.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/01-descobrir-nova-ideia-de-app.md' 'n.o devolvas um question.rio inicial' 'O prompt 01 ainda pode terminar pedindo dados ao utilizador.'
-Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'C:\\Work\\BoilerPlateAdvance' 'O prompt 03 nao identifica a localizacao canonica do BoilerPlateAdvance.'
-Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'C:\\Work\\BoilerPlateAdvance' 'O prompt 07 nao identifica a origem canonica do BoilerPlateAdvance.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)exclusivamente pelo caminho absoluto registado no.*lifecycle' 'O prompt 03 nao resolve de forma portavel a localizacao canonica do BoilerPlateAdvance.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'caminho absoluto registado no lifecycle' 'O prompt 07 nao identifica a origem canonica registada no lifecycle.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'GO.*REWORK.*NO-GO' 'O prompt 04 nao produz uma decisao completa do Gate A.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'DOR-01 a DOR-12' 'O prompt 04 nao audita todos os criterios de passagem.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '10.15 nomes' 'O prompt 02 nao exige uma shortlist final de 10 a 15 nomes.'

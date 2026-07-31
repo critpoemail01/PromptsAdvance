@@ -161,7 +161,7 @@ Aliases:
 
 | Finalidade | Valor real | Estado | Fonte |
 |---|---|---|---|
-| Raiz do BoilerPlateAdvance | `C:\Work\BoilerPlateAdvance` | confirmado | Localização canónica desta workspace |
+| Raiz do BoilerPlateAdvance | A preencher | pendente | `software-lifecycle.ps1` regista o caminho absoluto validado |
 | Raiz da aplicação | A preencher | pendente | Sistema de ficheiros |
 | Solution filter Web | A preencher | pendente | Repositório |
 | Projeto de testes | A preencher | pendente | Repositório |

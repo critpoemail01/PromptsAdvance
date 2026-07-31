@@ -49,7 +49,16 @@ if ([string]::IsNullOrWhiteSpace([string]$powerShellExe)) {
 
 try {
     New-Item -ItemType Directory -Path $evaluationRoot | Out-Null
-    Copy-Item -LiteralPath $CatalogRoot -Destination $catalogCopy -Recurse
+    New-Item -ItemType Directory -Path $catalogCopy | Out-Null
+    foreach ($catalogItem in @(Get-ChildItem -LiteralPath $CatalogRoot -Force)) {
+        if ($catalogItem.Name -eq '.git') {
+            continue
+        }
+        Copy-Item -LiteralPath $catalogItem.FullName -Destination $catalogCopy -Recurse -Force
+    }
+    if (Test-Path -LiteralPath (Join-Path $catalogCopy '.git')) {
+        throw 'Disposable catalog copy must not inherit source Git metadata.'
+    }
     $linkItemType = $(if ($IsWindows) { 'Junction' } else { 'SymbolicLink' })
     New-Item -ItemType $linkItemType -Path $boilerplateLink -Target $boilerplateSource | Out-Null
 

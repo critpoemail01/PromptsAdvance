@@ -31,16 +31,16 @@ Lê integralmente, por esta ordem:
    `IMPLEMENTATION_STATUS.md` e `PRODUCT_DEFINITION.md`;
 3. `[FONTES_DE_REQUISITOS]` e apenas as fontes ligadas necessárias;
 4. `AGENTS.md`, `MODULES.md`, código, rotas, configuração e testes da
-   `[PASTA_ORIGEM_BOILERPLATE]`, cuja localização canónica é
-   `C:\Work\BoilerPlateAdvance`, em modo read-only.
+   `[PASTA_ORIGEM_BOILERPLATE]`, resolvida pelo lifecycle e confirmada em
+   `APP_CONTEXT.md`, em modo read-only.
 
 Confirma com evidência que os prompts 01 e 02 terminaram, que existe uma única
 oportunidade selecionada, owner de produto, problema, público, job to be done,
 proposta de valor, MVP preliminar e nome de trabalho. Resolve
 `[FONTES_DE_REQUISITOS]` a partir do contexto. Resolve
-`[PASTA_ORIGEM_BOILERPLATE]` primeiro como
-`C:\Work\BoilerPlateAdvance`; só aceita outro caminho quando o
-contexto da instância o declarar e a pasta existir. Não inventes caminhos.
+`[PASTA_ORIGEM_BOILERPLATE]` exclusivamente pelo caminho absoluto registado no
+estado do lifecycle e confirmado no contexto da instância; exige que a pasta
+exista. Não inventes caminhos nem uses um fallback específico do sistema operativo.
 
 Se faltar uma decisão ou fonte que altere uma jornada, dados, permissões,
 cobrança ou obrigação, conserva o trabalho independente e regista:

@@ -467,6 +467,19 @@ try {
 
     $statePath = Join-Path $fixtureRoot 'LIFECYCLE_STATE.json'
     $originalStateJson = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath
+    $startedState = $originalStateJson | ConvertFrom-Json
+    if ([System.IO.Path]::GetFullPath([string]$startedState.boilerplatePath) -ne
+        [System.IO.Path]::GetFullPath($boilerplate)) {
+        throw 'Start did not persist the exact resolved BoilerplatePath.'
+    }
+    $instanceContext = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'APP_CONTEXT.md')
+    if (-not $instanceContext.Contains("| Raiz do BoilerPlateAdvance | $boilerplate | confirmado | Sistema de ficheiros |")) {
+        throw 'Start did not confirm the resolved BoilerplatePath in APP_CONTEXT.md.'
+    }
+    $nextTask = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $fixtureRoot 'NEXT_TASK.md')
+    if (-not $nextTask.Contains('[PASTA_ORIGEM_BOILERPLATE]')) {
+        throw 'Prompt 01 no longer resolves the boilerplate through the lifecycle context placeholder.'
+    }
 
     $missingLedgerRecord = Invoke-RawLifecycle @(
         'record', '-ProcessRoot', $fixtureRoot, '-PromptId', '01',

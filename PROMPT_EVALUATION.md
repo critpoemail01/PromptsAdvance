@@ -27,12 +27,15 @@ autonomamente sem pedir aprovação para ações read-only. Antes da entrega, de
 tentar refutar fontes, métricas, fragmentação, diferenciação e ranking, corrigir
 o resultado e obter revisão realmente separada antes de usar `concluído`. A
 pontuação tem de usar pesos, âncoras e cálculo reproduzíveis, análise de
-sensibilidade e stopping conditions; a resposta começa pela decisão e liga cada
-claim material à fonte. As cinco aplicações possíveis usam estrutura comum com
-problema, solução, modelo de negócio, novidade concreta e razão comparativa para
-apostar; a redação deve ser direta e fácil de interpretar. Sem tarefa/agente
-separado, deve terminar `parcial` e identificar a lacuna. Não pode inventar
-métricas nem estimar orçamento/prazo.
+sensibilidade e stopping conditions. A análise completa, incluindo claims,
+fontes, cálculos e benchmark, fica em `DISCOVERY_RESEARCH.md`. A resposta começa
+por um bloco de decisão compacto, limita razões e riscos, apresenta uma tabela
+curta das cinco hipóteses com utilizador/problema, proposta, pontuação/confiança
+e risco, explica por que a primeira vence e termina com as respostas rápidas
+permitidas. Deve ser possível comparar as hipóteses sem abrir o artefacto, mas
+todo o detalhe omitido continua rastreável nele. Sem tarefa/agente separado,
+deve terminar `parcial` e identificar a lacuna. Não pode inventar métricas nem
+estimar orçamento/prazo.
 
 O avaliador rejeita notas cuja justificação não satisfaça textualmente a âncora,
 incluindo nota 5 de monetização baseada apenas num proxy ou nota 5 de
@@ -43,8 +46,9 @@ Cada oportunidade do top 5 tem de cumprir individualmente a suficiência de
 proveniências e tipos de fonte. Cada experimento tem de definir no prompt 01 uma
 métrica observável e um limiar de decisão, sem os adiar para o prompt 02.
 Quando o runner declarar `workspace-write`, o executor tem de persistir
-`PRODUCT_DEFINITION.md` e `IMPLEMENTATION_STATUS.md`; uma alegação de sandbox
-read-only sem tentativa de escrita e erro exato é falha material.
+`DISCOVERY_RESEARCH.md`, `PRODUCT_DEFINITION.md` e `IMPLEMENTATION_STATUS.md`;
+uma alegação de sandbox read-only sem tentativa de escrita e erro exato é falha
+material.
 
 ### EVAL-02 — alteração local limitada
 
@@ -544,6 +548,25 @@ lifecycle concorrente. A regressão estrutural deve provar estes contratos numa
 cópia descartável. Como a mudança altera o comportamento transversal de
 preparação e verificação, a suite completa, a avaliação humana e a revisão
 separada permanecem obrigatórias.
+
+Na `catalogVersion` `2026-07-31.2`, os prompts ativos passaram a resolver
+`[PASTA_ORIGEM_BOILERPLATE]` exclusivamente pelo caminho absoluto registado no
+lifecycle e confirmado em `APP_CONTEXT.md`, sem fallback Windows fixo. O runner
+da cópia descartável passou a copiar todos os itens, incluindo dotfiles, exceto
+`.git`, e cria depois um repositório novo para a candidata. A regressão deve
+passar em Windows, macOS e Linux quando esses ambientes estiverem disponíveis.
+Estas verificações estruturais não executam nem aprovam os 15 casos, a avaliação
+humana ou a revisão separada, que permanecem obrigatórios.
+
+Na `catalogVersion` `2026-07-31.3`, `EXECUTION_CONTRACT.md` passou a exigir para
+todos os prompts uma resposta de decisão curta, sem substituir os artefactos de
+evidência. O prompt 01 separa explicitamente a síntese da investigação: cria
+`DISCOVERY_RESEARCH.md` com fontes, claims, scoring, sensibilidade, benchmark e
+revisão, enquanto a conversa apresenta decisão, até três razões/riscos, cinco
+hipóteses em linhas curtas, trade-offs do top 3 e respostas rápidas. EVAL-01
+deve rejeitar detalhe despejado na resposta, hipóteses vagas ou a ausência de
+qualquer dos três artefactos. A validação estrutural não substitui a repetição
+de EVAL-01, da suite completa, da avaliação humana e da revisão separada.
 
 ## Referências
 
