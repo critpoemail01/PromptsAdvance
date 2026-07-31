@@ -60,3 +60,20 @@ Observações aprovadas:
 - Que informação e estados são apropriados numa página pública de visita?
 - Que padrões de páginas premium revelam estados ou ações em falta sem impor um
   dashboard genérico, stack ou identidade visual?
+
+## SRC-004 — ajuda contextual e formação
+
+| Campo | Valor |
+|---|---|
+| Owner | Fixture Product Owner |
+| Estado | aprovado para especificação; publicação externa não autorizada |
+| Âmbito | Ajuda contextual bilingue nas tarefas críticas; vídeos e Academia planeados |
+
+Decisões aprovadas:
+
+- cada tarefa crítica liga a um artigo nos idiomas materiais e ao respetivo
+  `APP/PAGE/FNC`, com perfil, permissões, passos, erros e resultado;
+- reatribuir trabalho é a primeira unidade candidata da ajuda contextual;
+- vídeos e cursos devem aparecer na matriz com estado `planeado`, sem escolher
+  fornecedor, criar canal, fazer upload ou inventar IDs nesta etapa;
+- o artigo textual continua disponível quando o player externo falhar.

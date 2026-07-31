@@ -15,6 +15,8 @@ Seleciona apenas os aplicáveis ao contrato e risco da página e justifica exclu
 - mobile e desktop, teclado, foco e nomes acessíveis;
 - snapshots dos estados estáveis em mobile/desktop e temas suportados;
 - sessão expirada, rede lenta/offline e os estados HTTP materialmente possíveis entre 401/403/404/409/429/500.
+- quando aplicável, ajuda correta para a rota e `FNC`, idiomas, abertura/fecho do
+  painel, foco, player simulado, fornecedor bloqueado e fallback textual.
 
 ## Processo
 

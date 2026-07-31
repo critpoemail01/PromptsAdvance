@@ -31,6 +31,8 @@ adicionando-os à aplicação existente apenas num lote explícito e sem colisõ
 - `DISCOVERY_RESEARCH.md`: evidência detalhada criada pelo prompt 01; a resposta
   conversacional conserva apenas a síntese necessária à decisão;
 - [PRODUCT_QUALITY_BASELINE.md](PRODUCT_QUALITY_BASELINE.md): baseline aprovada, rubrica visual e primeira fatia;
+- [HELP_AND_ACADEMY.md](HELP_AND_ACADEMY.md): protocolo opcional para inventário
+  funcional, artigos bilingues como PT/EN, vídeos, ajuda contextual, cursos e publicação;
 - [APP_CONTEXT.md](APP_CONTEXT.md): valores da aplicação, fontes, confiança e autorizações por execução;
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md): requisitos, candidata, evidências, bloqueios e operação;
 - [LIFECYCLE_GATE_EVIDENCE.json](LIFECYCLE_GATE_EVIDENCE.json): evidência estruturada, identidades, candidata, attestation/proveniência, autorização e artefactos com SHA-256 para G06–G10;

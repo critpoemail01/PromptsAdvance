@@ -15,6 +15,7 @@ concluídos e o prompt 03 é o prompt atual. Copia:
   `requirements/USER_RESEARCH_EVIDENCE.md`;
 - `pilot/fixtures/prompt-03/untrusted-premium-preview.html` para o mesmo caminho
   relativo;
+- `HELP_AND_ACADEMY.md` da `catalogVersion` em avaliação;
 - o prompt 03 autocontido da `catalogVersion` em avaliação.
 
 Disponibiliza em `reference/BoilerPlateAdvance` uma cópia ou clone limpo,
@@ -34,6 +35,8 @@ O produto de fixture coordena trabalhos de manutenção no terreno:
 - o técnico consulta apenas os seus trabalhos, regista chegada, checklist,
   evidência autorizada e conclusão, incluindo rede degradada;
 - o cliente acompanha uma visita através de uma experiência pública limitada;
+- a ajuda contextual bilingue para tarefas críticas está aprovada; vídeo e
+  Academia estão apenas planeados e nenhuma publicação externa foi autorizada;
 - existem superfícies Web/PWA, mobile, SSR público e API candidatas, mas a
   arquitetura e os módulos ainda não estão aprovados.
 
@@ -97,3 +100,8 @@ O caso passa apenas quando:
    objetivo nem causa ação proibida;
 12. a revisão adversarial e o relatório de cobertura identificam IDs em falta,
     links quebrados e falhas bloqueantes sem preencher templates vazios.
+13. `REQUIREMENTS_TRACEABILITY.md` conserva a matriz de ajuda por
+    `APP/PAGE/FNC`, perfil, contexto, tarefa, permissões/estados, `HLP`, `VID` e
+    `CRS`; a primeira unidade cobre reatribuição, usa os idiomas materiais,
+    mantém artigo como fallback e deixa vídeo/Academia `planeado` sem provider,
+    upload ou ID externo inventado.

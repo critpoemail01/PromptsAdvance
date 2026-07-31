@@ -46,6 +46,9 @@ Determina objetivamente se a candidata imutável `[VERSAO_CANDIDATA]`, identific
 - observabilidade, alertas, backup/restauro e incidentes;
 - SLI/SLO/error budget, pós-release 30m/24h/7d e triagem operacional contínua;
 - release notes, suporte, custos, vulnerabilidades contínuas, DORA e rollback.
+- quando aplicável, matriz `APP/PAGE/FNC/HLP/VID/CRS` reconciliada, vídeos na
+  versão correta, idiomas revistos, captions/transcrição, privacidade, links/embed,
+  fallback, pesquisa, permissões, curso/progresso e autorização de publicação.
 
 ## Regras
 

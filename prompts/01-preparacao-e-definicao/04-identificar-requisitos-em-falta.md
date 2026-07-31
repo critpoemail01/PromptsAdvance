@@ -11,6 +11,8 @@ Lê integralmente:
 - `AGENTS.md`;
 - `EXECUTION_CONTRACT.md`;
 - `PRODUCT_EXCELLENCE.md`;
+- `HELP_AND_ACADEMY.md`, quando ajuda contextual, vídeos ou Academia estiverem
+  em âmbito;
 - `PRODUCT_DEFINITION.md`;
 - `APP_CONTEXT.md`;
 - `IMPLEMENTATION_STATUS.md`;
@@ -67,6 +69,9 @@ Se `PRODUCT_DEFINITION.md` não existir, estiver vazio ou não for rastreável a
      concorrência, falha e recuperação material aparecem em linhas próprias;
    - nenhuma linha usa ações/atores/locais/tempos genéricos sem identificar a
      regra, fronteira, evento e efeito observável concretos.
+   - quando ajuda/Academia estiver em âmbito, existe matriz por `APP/PAGE/FNC`
+     com idiomas aprovados, vídeo, contexto, curso, owners e publicação,
+     privacidade, acessibilidade, invalidação e aceitação.
 6. Confirma que o MVP contém uma jornada ponta a ponta coerente e pequena, com inclusões e exclusões explícitas.
 7. Confirma a viabilidade face ao `BoilerPlateAdvance` em `[PASTA_ORIGEM_BOILERPLATE]`, resolvida pelo lifecycle e confirmada em `APP_CONTEXT.md`, bem como orçamento, prazo, competências, dependências, legalidade, privacidade e acesso ao público. Limita-te a adequação e riscos; não escolhas ainda módulos ou topologia.
 8. Confirma que existe uma métrica de resultado, baseline ou método para a obter, meta, horizonte temporal, métricas de proteção e critério de continuar/parar.
@@ -95,6 +100,8 @@ O Gate A não pode receber `GO` se ocorrer qualquer uma destas condições:
   usa texto genérico que permite implementações incompatíveis;
 - um projeto/superfície não comprovado é apresentado como aplicação ativa, ou
   uma biblioteca/API/job recebe uma página fictícia;
+- ajuda/Academia em âmbito sem matriz rastreável, idiomas decididos, owner,
+  primeira unidade vertical ou critérios de publicação e atualização;
 - conflito material sobre dados, permissões, cobrança, retenção, contrato, legalidade, orçamento, prazo ou viabilidade;
 - métrica de resultado ou critério de continuar/parar ausente;
 - DOR-01 a DOR-12 sem estado `passou` e evidência;

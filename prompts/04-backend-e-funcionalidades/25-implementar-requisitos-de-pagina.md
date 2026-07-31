@@ -18,6 +18,8 @@ Recebe IDs estáveis e `[FORA_DO_AMBITO]`. Se o pedido abranger várias rotas ou
 1. Confirma a superfície: `Client.Ssr`, `Client.Web`/`Client.Core` ou `Client.Maui`.
 2. Reproduz o estado atual e identifica layout, componentes, serviços, endpoint, modelo, policy e testes relacionados.
 3. Aplica o `PRODUCT_EXCELLENCE.md` ao padrão principal da página. Compara jornadas equivalentes de produtos profissionais e referências premium, adaptando apenas o que melhorar os critérios desta rota.
+   Se a página tiver ajuda/Academia aprovada, lê `HELP_AND_ACADEMY.md`, resolve
+   os IDs `APP/PAGE/FNC/HLP/VID/CRS` e inclui apenas as unidades selecionadas.
 4. Converte o pedido em critérios observáveis:
 
 | Cenário | Pré-condição | Ação | Resultado UI | Resultado servidor/dados |
@@ -33,6 +35,8 @@ Inclui loading, vazio, erro, sem permissão, conteúdo longo e repetição.
 - Garante autorização por recurso e evita confiar em IDs/roles do browser.
 - Usa operações assíncronas canceláveis, feedback claro e prevenção de double-submit.
 - Preserva query string, deep links, back/forward, localização e acessibilidade.
+- Associa ajuda por identidade funcional estável; a rota é contexto, não chave
+  canónica. Mantém artigo/fallback utilizável sem o player externo.
 - Não alteres outras páginas apenas para “uniformizar” sem relação com o requisito.
 
 ## Testes

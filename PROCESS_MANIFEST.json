@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-07-31.3",
+  "catalogVersion": "2026-07-31.4",
   "name": "Professional Advance .NET Software Lifecycle",
   "promptCount": 73,
   "executionPolicy": {
@@ -357,6 +357,7 @@
     "EXECUTION_CONTRACT.md",
     "CHANGE_CONTROL.md",
     "PRODUCT_EXCELLENCE.md",
+    "HELP_AND_ACADEMY.md",
     "PRODUCT_DEFINITION.md",
     "PRODUCT_QUALITY_BASELINE.md",
     "APP_CONTEXT.md",

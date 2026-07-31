@@ -28,7 +28,9 @@ Lê integralmente, por esta ordem:
 
 1. os `AGENTS.md` ou `AGENTS.override.md` aplicáveis;
 2. `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`, `APP_CONTEXT.md`,
-   `IMPLEMENTATION_STATUS.md` e `PRODUCT_DEFINITION.md`;
+   `IMPLEMENTATION_STATUS.md`, `PRODUCT_DEFINITION.md` e, quando ajuda
+   contextual/Academia estiver proposta, mencionada nas entradas ou em âmbito,
+   `HELP_AND_ACADEMY.md`;
 3. `[FONTES_DE_REQUISITOS]` e apenas as fontes ligadas necessárias;
 4. `AGENTS.md`, `MODULES.md`, código, rotas, configuração e testes da
    `[PASTA_ORIGEM_BOILERPLATE]`, resolvida pelo lifecycle e confirmada em
@@ -95,6 +97,7 @@ RF-P<NNN>-<NN>-<NN> obrigação atómica da funcionalidade na página
 BR regra de negócio        DATA contrato de dados      PERM autorização
 INT integração             NFR qualidade mensurável    SEC segurança/privacidade
 AC-<REQ>-## aceitação      SLICE fatia candidata
+HLP unidade de ajuda       VID vídeo                     CRS curso/aula
 ```
 
 Cada registo tem `evidenceState` (`confirmed`, `partial`, `inconclusive`,
@@ -238,7 +241,7 @@ Aplica estas regras sem exceção:
 - a contagem de `APP/PAGE/FNC/RF-P` e os IDs coincidem mecanicamente com a
   especificação, contratos PAGE, checklist e rastreabilidade.
 
-`REQUIREMENTS_TRACEABILITY.md` contém as vistas bidirecionais `SRC/DEC -> OBJ/CAP/JRN -> requisito`, `REF -> INS -> HYP -> decisão`, `JRN/STP -> APP -> PAGE/operação -> requisito -> AC`, `APP/PAGE -> BPP/BPR/BPC`, contratos transversais e requisito -> `SLICE`, além de órfãos, conflitos e bloqueios.
+`REQUIREMENTS_TRACEABILITY.md` contém as vistas bidirecionais `SRC/DEC -> OBJ/CAP/JRN -> requisito`, `REF -> INS -> HYP -> decisão`, `JRN/STP -> APP -> PAGE/operação -> requisito -> AC`, `APP/PAGE -> BPP/BPR/BPC`, contratos transversais e requisito -> `SLICE`, além de órfãos, conflitos e bloqueios. Quando ajuda/Academia estiver em âmbito, acrescenta a matriz `APP/PAGE/FNC -> perfil -> rota/contexto -> tarefa/resultado -> permissões/estados -> HLP por idioma aprovado -> VID -> ajuda contextual -> CRS -> estado/evidência`, sem tratar a rota como identidade canónica.
 Cada `SLICE` liga resultado, jornada, aplicação/página, requisitos mínimos, dados, permissões, erros, observabilidade, provas, dependências, exclusões e prompts downstream.
 
 O relatório de cobertura dá contagem, IDs em falta e passou/falhou para objetivos/fontes, jornadas/passos, aplicações/capacidades, páginas/navegação/ações/estados, divergências, inventário/mapeamentos, pesquisa/licenças, `INS/HYP`, atomicidade/aprovação, regras/dados/permissões, integrações/falhas, `NFR/SEC`, `AC/prova` e rastreabilidade.
@@ -355,6 +358,9 @@ owner e prazo.
 - Modela variantes como estados da mesma página quando partilham objetivo,
   rota e contrato; cria páginas distintas quando mudam objetivo, navegação,
   autorização ou responsabilidade.
+- Decide `não aplicável`, `planeada` ou `em âmbito` para ajuda/Academia. Se
+  estiver em âmbito, liga artigos, vídeos e cursos aos requisitos funcionais,
+  idiomas, owners, publicação, privacidade, acessibilidade e prova.
 
 ### 5. Derivar requisitos verificáveis
 

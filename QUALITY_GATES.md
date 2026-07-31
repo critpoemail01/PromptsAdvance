@@ -20,6 +20,9 @@ Validador: `scripts/Test-ProductDefinitionGate.ps1`.
   aprovado; nenhuma linha genérica finge que uma slice futura está pronta;
 - cada slice posterior passa um Definition of Ready no prompt 25/27, atualiza a
   fonte canónica e reconcilia checklist e `ALL_FUNCTIONALITIES.md` antes de código;
+- quando ajuda contextual/Academia estiver em âmbito, existe matriz
+  `APP/PAGE/FNC -> artigo -> vídeo -> ajuda -> curso`, idiomas, owners,
+  publicação externa e critérios de aceitação segundo `HELP_AND_ACADEMY.md`;
 - aprovação explícita da versão pelo responsável de produto.
 
 ## G02 — Arquitetura e fundação
@@ -34,6 +37,8 @@ Artefactos mínimos:
 - estratégia de configuração, segredos e ambientes;
 - avaliação proporcional de fiabilidade, segurança, custo, operação e performance;
 - módulos mantidos/removidos/adiados ligados a requisitos;
+- arquitetura de ajuda/Academia, resolução contextual, fallback e fornecedor
+  externo decididos apenas quando a capacidade estiver aprovada;
 - restore/build/testes reais da fundação quando existir código alterado.
 
 Bloqueia quando um serviço, framework, provider ou módulo é escolhido sem requisito ou quando uma decisão material continua implícita.
@@ -120,6 +125,8 @@ Critérios:
 - idempotência, repetição, timeout, falha parcial e recuperação onde aplicáveis;
 - contratos públicos e erros consistentes;
 - estados UI e acessibilidade mantidos;
+- unidades de ajuda em âmbito ligadas à mesma versão e critérios da
+  funcionalidade, sem vídeos finais sobre jornadas instáveis;
 - logs estruturados sem segredos/dados indevidos, métricas e traces úteis;
 - testes unitários, integração, contrato e browser proporcionais ao risco;
 - dívida e exceções com owner/prazo, sem critérios `Must` ocultamente parciais.
@@ -131,6 +138,8 @@ Critérios:
 - dependências, SBOM/licenças, advisories e proveniência revistos;
 - segredos, configuração, headers, rate limiting, input/output e logs auditados;
 - privacidade, retenção e direitos de dados revistos quando aplicáveis;
+- embeds/media externos, captions/transcrições, dados de demonstração, CSP,
+  tracking e autorização de acesso revistos quando ajuda multimédia for ativa;
 - acessibilidade avaliada em amostra representativa segundo metodologia W3C;
 - performance/carga com baseline, objetivos e ambiente registados;
 - resiliência, recovery e falhas de dependências testadas;
@@ -153,6 +162,8 @@ Critérios:
 ## G08/G09 — Aceitação, revisão independente e release
 
 - documentação e manutenção concluídas;
+- quando aplicável, matriz de ajuda reconciliada, idiomas aprovados revistos,
+  vídeos validados/publicados com autorização e regra de invalidação registada;
 - base SHA, candidate SHA, artefacto, digest e attestation imutáveis;
 - aceitação sobre a candidata exata;
 - revisão separada, read-only e sem transcript da implementação;

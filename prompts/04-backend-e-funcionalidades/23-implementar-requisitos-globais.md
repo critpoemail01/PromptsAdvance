@@ -25,6 +25,9 @@ Se o lote não for fornecido, propõe o menor corte vertical elegível e termina
 1. Confirma os requisitos, respetivas fontes, dependências e critérios de aceitação.
 2. Lê a arquitetura do derivado de `BoilerPlateAdvance` e preserva alterações locais.
 3. Se o lote alterar jornadas ou UI, aplica o `PRODUCT_EXCELLENCE.md` e liga cada padrão adotado a um requisito e critério observável.
+   Se o lote for ajuda contextual/Academia, lê `HELP_AND_ACADEMY.md` e limita a
+   primeira fatia ao registo central, painel, pesquisa/fallback e uma unidade
+   `FNC -> HLP por idioma -> VID -> contexto -> CRS` demonstrável.
 4. Cria um plano apenas para o lote e uma matriz `requisito → projeto → ficheiros → testes → risco`.
 5. Para perante requisitos contraditórios, alterações destrutivas de dados, contratos públicos incompatíveis ou decisões de produto sem resposta. Para lacunas menores, declara pressupostos reversíveis.
 
@@ -37,6 +40,9 @@ Se o lote não for fornecido, propõe o menor corte vertical elegível e termina
 - Reutiliza módulos existentes; não ativa Hangfire, SignalR, attachments, OData, telemetry, push ou MAUI se não forem necessários.
 - Mantém segredos fora do repositório e configurações por ambiente validadas.
 - Implementa uma fase do lote de cada vez, executa testes direcionados e atualiza a matriz antes de avançar.
+- Em ajuda/Academia, usa IDs estáveis `APP/PAGE/FNC/HLP/VID/CRS`, autorização no
+  servidor, progresso idempotente e fallback textual quando o player falhar.
+  Não faz upload real nem inventa IDs do fornecedor durante a implementação.
 - Não aproveites o contexto para corrigir requisitos adjacentes; regista-os como backlog.
 
 ## Qualidade e testes

@@ -36,7 +36,7 @@ Se as entradas de aplicação não estiverem completas, termina depois da propos
 
 ## Processo
 
-1. Lê `AGENTS.md`, requisitos, `README.md`, `MODULES.md`, projetos, packages, configuração, CI e documentação da base.
+1. Lê `AGENTS.md`, requisitos, `README.md`, `MODULES.md`, projetos, packages, configuração, CI e documentação da base; lê `HELP_AND_ACADEMY.md` quando essa capacidade estiver aprovada.
 2. Confirma superfícies ativas: `Client.Ssr`, `Client.Web`, `Client.Core`, `Client.Maui`, `Server.Api` e testes, adaptando nomes reais.
 3. Mapeia atores, jornadas, dados, integrações, disponibilidade, segurança, privacidade, performance, escala, operação e restrições.
 4. Produz:
@@ -52,6 +52,10 @@ Se as entradas de aplicação não estiverem completas, termina depois da propos
 - Mantém MAUI apenas se existir requisito nativo.
 - Ativa providers externos, push, SMS, Azure SignalR, Azure Monitor/OTLP ou Sentry apenas com caso de uso, configuração e smoke test.
 - Trata Hangfire, SignalR, attachments, OData, diagnósticos avançados e MAUI como capacidades acopladas: uma remoção deve cobrir código, configuração, packages, endpoints, recursos e testes.
+- Para ajuda/Academia aprovada, decide registo central `APP/PAGE/FNC`, resolução
+  de rota/contexto, armazenamento, pesquisa, autorização, localização, cursos/
+  progresso, cache/fallback e fronteira com o fornecedor de vídeo. Não uses
+  vídeo `não listado` como controlo de acesso nem escolhas API/provider sem requisito.
 - Não copies credenciais nem inventes infraestrutura.
 
 ## Fase 1 — Decisão arquitetural

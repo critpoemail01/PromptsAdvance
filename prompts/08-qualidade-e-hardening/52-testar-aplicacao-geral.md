@@ -38,6 +38,11 @@ Audita a qualidade da aplicação derivada de `BoilerPlateAdvance` dentro de `[J
 
 Valida happy paths e também: dados vazios/limite/inválidos, 401/403/404/409/429/500, repetição, concorrência, timeouts, rede lenta/offline, sessão expirada, deep links, mobile/tablet/desktop, teclado e idiomas/temas existentes.
 
+Quando ajuda/Academia estiver ativa, amostra a matriz `APP/PAGE/FNC -> HLP ->
+VID -> contexto -> CRS`: confirma versão da UI, idiomas, pesquisa/links, perfis,
+player bloqueado/indisponível, fallback, captions/transcrição e progresso. Não
+chama nem altera o canal externo durante uma auditoria diagnóstica.
+
 ## Regras
 
 Usa dados isolados e descartáveis. Credenciais entram por variáveis de ambiente (`[TEST_USER_EMAIL]`, `[TEST_USER_PASSWORD]`) e nunca ficam em ficheiros/logs. Não uses produção, não envies emails/notificações, não faças compras e não cliques em anúncios reais.

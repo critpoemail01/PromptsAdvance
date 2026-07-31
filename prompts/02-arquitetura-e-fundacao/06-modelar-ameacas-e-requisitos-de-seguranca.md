@@ -19,6 +19,9 @@ Usa a arquitetura, os módulos e os fluxos de dados aprovados no prompt 05. Se e
 
 1. Lê arquitetura, requisitos, `MODULES.md`, fluxos de dados, configuração, endpoints, identidade e deployment.
 2. Inventaria atores, ativos, entradas, dados sensíveis, processos, armazenamentos, canais externos e trust boundaries.
+   Quando ajuda multimédia/Academia estiver aprovada, inclui artigos internos,
+   progresso, embeds, cookies/telemetria, OAuth/upload e fornecedor de vídeo;
+   trata links `não listados` como partilháveis, não como controlo de acesso.
 3. Desenha um diagrama de fluxo de dados simples e numera os elementos.
 4. Analisa spoofing, tampering, repudiation, information disclosure, denial of service e elevation of privilege, complementando com abuso de lógica de negócio.
 5. Prioriza por impacto e explorabilidade; não atribuas números pseudoexatos sem dados.

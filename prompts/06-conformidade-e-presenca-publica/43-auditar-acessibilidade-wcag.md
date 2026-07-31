@@ -51,6 +51,9 @@ Define `[JORNADAS_E_ESTADOS_CRITICOS]`, browsers/viewports e tecnologias de apoi
    - alternativas textuais orientadas ao propósito;
    - imagens decorativas ignoradas;
    - legendas, transcrições e controlos acessíveis quando existir áudio/vídeo.
+   - para `HELP_AND_ACADEMY.md`, confirma captions revistas, transcrição ligada,
+     título do iframe/player, teclado, foco ao abrir/fechar e artigo equivalente;
+     captions automáticas sem revisão não satisfazem o critério.
 6. Conteúdo dinâmico:
    - nomes/roles/values corretos;
    - anúncios proporcionais por live regions;

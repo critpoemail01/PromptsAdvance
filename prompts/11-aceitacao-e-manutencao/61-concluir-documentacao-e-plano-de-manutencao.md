@@ -13,6 +13,9 @@ Entrega documentação verificável para desenvolvimento, operação, administra
 - Princípios de produto, benchmark e licenças de temas/assets incorporados têm fonte e owner.
 - SLI/SLO, error budget, pós-release, triagem diária, RUM, suporte, custos, vulnerabilidades e métricas DORA têm runbook, cadência e owner.
 - Links, comandos e exemplos foram validados.
+- Quando ajuda/Academia estiver em âmbito, a matriz está reconciliada com a UI
+  estável e cada unidade concluída tem artigo, vídeo, contexto, curso, versão,
+  revisão, autorização de publicação e owner de manutenção comprovados.
 
 ## Processo
 
@@ -21,6 +24,11 @@ Entrega documentação verificável para desenvolvimento, operação, administra
 3. Mantém `AGENTS.md` curto e orientado a trabalho; coloca explicações profundas na documentação adequada.
 4. Cria um mapa `necessidade → documento → proprietário → revisão`.
 5. Antes de remover ou arquivar documentação, confirma referências e preserva conteúdo único num destino explícito. Não elimines informação apenas por estar desatualizada se ainda não existir substituto validado.
+6. Para ajuda/Academia, lê `HELP_AND_ACADEMY.md`, valida primeiro artigos,
+   guiões, dados de demonstração, captions e vídeos locais. Só depois de
+   autorização explícita publica o lote no canal/playlist aprovados, regista
+   IDs/URLs e executa smoke test do embed/fallback. Sem autorização, prepara os
+   artefactos e termina `parcial`, sem inventar IDs externos.
 
 ## Conteúdo mínimo
 
@@ -35,10 +43,12 @@ Entrega documentação verificável para desenvolvimento, operação, administra
 - changelog/release notes e política de depreciação;
 - princípios de experiência do `PRODUCT_EXCELLENCE.md`, referências adotadas e registo de licenças, sem redistribuir material premium;
 - calendário de dependências, vulnerabilidades, certificados, backups e revisão legal.
+- matriz de ajuda por `APP/PAGE/FNC`, idiomas, perfil de vídeo, canal/
+  playlists, regra de invalidação por mudança de UI e calendário editorial.
 
 ## Validação
 
-Executa ou confirma comandos, verifica caminhos/links, gera OpenAPI quando aplicável e faz uma passagem de onboarding limpa sem conhecimento implícito. Confirma que cada fluxo operacional tem consulta read-only, limiar, owner, escalamento, autoridade corretiva e evidência guardada. Não coloca credenciais, endpoints privados ou dados pessoais em documentação versionada.
+Executa ou confirma comandos, verifica caminhos/links, gera OpenAPI quando aplicável e faz uma passagem de onboarding limpa sem conhecimento implícito. Confirma que cada fluxo operacional tem consulta read-only, limiar, owner, escalamento, autoridade corretiva e evidência guardada. Para cada vídeo em âmbito, compara estado inicial, passos, confirmação e resultado com a candidata atual; valida idiomas, captions/transcrição, pesquisa, painel, curso e fallback. Não coloca credenciais, endpoints privados ou dados pessoais em documentação versionada.
 
 ## Entrega
 

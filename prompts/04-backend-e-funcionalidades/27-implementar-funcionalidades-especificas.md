@@ -17,6 +17,8 @@ Recebe uma única funcionalidade, IDs de requisitos/aceitação, atores/permiss�
    antes de código; `approved_for_refinement` não autoriza implementação.
 1. Lê instruções e encontra funcionalidades análogas no projeto.
 2. Quando existir experiência visível, aplica o `PRODUCT_EXCELLENCE.md` e compara a jornada completa com produtos profissionais relevantes; não limites a referência ao screenshot do estado ideal.
+   Quando existir unidade de ajuda associada, lê `HELP_AND_ACADEMY.md` e inclui
+   no lote apenas os `HLP/VID/CRS` aprovados para esta `FNC`.
 3. Mapeia UI, contratos, API, domínio, persistência, autorização, jobs/integrações e testes.
 4. Regista invariantes, ownership, estados, concorrência, repetição, erros e requisitos de auditoria.
 5. Expõe perguntas que mudariam contrato, dados, cobrança, privacidade ou permissões. Usa pressupostos apenas quando reversíveis.
@@ -31,6 +33,9 @@ Recebe uma única funcionalidade, IDs de requisitos/aceitação, atores/permiss�
 - Usa migration e transação quando necessárias; torna callbacks/jobs/comandos idempotentes.
 - Trata loading, vazio, erro, offline/retry e double-submit.
 - Mantém secrets fora do código e não chama serviços reais nos testes.
+- Não declares a unidade de ajuda concluída sem paridade entre idiomas, associação
+  contextual, permissões, versão, owner, fallback e prova da tarefa completa;
+  gravação/publicação final fica para conteúdo estável e autorização própria.
 
 ## Validação
 

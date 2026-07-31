@@ -31,6 +31,9 @@ Define `[LOTE_DE_REQUISITOS]`, `[BROWSERS_E_VIEWPORTS]` e `[REPETICOES_ANTI_FLAK
 - Usa `GetByRole`, `GetByLabel`, `GetByText` e `GetByTestId` apenas quando necessário. Não usa seletores CSS frágeis.
 - Usa assertions web-first e espera por estados observáveis; não usa `Task.Delay`, sleeps fixos ou polling manual sem limite.
 - Cobre navegação global, autorização, validação, feedback, erro recuperável, refresh/deep link e responsividade essencial.
+- Para ajuda/Academia, cobre `APP/PAGE/FNC`, idiomas aprovados, pesquisa,
+  painel/teclado/foco, permissões, curso/progresso idempotente, player simulado,
+  fornecedor indisponível e fallback para o artigo; não chama YouTube real em CI.
 - Isola emails, pagamentos, push e outros efeitos externos com fakes/sandboxes locais já aprovados.
 - Preserva paralelismo; se um teste exigir serialização, documenta a causa e o âmbito mínimo.
 - Ativa trace, vídeo ou screenshot de acordo com a infraestrutura existente, preferencialmente em falha.

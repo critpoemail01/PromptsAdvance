@@ -81,6 +81,7 @@ $implementationPath = Join-Path $Worktree 'IMPLEMENTATION_STATUS.md'
 $productDefinitionPath = Join-Path $Worktree 'PRODUCT_DEFINITION.md'
 $manifestPath = Join-Path $CatalogRoot 'PROCESS_MANIFEST.json'
 $promptPath = Join-Path $Worktree 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md'
+$helpProtocolPath = Join-Path $Worktree 'HELP_AND_ACADEMY.md'
 $researchPath = Join-Path $Worktree 'requirements/REQUIREMENTS_RESEARCH.md'
 $specificationPath = Join-Path $Worktree 'requirements/REQUIREMENTS_SPECIFICATION.md'
 $traceabilityPath = Join-Path $Worktree 'requirements/REQUIREMENTS_TRACEABILITY.md'
@@ -97,6 +98,7 @@ $requiredPaths = @(
     $productDefinitionPath,
     $manifestPath,
     $promptPath,
+    $helpProtocolPath,
     $researchPath,
     $specificationPath,
     $traceabilityPath,
@@ -354,6 +356,13 @@ Require-Pattern -Content $traceability -Pattern '(?is)SRC-\d{3}.*JRN-\d{3}.*APP-
     -Message 'Traceability does not demonstrate the chain from source to proof.'
 Require-Pattern -Content $traceability -Pattern '(?is)bidirecional|vista inversa|requisito.*fonte' `
     -Message 'Traceability is not demonstrably bidirectional.'
+Require-Pattern -Content $traceability -Pattern '(?is)APP-\d{3}.*PAGE-\d{3}.*FNC-[^\s|]+.*perfil.*(?:rota|contexto).*permiss.*HLP-[^\s|]+.*VID-[^\s|]+.*CRS-[^\s|]+' `
+    -Message 'Traceability lacks the approved contextual-help and academy matrix.'
+Require-Pattern -Content $traceability -Pattern '(?is)(?=.*reatribu)(?=.*(?:portugu.s|pt-PT))(?=.*(?:espanhol|es-ES))(?=.*artigo)(?=.*fallback)(?=.*VID-.*(?:planead|pendente))(?=.*CRS-.*(?:planead|pendente))' `
+    -Message 'The first help unit does not preserve languages, fallback and honest planned video/course states.'
+if ($allRequirements -match '(?is)(?:YouTube|Vimeo|provider).{0,120}(?:publicad|upload conclu.do|ID externo).{0,80}(?:confirmad|conclu.do)') {
+    Add-Issue 'The requirements invent an external video provider/publication during prompt 03.'
+}
 Require-Pattern -Content $specification -Pattern '(?is)relat.rio de cobertura.*passou|relat.rio de cobertura.*falhou' `
     -Message 'The specification lacks a coverage report with pass/fail results.'
 Require-Pattern -Content $allRequirements -Pattern '(?is)QST-001.*pendente.*Fixture Product Owner' `

@@ -30,6 +30,9 @@ Usa primeiro scanners já existentes. Se não houver scanner, faz pesquisa dirig
 - Mantém placeholders sem aparência de credenciais reais.
 - Não coloca tokens, connection strings, certificados privados ou passwords em `appsettings*.json`, scripts, testes ou logs.
 - Garante que integrações condicionais ficam inativas quando a configuração está ausente.
+- Para ajuda multimédia/Academia, separa configuração pública do player de
+  credenciais de gestão/upload, valida domínios/CSP, canal/playlist e feature
+  flags por ambiente, e mantém a aplicação/artigo funcionais sem o fornecedor.
 - Configura persistência/proteção de Data Protection em produção segundo a topologia, sem inventar certificados.
 - Restringe CORS, origins, redirect URIs e hosts por ambiente.
 - Atualiza documentação e templates de variáveis sem valores secretos.

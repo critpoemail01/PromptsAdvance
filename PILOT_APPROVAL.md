@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-31.3 |
+| Catalog version | 2026-07-31.4 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -141,3 +141,13 @@ mostrar ao programador apenas uma tabela curta das cinco hipóteses, a recomenda
 e respostas rápidas. O caso EVAL-01 e o oráculo exigem agora essa separação e os
 três artefactos duráveis. Esta alteração material exige repetir EVAL-01 e a suite
 completa, com avaliação humana e revisão separada; o estado permanece `pending`.
+
+A versão 2026-07-31.4 acrescenta o percurso opcional de ajuda contextual,
+conteúdo bilingue, vídeos e Academia. `HELP_AND_ACADEMY.md` define inventário
+por `APP/PAGE/FNC`, IDs `HLP/VID/CRS`, perfil de produção, primeira unidade
+vertical, privacidade/acessibilidade, fallback e publicação externa autorizada.
+Os prompts 03–07, 09–10, 23–28, 31, 38–39, 43, 52 e 61–62 aplicam os checkpoints
+correspondentes. EVAL-15 passa a exigir a matriz e a rejeitar provider, upload
+ou IDs externos inventados. Esta alteração material exige repetir EVAL-15 e a
+suite completa, com avaliação humana e revisão separada; o estado permanece
+`pending`.

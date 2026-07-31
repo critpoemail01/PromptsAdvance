@@ -29,6 +29,9 @@ Executa uma auditoria de segurança baseada em risco contra `[VERSAO_ASVS]`, `[N
 - Verifica autorização por função e objeto, mass assignment, enumeração, rate limits e abuso de negócio.
 - Revê tokens, cookies, CORS, CSP/headers, Data Protection, secrets e logs.
 - Testa uploads, SSR, PWA, WebAuthn, SignalR, jobs e integrações apenas quando ativos.
+- Quando ajuda multimédia estiver ativa, revê CSP/frame-src, origem e
+  allowlist do embed, cookies/tracking, OAuth/segredos, autorização de artigos/
+  cursos, IDOR em progresso, validação de IDs/URLs e indisponibilidade do provider.
 - Não usa scanners como prova única e valida falsos positivos.
 - Não divulga payloads ofensivos, segredos ou dados pessoais no relatório.
 

@@ -23,6 +23,9 @@ Garante que SSR, Web/PWA, MAUI, API, emails e conteúdo partilhado apresentam `[
 3. Define fallback, cultura neutra, origem da preferência e comportamento entre SSR, Web e MAUI.
 4. Não traduzas conteúdo jurídico ou especializado como se estivesse aprovado; usa placeholders/revisão humana.
 5. Identifica conteúdo de produto, suporte e marketing que exige tradução/revisão humana; não declares uma língua concluída apenas porque todas as chaves têm valor.
+6. Quando ajuda/Academia estiver ativa, reconcilia cada `HLP/VID/CRS`: artigo,
+   termos da UI, narração, captions e transcrição têm idiomas e revisores
+   explícitos. Caption automática permanece provisória até revisão.
 
 ## Implementação e validação
 
@@ -33,6 +36,8 @@ Garante que SSR, Web/PWA, MAUI, API, emails e conteúdo partilhado apresentam `[
 - Testa culturas suportadas e uma cultura não suportada, timezone relevante, limites numéricos e texto longo.
 - Renderiza páginas/ecrãs críticos, verifica clipping, direção, foco e metadata.
 - Executa build/test e pesquisa strings visíveis hardcoded.
+- Compara passos, alertas, erros e resultado entre idiomas e a UI real; um texto
+  traduzido não pode instruir uma ação diferente nem ocultar uma permissão.
 
 ## Entrega
 

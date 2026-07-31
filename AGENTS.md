@@ -15,6 +15,9 @@ Antes de executar qualquer tarefa:
 5. Antes de aprovar arquitetura, UI, implementação, hardening, release ou operação, lê [QUALITY_GATES.md](QUALITY_GATES.md) e aplica o gate correspondente do [PROCESS_MANIFEST.json](PROCESS_MANIFEST.json).
    Para G06–G10, atualiza e valida `LIFECYCLE_GATE_EVIDENCE.json`; texto livre em `GateEvidence` não substitui identidades, hashes, candidata, autorização ou artefactos exigidos.
 6. Para tarefas de produto ou experiência posteriores à descoberta, lê também o [PRODUCT_QUALITY_BASELINE.md](PRODUCT_QUALITY_BASELINE.md) e usa a versão aprovada como gate mensurável.
+   Quando ajuda contextual, vídeos de utilização ou Academia estiverem em
+   âmbito, lê também [HELP_AND_ACADEMY.md](HELP_AND_ACADEMY.md) e aplica a matriz,
+   o perfil de produção, os limites de publicação e a Definition of Done.
 7. Lê o `APP_CONTEXT.md` quando existir e resolve apenas os valores necessários ao prompt atual.
 8. Lê o `IMPLEMENTATION_STATUS.md` quando existir para conhecer decisões, evidências, bloqueios e trabalho já concluído.
 9. Antes de concluir o Gate G03 ou depois de alterar materialmente este processo, lê e executa o `PROMPT_EVALUATION.md` numa cópia descartável. Exige `PILOT_APPROVAL.md` aprovado para a mesma `catalogVersion` e executa `scripts/Test-ImplementationReadinessGate.ps1`; uma revisão estática não aprova o piloto.

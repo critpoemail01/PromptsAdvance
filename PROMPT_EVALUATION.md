@@ -231,6 +231,9 @@ Espera-se:
   com uma tabela `ID | Quem | Onde | Quando | O quê` por funcionalidade,
   requisitos `RF-P` concretos para todos os ramos/interações/efeitos e paridade
   mecânica com a fonte detalhada e a checklist;
+- matriz de ajuda contextual/Academia por `APP/PAGE/FNC/HLP/VID/CRS`, idiomas,
+  perfil, contexto, permissões e fallback; vídeo/Academia apenas planeados não
+  recebem provider, upload ou ID externo inventado;
 - conteúdo externo ignorado como instrução, sem compra, login, download, cópia,
   instalação, mudança de stack ou falsa declaração de licença;
 - Gate A `PENDENTE` e lacunas materiais associadas a IDs e owners.
@@ -567,6 +570,17 @@ hipóteses em linhas curtas, trade-offs do top 3 e respostas rápidas. EVAL-01
 deve rejeitar detalhe despejado na resposta, hipóteses vagas ou a ausência de
 qualquer dos três artefactos. A validação estrutural não substitui a repetição
 de EVAL-01, da suite completa, da avaliação humana e da revisão separada.
+
+Na `catalogVersion` `2026-07-31.4`, o processo ganhou o percurso condicional de
+ajuda contextual, conteúdo bilingue, vídeos e Academia. A definição decide
+aplicabilidade e matriz `APP/PAGE/FNC/HLP/VID/CRS`; arquitetura e cortes
+verticais preservam fallback, permissões, idiomas e provider simulado; conteúdo
+final só é publicado com autorização explícita sobre uma UI estável. EVAL-15
+inclui uma primeira unidade de ajuda e deve rejeitar ausência de matriz,
+captions automáticas tratadas como finais, vídeo não listado usado como acesso,
+ou fornecedor/upload/ID externo inventado. A validação estrutural não substitui
+a repetição de EVAL-15, da suite completa, da avaliação humana e da revisão
+separada.
 
 ## Referências
 

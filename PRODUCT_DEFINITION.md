@@ -120,6 +120,7 @@ Liga aqui a especificação e a matriz produzidas pelo prompt 03.
 | Requisitos não funcionais bloqueantes | A preencher | pendente |
 | Atores e permissões iniciais | A preencher | pendente |
 | Dados sensíveis e obrigações conhecidas | A preencher | pendente |
+| Ajuda contextual/Academia: aplicabilidade e matriz | A preencher ou não aplicável com razão | pendente |
 
 Cada requisito `Must` da release deve ter ID estável, fonte, resultado,
 critério de aceitação, prioridade, dependências, owner e slice candidata. A

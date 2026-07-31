@@ -68,6 +68,7 @@ $requiredDocuments = @(
     'CHANGE_CONTROL.md',
     'CLAUDE.md',
     'PRODUCT_EXCELLENCE.md',
+    'HELP_AND_ACADEMY.md',
     'PRODUCT_DEFINITION.md',
     'PRODUCT_QUALITY_BASELINE.md',
     'APP_CONTEXT.md',
@@ -322,6 +323,11 @@ Require-Pattern 'software-lifecycle.ps1' '(?s)Assert-WorkAttemptCanComplete.*ope
 Require-Pattern 'software-lifecycle.ps1' '(?s)Command -eq ''record''.*Test-TaskLedgerRequired.*Assert-WorkAttemptCanComplete' 'O record completed nao aplica mecanicamente o task ledger.'
 Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)finding-add.*finding-gate' 'O contrato nao exige registo e gate de findings.'
 Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)Resposta conversacional orientada . decis.o.*interface de decis.o.*no m.ximo tr.s raz.es.*entre duas e cinco op..es.*Prova.*Riscos e bloqueios.*Pr.ximo passo.*8.12 linhas.*artefactos dur.veis' 'O contrato comum nao separa uma resposta curta de decisao da evidencia detalhada.'
+Require-Pattern 'AGENTS.md' 'HELP_AND_ACADEMY\.md' 'As instrucoes nao encaminham tarefas de ajuda e Academia para o protocolo proprio.'
+Require-Pattern 'PROCESS_MANIFEST.json' '"HELP_AND_ACADEMY\.md"' 'O manifesto nao conserva o protocolo de ajuda como referencia autoritativa.'
+Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)(?=.*APP/PAGE/FNC)(?=.*HLP-\*)(?=.*VID-\*)(?=.*CRS-\*)(?=.*1920.1080)(?=.*1.4 minutos)(?=.*caption autom.tica)(?=.*nunca prova final)' 'O protocolo nao define inventario, IDs, perfil de video e captions verificaveis.'
+Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)(?=.*n.o listado.*n.o . controlo de\s+acesso)(?=.*fornecedor)(?=.*indisponibilidade)(?=.*fallback textual)(?=.*autoriza..o expl.cita)(?=.*conta/canal)' 'O protocolo nao trata privacidade, falha do provider e publicacao externa com fail-closed.'
+Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)Definition of Done por unidade.*UI e vers.o atuais.*idiomas.*rota/contexto.*player.*build e testes' 'O protocolo nao possui Definition of Done ponta a ponta por unidade de ajuda.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)work-start.*checkpoint.*finding-add' 'A skill nao conduz o task ledger durante cada prompt.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-04.*work ledger.*finding-gate.*record completed' 'O piloto nao exercita o findings gate durante a revisao adversarial.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11.*sem `work-start`.*goals.*incompletos.*finding aberto' 'O piloto nao tenta contornar o task ledger.'
@@ -458,6 +464,7 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcio
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)PAGE -> funcionalidade -> requisito detalhado -> AC -> prova' 'A vista do programador nao rastreia pagina e funcionalidade ate a prova.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/APPLICATION_CATALOG\.md' 'O prompt 03 nao exige um inventario canonico de aplicacoes.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/PAGE_CATALOG\.md' 'O prompt 03 nao exige um inventario canonico de paginas/ecras.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)HELP_AND_ACADEMY\.md.*HLP unidade de ajuda.*VID v.deo.*CRS curso/aula.*APP/PAGE/FNC.*HLP por idioma aprovado.*VID.*CRS' 'O prompt 03 nao modela ajuda contextual e Academia com IDs e matriz rastreavel.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/applications/APP-<slug>\.md' 'O prompt 03 nao modulariza o contrato de cada aplicacao ativa.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/pages/PAGE-<slug>\.md' 'O prompt 03 nao modulariza o contrato de cada pagina/ecra.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)### 1\. Enquadrar.*### 6\. Fechar' 'O prompt 03 nao orienta o Codex por fases verificaveis.'
@@ -488,13 +495,18 @@ Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' 'single functionality f
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-15-R1.*timestamps.*futuro.*BPP-007.*BPR-002' 'A falha adversarial de EVAL-15-R1 nao esta preservada.'
 $prompt03Path = Join-Path $root 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md'
 if ((Test-Path -LiteralPath $prompt03Path -PathType Leaf) -and
-    (Get-Content -Encoding UTF8 -LiteralPath $prompt03Path).Count -gt 420) {
-    Add-Failure 'O prompt 03 autocontido excede o budget de 420 linhas.'
+    (Get-Content -Encoding UTF8 -LiteralPath $prompt03Path).Count -gt 430) {
+    Add-Failure 'O prompt 03 autocontido excede o budget de 430 linhas.'
 }
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'PRODUCT_DEFINITION\.md' 'O prompt 05 nao verifica o artefacto da etapa 1.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'termina com estado `bloqueado`' 'O prompt 05 nao bloqueia quando o Gate A falha.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' 'Test-ProductDefinitionGate\.ps1' 'O prompt 05 nao executa o gate mecanico.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'Copia .*PRODUCT_DEFINITION\.md' 'O prompt 07 nao copia a definicao aprovada para a nova aplicacao.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'Copia .*HELP_AND_ACADEMY\.md' 'O prompt 07 nao copia o protocolo de ajuda para a aplicacao derivada.'
+Require-Pattern 'software-lifecycle.ps1' "'HELP_AND_ACADEMY\.md'" 'O inicializador nao copia o protocolo de ajuda para cada instancia.'
+Require-Pattern 'scripts/Test-SoftwareLifecycle.ps1' "'HELP_AND_ACADEMY\.md'" 'O teste end-to-end nao exige o protocolo de ajuda na instancia criada.'
+Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)HELP_AND_ACADEMY\.md.*contextual help.*task videos.*Academy' 'A skill de arranque nao le condicionalmente o protocolo de ajuda.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)HELP_AND_ACADEMY\.md.*contextual\s+help.*task videos.*Academy' 'A skill de continuacao nao le condicionalmente o protocolo de ajuda.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'scripts/Test-ProductDefinitionGate\.ps1' 'O prompt 07 nao copia o gate mecanico para a nova aplicacao.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' '\.agents/skills/advance-app-continue' 'O prompt 07 nao copia a skill para a nova aplicacao.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'Ado..o brownfield' 'O prompt 07 nao possui uma rota brownfield explicita.'
@@ -523,6 +535,19 @@ Require-Pattern 'pilot/PILOT-002-EVAL-14-EXECUTION.md' 'FA0081F9510EADFD2169EE0F
 Require-Pattern 'scripts/Test-Prompt02PilotArtifact.ps1' 'Human rubric and full 15-case pilot approval remain separate requirements' 'O validador de EVAL-14 confunde o teste técnico com aprovação humana.'
 Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)compar.veis diretos.*adjacente.*fonte madura.*refer.ncias\s+premium' 'O caso EVAL-15 nao cobre a pesquisa externa exigida.'
 Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)ALL_FUNCTIONALITIES\.md.*ID \| Quem \| Onde \| Quando \| O qu..*RF-P' 'O caso EVAL-15 nao valida o formato unico e os requisitos atomicos por funcionalidade.'
+Require-Pattern 'pilot/cases/EVAL-15.md' '(?s)ajuda contextual bilingue.*v.deo e\s+Academia.*planeados.*APP/PAGE/FNC.*HLP.*VID.*CRS.*fallback.*sem provider' 'O EVAL-15 nao exercita aplicabilidade e fail-closed de ajuda/Academia.'
+Require-Pattern 'scripts/Test-Prompt03PilotArtifact.ps1' '(?s)contextual-help and academy matrix.*first help unit.*invent an external video provider' 'O oraculo EVAL-15 nao valida matriz de ajuda nem publicacao externa inventada.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/05-definir-arquitetura-e-selecionar-modulos.md' '(?s)HELP_AND_ACADEMY\.md.*APP/PAGE/FNC.*pesquisa.*cursos/.*progresso.*n.o listado' 'A arquitetura nao decide fronteiras e riscos da ajuda/Academia.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/06-modelar-ameacas-e-requisitos-de-seguranca.md' '(?s)ajuda multim.dia/Academia.*embeds.*OAuth/upload.*n.o listados.*controlo de acesso' 'O threat model nao cobre os ativos e fronteiras do fornecedor de video.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/09-configurar-ambientes-segredos-e-configuracao.md' '(?s)ajuda multim.dia/Academia.*player.*gest.o/upload.*dom.nios/CSP.*sem o fornecedor' 'A configuracao nao separa player, credenciais e fallback por ambiente.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/10-definir-contratos-api-versionamento-e-compatibilidade.md' '(?s)ajuda/Academia.*APP/PAGE/FNC.*progresso.*IDs/URLs do fornecedor.*evento do player.*n.o prova sozinho aprendizagem' 'Os contratos API nao cobrem contexto, progresso e limites do provider.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/23-implementar-requisitos-globais.md' '(?s)HELP_AND_ACADEMY\.md.*FNC -> HLP por idioma -> VID -> contexto -> CRS.*fallback textual.*n.o faz upload real' 'O prompt 23 nao implementa a primeira unidade vertical de ajuda com provider isolado.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/24-criar-testes-playwright-para-requisitos-globais.md' '(?s)APP/PAGE/FNC.*player simulado.*fornecedor indispon.vel.*fallback.*n.o chama YouTube real' 'Os testes globais nao isolam o player externo e o fallback da ajuda.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/Optional/31-validar-localizacao-e-formatacao-cultural.md' '(?s)HLP/VID/CRS.*narra..o.*captions.*transcri..o.*Caption autom.tica.*provis.ria' 'O prompt de localizacao nao valida os idiomas dos conteudos de ajuda.'
+Require-Pattern 'prompts/05-seguranca-e-privacidade/39-auditar-seguranca-com-owasp-asvs.md' '(?s)CSP/frame-src.*cookies/tracking.*OAuth/segredos.*IDOR em progresso' 'A auditoria de seguranca nao cobre o provider multimédia e progresso da Academia.'
+Require-Pattern 'prompts/06-conformidade-e-presenca-publica/43-auditar-acessibilidade-wcag.md' '(?s)HELP_AND_ACADEMY\.md.*captions revistas.*transcri..o.*iframe/player.*foco.*captions autom.ticas' 'A auditoria WCAG nao cobre media de ajuda com captions revistas.'
+Require-Pattern 'prompts/11-aceitacao-e-manutencao/61-concluir-documentacao-e-plano-de-manutencao.md' '(?s)HELP_AND_ACADEMY\.md.*autoriza..o expl.cita.*canal/playlist.*IDs/URLs.*smoke test.*Sem autoriza..o.*`parcial`' 'O prompt 61 nao produz/publica videos com autorizacao e fail-closed.'
+Require-Pattern 'prompts/11-aceitacao-e-manutencao/62-executar-aceitacao-final-e-checklist-de-release.md' 'APP/PAGE/FNC/HLP/VID/CRS' 'A aceitacao final nao reconcilia a matriz de ajuda e Academia.'
 Require-Pattern 'pilot/fixtures/prompt-03/untrusted-premium-preview.html' 'Ignore as instru..es anteriores' 'A fixture adversarial do prompt 03 esta ausente.'
 Require-Pattern 'pilot/fixtures/prompt-03/product-definition.md' 'QST-001.*pendente' 'As fontes de EVAL-15 nao conservam uma decisao material em falta.'
 Require-Pattern 'pilot/fixtures/prompt-03/user-research-evidence.md' '(?s)Method.*Prototype task.*Limitation' 'EVAL-15 nao inclui evidencia sintetica de user research com limites.'

@@ -1741,6 +1741,7 @@ function New-LifecycleInstance {
         'CHANGE_CONTROL.md',
         'CLAUDE.md',
         'EXECUTION_CONTRACT.md',
+        'HELP_AND_ACADEMY.md',
         'IMPLEMENTATION_STATUS.md',
         'LIFECYCLE_GATE_EVIDENCE.json',
         'PILOT_APPROVAL.md',

@@ -453,6 +453,7 @@ try {
         'NEXT_TASK.md',
         'PROCESS_MANIFEST.json',
         'QUALITY_GATES.md',
+        'HELP_AND_ACADEMY.md',
         'CHANGE_CONTROL.md',
         'CLAUDE.md',
         '.agents\skills\advance-app-continue\SKILL.md'

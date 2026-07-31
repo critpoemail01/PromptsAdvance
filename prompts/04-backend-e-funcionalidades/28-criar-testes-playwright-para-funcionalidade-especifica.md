@@ -28,6 +28,9 @@ Implementa testes Playwright end-to-end para `[FUNCIONALIDADE]` e os critérios 
 - Para trabalho assíncrono, espera por um estado observável com timeout explícito; não usa sleeps fixos.
 - Valida efeitos persistidos e ausência de efeitos em falha, incluindo operações duplicadas.
 - Substitui email, SMS, push, pagamentos, armazenamento ou outros fornecedores por fakes/sandboxes previstos na infraestrutura.
+- Substitui também o player/API de vídeo externo; valida o `VID` correto,
+  artigo relacionado, captions/transcrição disponíveis, fallback e progresso
+  idempotente sem interpretar um evento do player como prova de aprendizagem.
 - Recolhe trace/vídeo/screenshot segundo a política existente e redige valores sensíveis.
 - Para estados visualmente estáveis, compara snapshots aprovados de mobile/desktop, temas suportados e normal/loading/vazio/erro/conteúdo longo num ambiente fixo; publica o diff e nunca atualiza a baseline sem `[AUTORIZAR_ALTERACAO_DE_BASELINE_VISUAL]`.
 - Executa checks automáticos de acessibilidade e regista a avaliação manual da jornada crítica.

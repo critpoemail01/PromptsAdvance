@@ -26,6 +26,9 @@ Se consumidores ou âmbito não estiverem identificados, inventaria e propõe co
 2. Identifica consumidores, cadência de atualização, versões mínimas e necessidade real de versionamento.
 3. Regista inconsistências e propõe uma convenção mínima para o âmbito antes de editar.
 4. Cria a matriz `operação → consumidor → contrato → erros → autorização → idempotência → compatibilidade`.
+   Se ajuda/Academia estiver em âmbito, inclui apenas os contratos necessários
+   a registo/pesquisa, resolução `APP/PAGE/FNC`, conteúdo localizado e progresso;
+   IDs/URLs do fornecedor são dados validados, não autoridade nem prova de acesso.
 
 ## Implementação
 
@@ -37,6 +40,9 @@ Se consumidores ou âmbito não estiverem identificados, inventaria e propõe co
 - Usa tokens de concorrência e idempotency keys em operações cujo replay pode causar dano.
 - Não adiciona versionamento por antecipação. Se necessário, documenta suporte, depreciação e migração.
 - Atualiza clientes e testes em conjunto; não quebra MAUI ou integrações existentes sem decisão explícita.
+- Para progresso de cursos, define identidade do utilizador, deduplicação,
+  concorrência, autorização por objeto e semântica observável de conclusão; um
+  evento do player não prova sozinho aprendizagem nem autoriza o conteúdo.
 - Não normalizes endpoints fora de `[API_SCOPE]`; regista inconsistências adjacentes para outro lote.
 
 ## Validação

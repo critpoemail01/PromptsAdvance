@@ -17,7 +17,8 @@ new greenfield lifecycle from this skill.
 2. Treat that directory as the lifecycle root.
 3. Read `AGENTS.md`, `EXECUTION_CONTRACT.md`, `CHANGE_CONTROL.md`,
    `APP_CONTEXT.md`, `IMPLEMENTATION_STATUS.md`, `LIFECYCLE_STATE.json` when
-   present, and the current prompt.
+   present, and the current prompt. Read `HELP_AND_ACADEMY.md` when contextual
+   help, task videos, or an Academy is in scope for the current prompt.
 4. Read [workflow.md](references/workflow.md) completely before selecting a prompt or crossing a stage.
 5. Read [quality-gates.md](references/quality-gates.md) and the root `QUALITY_GATES.md` before architecture, UI/UX, implementation, hardening, acceptance, release, or operations work.
 

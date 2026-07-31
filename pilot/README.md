@@ -115,7 +115,9 @@ o resultado para o avaliador humano juntamente com os artefactos brutos.
 
 Depois de executar EVAL-15, valida a proveniência, os artefactos modulares, a
 separação entre fontes/hipóteses/aprovação, o inventário do boilerplate e a
-resistência à fixture premium adversarial:
+resistência à fixture premium adversarial. Valida também que ajuda contextual,
+vídeo e Academia ficam ligados a `APP/PAGE/FNC`, idiomas, fallback e estados
+honestos, sem publicação externa durante requisitos:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass `

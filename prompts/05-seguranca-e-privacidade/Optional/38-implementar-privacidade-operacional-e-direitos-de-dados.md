@@ -23,6 +23,8 @@ Implementa processos técnicos verificáveis para acesso/exportação, retifica�
 ## Processo
 
 1. Mapeia dados em base, storage, logs, telemetry, backups, emails, pagamentos e fornecedores.
+   Inclui vídeos, thumbnails, captions, transcrições, progresso de cursos,
+   identificadores do player, cookies/telemetria e dados enviados ao fornecedor.
 2. Liga identificadores entre sistemas e identifica dados de terceiros/tenants.
 3. Confirma no artefacto aprovado workflow, prazos, aprovações, exceções, legal hold e comunicação ao titular.
 4. Regista divergências; não inventa bases legais ou prazos nem escolhe silenciosamente entre código e política.
@@ -35,6 +37,9 @@ Implementa processos técnicos verificáveis para acesso/exportação, retifica�
 - Regista quem, quando, âmbito, resultado e exceção, minimizando dados no próprio audit log.
 - Testa utilizador normal, conta comprometida simulada, dados partilhados, pedido repetido, provider indisponível, legal hold e recuperação parcial.
 - Executa em dados sintéticos; não processa pedidos reais sem autorização.
+- Trata vídeos `não listados` como partilháveis por link, não como conteúdo
+  privado; grava apenas ambiente de demonstração sem dados pessoais/segredos e
+  valida consentimento/fallback do embed conforme a decisão aprovada.
 
 ## Entrega
 

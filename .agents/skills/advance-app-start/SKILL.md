@@ -13,7 +13,9 @@ copy the boilerplate into an application, or skip product discovery and gates.
 1. Locate the nearest `PROCESS_MANIFEST.json` and `software-lifecycle.ps1` and
    treat that directory as the catalog root.
 2. Read `AGENTS.md`, `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`,
-   `APP_CONTEXT.md`, `IMPLEMENTATION_STATUS.md`, and prompt 01 completely.
+   `APP_CONTEXT.md`, `IMPLEMENTATION_STATUS.md`, and prompt 01 completely. Read
+   `HELP_AND_ACADEMY.md` when contextual help, task videos, or an Academy is in
+   the approved or proposed scope.
 3. Require the initiative name and product owner. Normalize a user-facing
    initiative label such as `Minha App` to a safe lowercase slug such as
    `minha-app`; report the normalization and do not present it as approved
