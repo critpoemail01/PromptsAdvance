@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-31.4 |
+| Catalog version | 2026-07-31.5 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -151,3 +151,10 @@ correspondentes. EVAL-15 passa a exigir a matriz e a rejeitar provider, upload
 ou IDs externos inventados. Esta alteração material exige repetir EVAL-15 e a
 suite completa, com avaliação humana e revisão separada; o estado permanece
 `pending`.
+
+A versão 2026-07-31.5 remove do prompt 02 a consulta intermédia a WIPO/EUIPO e
+proíbe pausar o fluxo para o utilizador resolver CAPTCHA, login ou outra ação
+manual. A triagem pública de associação e as provas OVHcloud/RDAP permanecem;
+a validação jurídica formal passa para depois da decisão do nome de trabalho.
+Esta alteração material exige repetir EVAL-14 e a suite completa, com avaliação
+humana e revisão separada; o estado permanece `pending`.

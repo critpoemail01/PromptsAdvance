@@ -97,12 +97,15 @@ A pesquisa online não prova objetivamente que um nome “soa bem”. Para o top
 
 Para cada candidato em `linguistico_pass`, pesquisa o nome completo e cada componente:
 
-- motores de pesquisa, lojas de aplicações e handles sociais prioritários;
-- aplicações, empresas e marcas no mesmo setor ou em setores confundíveis;
-- WIPO Global Brand Database, EUIPO e bases nacionais/regionais aplicáveis;
+- motores de pesquisa, lojas de aplicações, handles sociais prioritários e páginas públicas oficiais de produtos/empresas;
+- aplicações, empresas, produtos e marcas conhecidas no mesmo setor ou em setores confundíveis;
 - nome exato com e sem espaço e, nos compostos ou neologismos morfológicos, pesquisa separadamente cada palavra significativa e raiz lexical com `app`, `software`, `company`, `trademark`, setor e equivalentes locais.
 
-Regista consulta, jurisdição/classes relevantes, resultado, fonte, timestamp e limite. Exclui um `conflito potencial material`, mesmo que o nome completo não apareça e o domínio esteja disponível. Uma ausência de resultados não é parecer jurídico.
+Esta é uma triagem pública de associação, não uma pesquisa jurídica formal. Não consultes bases jurídicas especializadas de marcas neste prompt e não peças ao utilizador para resolver CAPTCHA, iniciar sessão ou executar outra intervenção manual.
+Se uma fonte pública bloquear o acesso, regista `indisponível`, continua com as restantes fontes/candidatos e não interrompas o fluxo. Conserva no `NAMING_RESEARCH.md` os marcadores `Triagem jurídica formal: fora do âmbito` e `Intervenção manual solicitada: não`.
+
+Regista consulta, resultado, fonte, timestamp e limite. Exclui um `conflito potencial material`, mesmo que o nome completo não apareça e o domínio esteja disponível.
+Uma ausência de resultados não é parecer jurídico; a validação jurídica formal fica como passo posterior à decisão do nome de trabalho.
 
 ### 5. Verifica o domínio `.com`
 
@@ -112,10 +115,10 @@ Só depois dos gates anteriores, para cada candidato em `associacao_pass`:
 2. Regista o texto apresentado para esse domínio, preço de registo, preço de renovação, moeda, IVA/taxas, promoções ou condições plurianuais, timestamp e evidência reproduzível, como URL e screenshot.
 3. Não uses tabela genérica de preços, snippet, DNS vazio ou site sem resposta como prova.
 4. Marca `dominio_pass` apenas quando a OVHcloud o oferecer explicitamente para registo imediato standard, sem `premium`, aftermarket, corretagem ou contacto com titular, e ambos os preços respeitarem o orçamento.
-5. Confirma com ICANN Lookup ou RDAP autoritativo: resposta `200` com objeto de domínio/registo ativo significa `indisponível`; `404`/`not found` significa apenas `sem registo encontrado` e exige em conjunto a oferta explícita da OVHcloud; `429`, CAPTCHA, rate limits, timeout, bloqueio ou contradição significa `inconclusivo`.
+5. Confirma com ICANN Lookup ou RDAP autoritativo: resposta `200` com objeto de domínio/registo ativo significa `indisponível`; `404`/`not found` significa apenas `sem registo encontrado` e exige em conjunto a oferta explícita da OVHcloud; `429`, CAPTCHA, rate limits, timeout, bloqueio ou contradição significa `inconclusivo` para esse candidato e o fluxo continua sem pedir intervenção manual.
 6. Exclui `indisponível`, `premium`, `acima do orçamento`, `conflito potencial material` ou `inconclusivo`.
 
-Não contornes CAPTCHA ou controlos de acesso. Não inicies sessão, reserves, compres nem adiciones domínios ao carrinho. Se OVHcloud ou RDAP não puderem ser consultados, não substituas a prova por inferência.
+Não contornes CAPTCHA ou controlos de acesso nem peças ao utilizador para os resolver. Não inicies sessão, reserves, compres nem adiciones domínios ao carrinho. Se OVHcloud ou RDAP não puderem ser consultados, não substituas a prova por inferência.
 
 ### 6. Itera, revalida e ordena
 
@@ -157,7 +160,5 @@ Existem 10–15 nomes materialmente diversos; todos percorreram o registo de est
 - https://lookup.icann.org/en
 - https://www.icann.org/rdap
 - https://www.iana.org/help/rdap-requirements
-- https://www.wipo.int/en/web/global-brand-database
-- https://www.euipo.europa.eu/en/trade-marks
 - https://forvo.com/
 - https://youglish.com/

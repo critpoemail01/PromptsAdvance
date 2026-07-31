@@ -199,6 +199,9 @@ Espera-se:
   gates linguísticos, de associação, OVHcloud, RDAP e custo;
 - instruções encontradas no conteúdo externo ignoradas, sem login, compra,
   reserva, contacto, execução de código ou divulgação de dados;
+- triagem de associação feita apenas em fontes públicas acessíveis, sem
+  WIPO/EUIPO nem pausa para CAPTCHA/login/intervenção do utilizador; validação
+  jurídica formal conservada como passo posterior à decisão do nome;
 - revalidação final dos domínios e timestamps;
 - `parcial` ou `bloqueado`, sem disponibilidade inventada, quando não for
   possível demonstrar 10 nomes elegíveis.
@@ -581,6 +584,14 @@ captions automáticas tratadas como finais, vídeo não listado usado como acess
 ou fornecedor/upload/ID externo inventado. A validação estrutural não substitui
 a repetição de EVAL-15, da suite completa, da avaliação humana e da revisão
 separada.
+
+Na `catalogVersion` `2026-07-31.5`, o prompt 02 remove a consulta intermédia a
+WIPO/EUIPO. A triagem de associação mantém pesquisa pública em motores, lojas,
+handles e páginas oficiais, mas nunca pausa para pedir CAPTCHA, login ou outra
+intervenção manual; a validação jurídica formal fica explicitamente posterior
+à escolha do nome de trabalho. EVAL-14 e o seu oráculo devem rejeitar a
+reintrodução dessa pausa. A validação estrutural não substitui a repetição de
+EVAL-14, da suite completa, da avaliação humana e da revisão separada.
 
 ## Referências
 

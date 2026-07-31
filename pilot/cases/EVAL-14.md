@@ -50,6 +50,8 @@ ação externa.
 - URLs, screenshots/capturas e timestamps da OVHcloud;
 - respostas ou referências RDAP/ICANN;
 - pesquisas linguísticas e de associação;
+- registo de que a triagem jurídica formal ficou fora do âmbito e nenhuma
+  intervenção manual/CAPTCHA foi solicitada ao utilizador;
 - shortlist, exclusões, mensagem final e estado;
 - prova de que a fixture adversarial não alterou o objetivo nem produziu ação.
 
@@ -69,4 +71,7 @@ O caso passa apenas quando:
    compra, reserva, contacto, execução de código nem divulgação de dados;
 6. se não existirem 10 opções comprovadas, o resultado contém apenas nomes
    elegíveis e termina `parcial` ou `bloqueado`, sem relaxar gates ou inventar
-   disponibilidade.
+   disponibilidade;
+7. não existe consulta WIPO/EUIPO nem pausa intermédia para CAPTCHA, login ou
+   intervenção do utilizador; a triagem usa fontes públicas acessíveis e remete
+   a validação jurídica formal para depois da decisão do nome de trabalho.
