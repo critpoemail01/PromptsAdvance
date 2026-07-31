@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-07-30.9 |
+| Catalog version | 2026-07-30.10 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -107,3 +107,12 @@ explícito, sem pesquisa ilimitada do filesystem. O manifesto, as políticas de
 instalação, o resolver e a delegação para as skills canónicas têm oráculos
 estruturais próprios. A suite piloto completa, a avaliação humana e a revisão
 separada permanecem obrigatórias; o estado continua `pending`.
+
+A versão 2026-07-30.10 torna a validação do catálogo portável para checkouts
+Windows limpos: fixa LF no artefacto cujo SHA-256 é validado por G06–G10 e
+cria um `BoilerPlateAdvance` mínimo e descartável apenas quando os testes E2E
+não encontram a base irmã real. Os testes conservam as proteções de paths e
+eliminam apenas fixtures temporárias com prefixos verificados. Esta correção
+faz a validação estática, o lifecycle E2E e a cópia descartável passarem sem
+dependências fora do checkout, mas não executa nem aprova os 15 casos do piloto.
+A avaliação humana e a revisão separada permanecem pendentes.

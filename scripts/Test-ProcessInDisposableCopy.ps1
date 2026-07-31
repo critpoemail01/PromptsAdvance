@@ -22,8 +22,16 @@ else {
 }
 
 $boilerplateSource = [System.IO.Path]::GetFullPath((Join-Path $CatalogRoot '..\BoilerPlateAdvance'))
+$ownedBoilerplateFixture = $null
 if (-not (Test-Path -LiteralPath $boilerplateSource -PathType Container)) {
-    throw "BoilerPlateAdvance is missing: $boilerplateSource"
+    $ownedBoilerplateFixture = Join-Path ([System.IO.Path]::GetTempPath()) `
+        ('prompts-boilerplate-source-' + [Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $ownedBoilerplateFixture | Out-Null
+    [System.IO.File]::WriteAllText(
+        (Join-Path $ownedBoilerplateFixture 'README.md'),
+        "Disposable BoilerPlateAdvance fixture for process tests.`n",
+        $utf8NoBom)
+    $boilerplateSource = [System.IO.Path]::GetFullPath($ownedBoilerplateFixture)
 }
 
 $evaluationRoot = Join-Path ([System.IO.Path]::GetTempPath()) `
@@ -114,5 +122,21 @@ finally {
             throw "Refusing to remove unverified evaluation root: $resolvedEvaluation"
         }
         Remove-Item -LiteralPath $resolvedEvaluation -Recurse -Force
+    }
+    if (-not [string]::IsNullOrWhiteSpace($ownedBoilerplateFixture) -and
+        (Test-Path -LiteralPath $ownedBoilerplateFixture -PathType Container)) {
+        $resolvedBoilerplateFixture = [System.IO.Path]::GetFullPath($ownedBoilerplateFixture)
+        $resolvedTemp = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd(
+            [System.IO.Path]::DirectorySeparatorChar,
+            [System.IO.Path]::AltDirectorySeparatorChar)
+        $requiredBoilerplatePrefix = $resolvedTemp +
+            [System.IO.Path]::DirectorySeparatorChar +
+            'prompts-boilerplate-source-'
+        if (-not $resolvedBoilerplateFixture.StartsWith(
+            $requiredBoilerplatePrefix,
+            [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove unverified boilerplate fixture path: $resolvedBoilerplateFixture"
+        }
+        Remove-Item -LiteralPath $resolvedBoilerplateFixture -Recurse -Force
     }
 }

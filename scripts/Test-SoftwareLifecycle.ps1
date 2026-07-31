@@ -42,6 +42,17 @@ $brownfieldProjectRoot = Join-Path $brownfieldFixtureRoot 'existing-application'
 $brownfieldProcessRoot = Join-Path $brownfieldFixtureRoot 'isolated-process'
 $brownfieldCollisionRoot = Join-Path $brownfieldFixtureRoot 'occupied-process'
 $boilerplate = [System.IO.Path]::GetFullPath((Join-Path $CatalogRoot '..\BoilerPlateAdvance'))
+$ownedBoilerplateFixture = $null
+if (-not (Test-Path -LiteralPath $boilerplate -PathType Container)) {
+    $ownedBoilerplateFixture = Join-Path ([System.IO.Path]::GetTempPath()) `
+        ("prompts-boilerplate-fixture-" + [Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $ownedBoilerplateFixture | Out-Null
+    [System.IO.File]::WriteAllText(
+        (Join-Path $ownedBoilerplateFixture 'README.md'),
+        "Disposable BoilerPlateAdvance fixture for lifecycle tests.`n",
+        $utf8NoBom)
+    $boilerplate = [System.IO.Path]::GetFullPath($ownedBoilerplateFixture)
+}
 $results = [System.Collections.Generic.List[string]]::new()
 
 function Invoke-RawLifecycle {
@@ -1354,5 +1365,21 @@ finally {
             throw "Refusing to remove unverified brownfield fixture path: $resolvedBrownfieldFixture"
         }
         Remove-Item -LiteralPath $resolvedBrownfieldFixture -Recurse -Force
+    }
+    if (-not [string]::IsNullOrWhiteSpace($ownedBoilerplateFixture) -and
+        (Test-Path -LiteralPath $ownedBoilerplateFixture -PathType Container)) {
+        $resolvedBoilerplateFixture = [System.IO.Path]::GetFullPath($ownedBoilerplateFixture)
+        $resolvedTemp = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd(
+            [System.IO.Path]::DirectorySeparatorChar,
+            [System.IO.Path]::AltDirectorySeparatorChar)
+        $requiredBoilerplatePrefix = $resolvedTemp +
+            [System.IO.Path]::DirectorySeparatorChar +
+            'prompts-boilerplate-fixture-'
+        if (-not $resolvedBoilerplateFixture.StartsWith(
+            $requiredBoilerplatePrefix,
+            [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove unverified boilerplate fixture path: $resolvedBoilerplateFixture"
+        }
+        Remove-Item -LiteralPath $resolvedBoilerplateFixture -Recurse -Force
     }
 }

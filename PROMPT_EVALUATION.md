@@ -526,6 +526,15 @@ escritas nem pesquisa ampla. A validação estrutural e a cópia descartável n�
 substituem a suite completa, a avaliação humana nem a revisão separada, que
 permanecem pendentes.
 
+Na `catalogVersion` `2026-07-30.10`, as suites do próprio catálogo passaram a
+ser autocontidas num checkout Windows limpo. O artefacto com hash estruturado
+usa LF determinístico e os testes criam uma base `BoilerPlateAdvance` mínima,
+temporária e isolada apenas quando a base irmã real não existe. A regressão
+deve executar `Test-PromptProcess.ps1`, `Test-SoftwareLifecycle.ps1` e
+`Test-ProcessInDisposableCopy.ps1` sem dependências fora do checkout. Estes
+resultados continuam a ser evidência estrutural; os 15 casos, a avaliação
+humana e a revisão separada permanecem obrigatórios.
+
 ## Referências
 
 - https://developers.openai.com/api/docs/guides/evaluation-best-practices
