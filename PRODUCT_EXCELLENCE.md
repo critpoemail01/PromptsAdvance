@@ -63,6 +63,12 @@ Converte a pesquisa em:
 
 Não combines automaticamente “as melhores partes” de todas as referências. Resolve conflitos e escolhe uma direção. A identidade final deve ser reconhecível como a aplicação atual, não como uma imitação de GitHub, Microsoft, Apple, Atlassian, Shopify, Stripe, Linear ou qualquer tema comercial.
 
+Para cada vertical slice visível aplica `VISUAL_SLICE_CONTRACT.md`. Explora
+duas ou três alternativas de baixa fidelidade para a mesma tarefa, compara-as
+com uma rubrica comum e regista uma decisão humana antes de implementar. Não
+constrói várias versões polidas nem propaga uma direção sem brief, trade-offs e
+alternativas rejeitadas.
+
 ## 5. Baseline profissional obrigatória
 
 Antes do primeiro layout ou da primeira vertical slice visível, cria e aprova `PRODUCT_QUALITY_BASELINE.md`. O documento deve conservar:
@@ -73,6 +79,8 @@ Antes do primeiro layout ou da primeira vertical slice visível, cria e aprova `
 - estratégia mobile Web/PWA e nativa quando aplicável;
 - plano e resultados de crítica profissional, usabilidade e regressão visual;
 - findings, exceções, owners e prazos.
+- briefs por slice com tese da tarefa, visual e interação, conteúdo real,
+  matriz responsiva/estados, anti-direções e direção selecionada.
 
 A rubrica não pode usar apenas adjetivos como “moderno”, “premium” ou “profissional”. Define resultados observáveis para adequação ao domínio, arquitetura de informação, eficiência da tarefa, estados e recuperação, mobile, acessibilidade, consistência visual, conteúdo/confiança e performance.
 
@@ -110,6 +118,8 @@ Aplica estas regras:
 ## 8. Implementação orientada a qualidade
 
 - Começa por uma vertical slice real e pequena: UI, contrato, backend/dados, autorização, estados, testes e observabilidade mínimos. Valida a direção antes de a propagar.
+- Implementa apenas a alternativa selecionada no brief; protótipos de baixa
+  fidelidade servem para decidir, não para multiplicar código de produção.
 - Usa tokens semânticos e componentes consistentes, evitando valores e variantes casuais.
 - Preserva comportamentos corretos e a arquitetura do projeto.
 - Cobre todos os estados da jornada, não apenas o screenshot ideal.

@@ -6,7 +6,7 @@ Melhora, dentro da `[VERTICAL_SLICE_ATUAL]`, a experiência autenticada Blazor W
 
 ## Entradas e limites
 
-Recebe `[JORNADAS_PRIORITARIAS]`, `[ATORES_E_PERMISSOES]`, `[VIEWPORTS_ALVO]`, `[ESTADOS_A_VALIDAR]`, a baseline aprovada e contas de teste por variáveis de ambiente. Exige backend, contratos, dados e autorização exercitáveis para a fatia. Se faltarem, audita e propõe o âmbito sem redesenhar a aplicação e termina `bloqueado` para implementação. Define métricas observáveis para os problemas visados, como conclusão da tarefa, erros, passos ou regressões de desempenho.
+Recebe `[JORNADAS_PRIORITARIAS]`, `[ATORES_E_PERMISSOES]`, `[VIEWPORTS_ALVO]`, `[ESTADOS_A_VALIDAR]`, `VISUAL_SLICE_CONTRACT.md`, a baseline aprovada e contas de teste por variáveis de ambiente. Cria/atualiza o brief da slice antes de editar. Exige backend, contratos, dados e autorização exercitáveis para a fatia. Se faltarem, audita e propõe o âmbito sem redesenhar a aplicação e termina `bloqueado` para implementação. Define métricas observáveis para os problemas visados, como conclusão da tarefa, erros, passos ou regressões de desempenho.
 
 ## Exigência herdada do prompt 13
 
@@ -38,6 +38,9 @@ Este prompt aplica à slice Web autenticada o mesmo nível de pesquisa, proveni�
 3. Mapeia `jornada → ecrãs → estados → permissões → API → componente`.
 4. Aplica o `PRODUCT_EXCELLENCE.md` e o contrato herdado do prompt 13 à jornada; conserva comparáveis, proveniência e licenças nos artefactos duráveis.
 5. Define princípios e âmbito; preserva elementos que já cumprem o design system e não introduzas o framework das referências.
+6. Compara duas ou três alternativas de baixa fidelidade para hierarquia,
+   densidade ou interação; regista a escolha humana e implementa apenas essa
+   direção.
 
 ## Implementação
 
@@ -55,7 +58,7 @@ Executa build/test e a jornada selecionada nos viewports alvo, com teclado, zoom
 
 ## Entrega
 
-Começa pelo resultado e por `Falta para terminar`. Apresenta âmbito, baseline, matriz de benchmark e padrões adotados, jornadas melhoradas, estados cobertos, componentes alterados, evidência visual, métricas antes/depois quando mensuráveis, comandos/resultados, permissões, licenças, revisão Product Design/UX, correções e lacunas. Liga os três artefactos `INITIAL_LAYOUT_*` atualizados.
+Começa pelo resultado e por `Falta para terminar`. Apresenta âmbito, baseline, brief, alternativas e direção selecionada, matriz de benchmark e padrões adotados, jornadas melhoradas, estados cobertos, componentes alterados, evidência visual, métricas antes/depois quando mensuráveis, comandos/resultados, permissões testadas, licenças, revisão Product Design/UX, correções e lacunas encaminhadas para o prompt de conclusão ou PWA. Liga os três artefactos `INITIAL_LAYOUT_*` atualizados.
 
 ## Referências oficiais
 

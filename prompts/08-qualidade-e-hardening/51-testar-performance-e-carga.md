@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Mede e melhora a performance da aplicação sob carga realista, usando `[AMBIENTE_AUTORIZADO]`, `[CENARIOS_CRITICOS]`, `[CARGA_ESPERADA]` e `[OBJETIVOS_DE_PERFORMANCE]`. Produz um baseline reproduzível, identifica gargalos com telemetria e prova as melhorias sem alterar comportamento, consistência ou segurança.
+Mede e melhora a performance da aplicação sob carga realista, usando `[AMBIENTE_AUTORIZADO]`, `[CENARIOS_CRITICOS]`, `[CARGA_ESPERADA]`, `[OBJETIVOS_DE_PERFORMANCE]` e `TEST_STRATEGY_CONTRACT.md`. Produz um baseline reproduzível, identifica gargalos com telemetria e prova as melhorias sem alterar comportamento, consistência ou segurança.
 
 ## Critérios de sucesso
 
@@ -20,6 +20,9 @@ Mede e melhora a performance da aplicação sob carga realista, usando `[AMBIENT
 4. Define o modelo de carga: distribuição de jornadas, think time, ramp-up/down, tamanhos de payload, cache quente/fria e utilizadores/dados distintos.
 5. Regista versões, configuração Release, capacidade do host, região/rede, estado da base e release da aplicação.
 6. Define antes de executar hard stops para taxa de erro, latência, CPU/memória, custo, duração e impacto nas dependências. Se faltarem limites seguros, executa apenas uma validação mínima dos scripts.
+7. Liga os cenários à análise de failure modes e à `quality/TEST_MATRIX.md`.
+   Só combina carga e fault injection num ambiente descartável explicitamente
+   autorizado, com hard stops e SLO/RTO/RPO aprovados.
 
 ## Plano de testes
 

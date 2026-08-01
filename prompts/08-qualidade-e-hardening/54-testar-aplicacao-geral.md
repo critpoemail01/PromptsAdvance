@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Audita a qualidade da aplicação derivada de `BoilerPlateAdvance` dentro de `[JORNADAS_CRITICAS]`, `[SUPERFICIES_E_PLATAFORMAS]`, `[AMBIENTE_AUTORIZADO]` e `[ORCAMENTO_DE_TESTE]`. Encontra defeitos reproduzíveis e produz evidência acionável. O modo predefinido é diagnóstico; corrige apenas itens incluídos literalmente em `[AUTORIZAÇÃO_DE_CORREÇÃO]`.
+Audita a qualidade da aplicação derivada de `BoilerPlateAdvance` dentro de `[JORNADAS_CRITICAS]`, `[SUPERFICIES_E_PLATAFORMAS]`, `[AMBIENTE_AUTORIZADO]` e `[ORCAMENTO_DE_TESTE]`, aplicando `REQUIREMENTS_ENGINEERING_CONTRACT.md` e `TEST_STRATEGY_CONTRACT.md`. Encontra defeitos reproduzíveis e produz evidência acionável. O modo predefinido é diagnóstico; corrige apenas itens incluídos literalmente em `[AUTORIZAÇÃO_DE_CORREÇÃO]`.
 
 ## Entradas e limites
 
@@ -25,6 +25,8 @@ Audita a qualidade da aplicação derivada de `BoilerPlateAdvance` dentro de `[J
 1. Lê instruções, arquitetura, CI e testes existentes.
 2. Confirma superfícies ativas e ambientes autorizados.
 3. Cria uma matriz de risco apenas para o âmbito selecionado, por jornada, impacto, probabilidade, dados/permissões e plataforma.
+   Reconcilia `quality/TEST_MATRIX.md`, identifica requisitos sem oráculo e
+   cobre o nível mais baixo adequado antes de expandir E2E.
 4. Prioriza: autenticação/recuperação, autorização, fluxos de negócio, integridade, pagamentos quando existentes, site público/SSR, erros e atualização PWA.
 5. Para jornadas visíveis, lê o benchmark e os princípios aprovados no `PRODUCT_EXCELLENCE.md`; avalia a implementação contra esses critérios, não por gosto pessoal nem por semelhança pixel a pixel.
 
@@ -35,6 +37,8 @@ Audita a qualidade da aplicação derivada de `BoilerPlateAdvance` dentro de `[J
 - HTTP para SSR, status, headers, health e metadata.
 - Browser/E2E para jornadas críticas e regressões visuais/interativas.
 - Avaliação manual para acessibilidade; ferramentas automáticas não provam conformidade WCAG.
+- Testes de contrato/compatibilidade e limites arquiteturais para interfaces e
+  dependências materiais; provider real descartável para semântica EF/SQL.
 
 Valida happy paths e também: dados vazios/limite/inválidos, 401/403/404/409/429/500, repetição, concorrência, timeouts, rede lenta/offline, sessão expirada, deep links, mobile/tablet/desktop, teclado e idiomas/temas existentes.
 
@@ -53,7 +57,7 @@ Antes de corrigir, confirma que o defeito está incluído em `[AUTORIZAÇÃO_DE_
 
 ## Execução técnica
 
-Executa os comandos do repositório: locked restore, build `*.Web.slnf` e testes Microsoft.Testing.Platform. Não passes `--logger`, `--report-trx` ou `-clp`. Compila MAUI só quando aplicável/workload disponível. Não escondas testes flaky por retries ilimitados.
+Executa os comandos do repositório: locked restore, build `*.Web.slnf` e testes Microsoft.Testing.Platform. Não passes `--logger`, `--report-trx` ou `-clp`. Compila MAUI só quando aplicável/workload disponível. Fixa/regista clock, seed, locale, timezone e versões relevantes. Não escondas testes flaky por retries ilimitados, `skip`, sleeps ou thresholds relaxados; regista owner e prazo.
 
 ## Entrega
 

@@ -27,7 +27,7 @@ escolhas arquitetura, módulos, fornecedores ou frameworks e não decidas o Gate
 Lê integralmente, por esta ordem:
 
 1. os `AGENTS.md` ou `AGENTS.override.md` aplicáveis;
-2. `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`, `APP_CONTEXT.md`,
+2. `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`, `REQUIREMENTS_ENGINEERING_CONTRACT.md`, `APP_CONTEXT.md`,
    `IMPLEMENTATION_STATUS.md`, `PRODUCT_DEFINITION.md` e, quando ajuda
    contextual/Academia estiver proposta, mencionada nas entradas ou em âmbito,
    `HELP_AND_ACADEMY.md`;
@@ -67,6 +67,7 @@ Cria ou atualiza, sem duplicar equivalentes:
 - `requirements/USER_RESEARCH_EVIDENCE.md`;
 - `requirements/REQUIREMENTS_SPECIFICATION.md`;
 - `requirements/REQUIREMENTS_TRACEABILITY.md`;
+- `requirements/REQUIREMENTS_QUALITY_MATRIX.md`;
 - `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md`;
 - `requirements/ALL_FUNCTIONALITIES.md`;
 - `requirements/APPLICATION_CATALOG.md`;
@@ -367,6 +368,7 @@ owner e prazo.
 - Produz requisitos atómicos `FR`, `BR`, `DATA`, `PERM`, `INT`, `NFR` e `SEC`,
   com uma única obrigação observável, fonte, ator, prioridade, aprovação,
   `APP/PAGE` ou justificação não visual e dependências.
+- Aplica `REQUIREMENTS_ENGINEERING_CONTRACT.md`: usa decisões, transições, exemplos, contraexemplos e classes de equivalência nas regras materiais.
 - Para slices posteriores, conserva resultado/aceitação e marca lacunas
   `approved_for_refinement`; primeira slice/alto risco não usam esse estado.
 - Escreve o que o produto deve fazer, sem prescrever implementação. Substitui
@@ -376,6 +378,7 @@ owner e prazo.
 - Avalia regras e invariantes, dados e ciclo de vida, autorização por ação e
   objeto, integrações e falha/reconciliação, segurança, privacidade e as nove
   áreas de qualidade do ISO/IEC 25010 aplicáveis.
+- Especifica cada NFR como `fonte -> estímulo -> ambiente -> resposta -> medida/tolerância -> prova -> owner`; não inventa budgets, SLO, RTO, RPO, carga ou latência.
 - Define `AC-<REQ>-##` para sucesso, erro, acesso negado, limites, repetição,
   concorrência, falha parcial e recuperação quando materiais. Given/When/Then é
   opcional; observabilidade e ausência de efeitos indevidos são obrigatórias.
@@ -389,6 +392,7 @@ owner e prazo.
 
 - Completa a matriz bidirecional desde fonte até prova e propõe fatias verticais
   pequenas; não seleciona a fatia no lifecycle.
+- Mantém `REQUIREMENTS_QUALITY_MATRIX.md`: `requisito -> risco -> invariante/oráculo -> nível de teste -> cenário negativo -> evidência`.
 - Reconcilia mecanicamente todas as ocorrências de cada `APP/PAGE/BPP/BPR` nos
   catálogos, contratos, especificação, checklist do programador e
   rastreabilidade; uma identidade não pode apontar para destinos diferentes.

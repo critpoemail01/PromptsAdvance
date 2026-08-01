@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Implementa testes Playwright end-to-end para `[FUNCIONALIDADE]` e os critérios `[CRITERIOS_DE_ACEITACAO]`, cobrindo a jornada completa, efeitos persistidos e recuperação de falhas. Inclui apenas integrações autorizadas em sandbox/fake; nunca executa efeitos reais.
+Implementa testes Playwright end-to-end para `[FUNCIONALIDADE]` e os critérios `[CRITERIOS_DE_ACEITACAO]`, aplicando `TEST_STRATEGY_CONTRACT.md` e cobrindo a jornada completa, efeitos persistidos e recuperação de falhas. Inclui apenas integrações autorizadas em sandbox/fake; nunca executa efeitos reais.
 
 ## Critérios de sucesso
 
@@ -19,6 +19,8 @@ Implementa testes Playwright end-to-end para `[FUNCIONALIDADE]` e os critérios 
 2. Identifica atores, dados, invariantes, efeitos externos, tempos assíncronos e compensações.
 3. Decide o que é melhor validado por unitário, integração ou Playwright; evita duplicação sem valor.
 4. Define cenários positivos, negativos e de recuperação numa matriz com prioridade de risco.
+5. Reconcilia `quality/TEST_MATRIX.md`; lacunas de provider, contrato,
+   arquitetura, performance ou resiliência ficam no nível/lane proprietário.
 
 ## Implementação
 
@@ -42,7 +44,7 @@ Executa os testes focados, repete-os sob a mesma seed/ambiente, corre a suite da
 
 ## Entrega
 
-Apresenta mapa da jornada, matriz de riscos/cenários, ficheiros de teste e seams adicionados, fixtures, comandos/resultados, duração, artefactos, casos não automatizados e motivo. Não declares cobertura total fora dos critérios explicitamente testados.
+Apresenta mapa da jornada, matriz de riscos/cenários/níveis, ficheiros de teste e seams adicionados, fixtures, clock/seed/locale/timezone, comandos/resultados, duração, artefactos, flakiness com owner/prazo, casos não automatizados e motivo. Não declares cobertura total fora dos critérios explicitamente testados.
 
 ## Referências oficiais
 

@@ -458,6 +458,9 @@ try {
         'PROCESS_MANIFEST.json',
         'QUALITY_GATES.md',
         'HELP_AND_ACADEMY.md',
+        'REQUIREMENTS_ENGINEERING_CONTRACT.md',
+        'TEST_STRATEGY_CONTRACT.md',
+        'VISUAL_SLICE_CONTRACT.md',
         'CHANGE_CONTROL.md',
         'CLAUDE.md',
         '.agents\skills\advance-app-continue\SKILL.md'
@@ -540,7 +543,9 @@ try {
     foreach ($file in @(
         'AGENTS.md', 'CHANGE_CONTROL.md', 'CLAUDE.md', 'EXECUTION_CONTRACT.md',
         'EVALUATION_IMPACT_MAP.json', 'HELP_AND_ACADEMY.md', 'PILOT_APPROVAL.md',
-        'PRODUCT_EXCELLENCE.md', 'PROMPT_EVALUATION.md', 'QUALITY_GATES.md',
+        'PRODUCT_EXCELLENCE.md', 'REQUIREMENTS_ENGINEERING_CONTRACT.md',
+        'PROMPT_EVALUATION.md', 'QUALITY_GATES.md', 'TEST_STRATEGY_CONTRACT.md',
+        'VISUAL_SLICE_CONTRACT.md',
         'PROCESS_MANIFEST.json', 'README.md', 'START_HERE.md', 'software-lifecycle.ps1'
     )) {
         Copy-Item -LiteralPath (Join-Path $CatalogRoot $file) -Destination $stableCatalogRoot

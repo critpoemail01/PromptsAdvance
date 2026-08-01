@@ -29,10 +29,16 @@ adicionando-os à aplicação existente apenas num lote explícito e sem colisõ
   invalidação de gates e novos ciclos depois da release;
 - [CLAUDE.md](CLAUDE.md): ponte mínima para Claude Code importar `AGENTS.md`;
 - [PRODUCT_EXCELLENCE.md](PRODUCT_EXCELLENCE.md): benchmark, crítica profissional e critérios de produto/UX;
+- [REQUIREMENTS_ENGINEERING_CONTRACT.md](REQUIREMENTS_ENGINEERING_CONTRACT.md):
+  atomicidade, decisões/estados, NFR e rastreabilidade requisito-risco-teste;
 - [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md): definição e lacunas conhecidas do produto;
 - `DISCOVERY_RESEARCH.md`: evidência detalhada criada pelo prompt 01; a resposta
   conversacional conserva apenas a síntese necessária à decisão;
 - [PRODUCT_QUALITY_BASELINE.md](PRODUCT_QUALITY_BASELINE.md): baseline aprovada, rubrica visual e primeira fatia;
+- [VISUAL_SLICE_CONTRACT.md](VISUAL_SLICE_CONTRACT.md): brief, alternativas de
+  baixa fidelidade, decisão humana, responsividade, estados e evidência visual;
+- [TEST_STRATEGY_CONTRACT.md](TEST_STRATEGY_CONTRACT.md): matriz de testes por
+  risco, níveis, lanes de CI, determinismo, flakiness e failure modes;
 - [HELP_AND_ACADEMY.md](HELP_AND_ACADEMY.md): protocolo opcional para inventário
   funcional, artigos bilingues como PT/EN, vídeos, ajuda contextual, cursos e publicação;
 - [APP_CONTEXT.md](APP_CONTEXT.md): valores da aplicação, fontes, confiança e autorizações por execução;
@@ -256,13 +262,19 @@ o programador ao mesmo prompt.
 Depois dos prompts 9–13:
 
 1. executa 21 para o backend mínimo e 22–24 apenas no âmbito necessário;
-2. escolhe um requisito observável pequeno;
-3. executa 27 e 28 para uma página, ou 29 e 30 para uma funcionalidade;
-4. aplica 14, 16 ou 18 apenas à superfície dessa fatia;
-5. valida UI, contrato, backend/dados, autorização, loading/vazio/erro/conteúdo longo, observabilidade, acessibilidade e snapshots;
-6. submete a primeira fatia a crítica de design e engenharia e a validação de usabilidade;
-7. corrige e repete os testes afetados;
-8. atualiza `IMPLEMENTATION_STATUS.md` e seleciona a fatia seguinte.
+2. escolhe um requisito observável pequeno e aplica o Definition of Ready de
+   `REQUIREMENTS_ENGINEERING_CONTRACT.md`;
+3. executa 27 para uma página ou 29 para uma funcionalidade;
+4. aplica 14, 16 ou 18 apenas à superfície dessa fatia, seguindo o brief e a
+   direção escolhida de `VISUAL_SLICE_CONTRACT.md`;
+5. executa 20 para reconciliar os requisitos com a experiência renderizada;
+6. executa 28 para a página ou 30 para a funcionalidade e reconcilia a matriz
+   de `TEST_STRATEGY_CONTRACT.md`;
+7. valida UI, contrato, backend/dados, autorização, loading/vazio/erro/conteúdo
+   longo, observabilidade, acessibilidade e snapshots;
+8. submete a primeira fatia a crítica de design e engenharia e a validação de usabilidade;
+9. corrige e repete os testes afetados;
+10. atualiza `IMPLEMENTATION_STATUS.md` e seleciona a fatia seguinte.
 
 Os prompts 25/26 tratam requisitos globais quando já existe base funcional suficiente. Os prompts 15/17/19 são gates de conclusão, não atividades iniciais. Não propagues um padrão visual antes de a primeira fatia real satisfazer `PRODUCT_QUALITY_BASELINE.md`.
 
@@ -274,6 +286,11 @@ Os prompts 25/26 tratam requisitos globais quando já existe base funcional sufi
 - Mantém catálogo `componente → variantes → estados → plataformas → acessibilidade → baseline`.
 - Executa acessibilidade desde a primeira fatia: checks automáticos em cada pull request aplicável e avaliação manual das jornadas críticas.
 - Executa regressão visual reproduzível em mobile/desktop, temas suportados e estados normal/loading/vazio/erro/conteúdo longo. Publica o diff na pull request; só altera baselines mediante revisão e autorização explícitas.
+- Mantém a matriz `requisito/risco → oráculo → nível → evidência`; usa provider
+  real descartável quando a semântica depender dele e diffs de compatibilidade
+  para contratos públicos.
+- Trata flakiness como defeito com owner/prazo; não usa retries ilimitados,
+  `skip`, sleeps ou thresholds relaxados para tornar a CI verde.
 - Não declara “sem bugs”, conformidade total ou sucesso sem evidência. A revisão adversarial do próprio executor é obrigatória, mas só a tarefa/revisor separado do prompt 65 é independente.
 
 ## Ordem global dos prompts

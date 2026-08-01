@@ -23,6 +23,7 @@ Não uses este template como uma checklist genérica. Substitui `A preencher` po
 | Owner de produto | A preencher | pendente | — |
 | Revisor de Product Design/UX | A preencher | pendente | — |
 | Revisor de engenharia/frontend | A preencher | pendente | — |
+| Contrato visual aplicado | `VISUAL_SLICE_CONTRACT.md` | pendente | — |
 | Data da aprovação | A preencher | pendente | — |
 
 ## Benchmark aprovado
@@ -63,6 +64,12 @@ Classificações permitidas: `passou`, `falhou`, `bloqueado`, `não aplicável`.
 | Campo | Valor/evidência | Estado |
 |---|---|---|
 | Requisitos Must cobertos | A preencher | pendente |
+| Brief da slice | `design/slices/<SLICE-ID>-VISUAL_BRIEF.md` | pendente |
+| Tese da tarefa/visual/interação | A preencher | pendente |
+| Alternativas de baixa fidelidade comparadas | A preencher | pendente |
+| Direção selecionada, revisor e trade-offs | A preencher | pendente |
+| Anti-direções rejeitadas | A preencher | pendente |
+| Matriz responsiva e de estados | A preencher | pendente |
 | Dados/backend reais usados | A preencher | pendente |
 | Atores e permissões exercitados | A preencher | pendente |
 | Estados de erro/recuperação exercitados | A preencher | pendente |

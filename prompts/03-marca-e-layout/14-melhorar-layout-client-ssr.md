@@ -6,7 +6,7 @@ Melhora, dentro da `[VERTICAL_SLICE_ATUAL]`, a experiência pública em static S
 
 ## Entradas
 
-Usa `[CONTEUDO_PUBLICO_APROVADO]`, `[REFERENCIA_VISUAL_OU_BASELINE]`, `PRODUCT_QUALITY_BASELINE.md` e apenas as rotas da fatia atual. Se faltar conteúdo factual aprovado ou implementação funcional exercitável, bloqueia a propagação do padrão; conserva placeholders visíveis e não inventa claims, métricas, clientes ou benefícios.
+Usa `[CONTEUDO_PUBLICO_APROVADO]`, `[REFERENCIA_VISUAL_OU_BASELINE]`, `PRODUCT_QUALITY_BASELINE.md`, `VISUAL_SLICE_CONTRACT.md` e apenas as rotas da fatia atual. Cria/atualiza o brief da slice antes de editar. Se faltar conteúdo factual aprovado, direção selecionada ou implementação funcional exercitável, bloqueia a propagação do padrão; conserva placeholders visíveis e não inventa claims, métricas, clientes ou benefícios.
 
 ## Exigência herdada do prompt 13
 
@@ -38,6 +38,8 @@ Este prompt aplica à slice SSR o mesmo nível de pesquisa, proveniência, quali
 3. Renderiza o estado atual em mobile e desktop. Regista problemas de hierarquia, conteúdo, responsividade, acessibilidade e desempenho com evidência.
 4. Identifica páginas críticas: início, funcionalidades, preços quando aplicável, contacto, autenticação e páginas legais.
 5. Propõe alterações ligadas a problemas observados e aos princípios aprovados; evita secções decorativas, “template look” ou texto inventado.
+6. Compara duas ou três alternativas de baixa fidelidade para a hierarquia e
+   composição, regista a escolha humana e implementa apenas a direção escolhida.
 
 ## Implementação
 
@@ -55,7 +57,7 @@ Verifica HTML da resposta com JavaScript desativado, status HTTP, canonical/meta
 
 ## Entrega
 
-Começa pelo resultado e por `Falta para terminar`. Apresenta inputs/baseline, benchmark e padrões adotados, diagnóstico inicial, alterações por página, evidência visual e HTML, comandos/resultados, métricas comparáveis, placeholders/decisões de conteúdo, licenças, revisão Product Design/UX, correções e riscos. Liga os três artefactos `INITIAL_LAYOUT_*` atualizados.
+Começa pelo resultado e por `Falta para terminar`. Apresenta inputs/baseline, brief, alternativas e direção selecionada, benchmark e padrões adotados, diagnóstico inicial, alterações por página, evidência visual e HTML, comandos/resultados, métricas comparáveis, placeholders/decisões de conteúdo, licenças, revisão Product Design/UX, correções e riscos ainda abertos. Liga os três artefactos `INITIAL_LAYOUT_*` atualizados.
 
 ## Referências oficiais
 

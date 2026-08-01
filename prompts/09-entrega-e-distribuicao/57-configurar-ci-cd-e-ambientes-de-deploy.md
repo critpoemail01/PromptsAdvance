@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Adapta os workflows existentes (`ci.yml`, `ci-maui.yml`, `cd-test.yml`, `cd-production.yml` e templates aplicáveis) ao projeto derivado, criando uma cadeia reprodutível, segura e auditável para `[AMBIENTES]`.
+Adapta os workflows existentes (`ci.yml`, `ci-maui.yml`, `cd-test.yml`, `cd-production.yml` e templates aplicáveis) ao projeto derivado, aplicando `TEST_STRATEGY_CONTRACT.md` e criando uma cadeia reprodutível, segura e auditável para `[AMBIENTES]`.
 
 ## Critérios de sucesso
 
@@ -21,6 +21,8 @@ Adapta os workflows existentes (`ci.yml`, `ci-maui.yml`, `cd-test.yml`, `cd-prod
 1. Lê workflows, documentação CI/CD do boilerplate, solution filters, testes, publicação e infraestrutura.
 2. Confirma branches/tags, ambientes, runners, artefactos, providers e política de release.
 3. Cria a matriz `evento → job → permissões → artefacto → ambiente → gate → rollback`.
+   Mapeia também as lanes `commit`, `pull request`, `nightly` e `release` para
+   `quality/TEST_MATRIX.md`, com budget, owner e política de falha.
 4. Mantém etapas que continuam válidas; não reescreve tudo sem necessidade.
 5. Confirma o remote GitHub criado no prompt 7, a branch principal, os owners e as capacidades do plano GitHub. Se uma proteção não estiver disponível, regista o controlo compensatório em vez de fingir enforcement.
 

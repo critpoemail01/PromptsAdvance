@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-01.5 |
+| Catalog version | 2026-08-01.6 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -273,3 +273,10 @@ regista os defaults na matriz de inputs e continua a dar precedência a decisõe
 explícitas. EVAL-14 ganha o subcaso sem estes valores. EVAL-01, EVAL-11,
 EVAL-12, EVAL-14 e a suite completa devem ser repetidos; o piloto permanece
 `pending` e o canal permanece `candidate`.
+
+A versão 2026-08-01.6 introduz contratos comuns para qualidade dos requisitos,
+decisão visual por slice e estratégia de testes, além de um validador semântico
+do routing. A alteração afeta definição, layout, implementação, hardening e CI:
+EVAL-05, EVAL-06, EVAL-09, EVAL-10, EVAL-11, EVAL-12, EVAL-15 e depois os 15
+casos devem ser repetidos na mesma versão, com avaliação humana e revisão
+separada. O estado permanece `pending` e o canal `candidate`.

@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Cria testes Playwright para `[ROTA_OU_ECRA]` contra `[REQUISITOS_DA_PAGINA]`, validando conteúdo, interação, estados, permissões e integração real com o backend. Mantém o âmbito na página e nas transições diretamente necessárias.
+Cria testes Playwright para `[ROTA_OU_ECRA]` contra `[REQUISITOS_DA_PAGINA]`, validando conteúdo, interação, estados, permissões e integração real com o backend. Aplica `TEST_STRATEGY_CONTRACT.md` e mantém o âmbito na página e nas transições diretamente necessárias.
 
 ## Cenários obrigatórios
 
@@ -22,6 +22,9 @@ Seleciona apenas os aplicáveis ao contrato e risco da página e justifica exclu
 
 1. Lê o requisito, página, componentes, endpoint, autorização, testes existentes e infraestrutura Playwright.
 2. Regista a matriz `critério → precondição → ação → resultado visível → efeito persistido`.
+   Reconcilia-a com `quality/TEST_MATRIX.md`; lacunas de unitário, componente,
+   integração/provider, contrato ou arquitetura regressam ao nível correto em
+   vez de serem escondidas num E2E maior.
 3. Prepara os dados por API/helper de teste em vez de construir toda a precondição pela UI.
 4. Exercita pela UI apenas o comportamento que o utilizador realmente executa.
 
@@ -42,7 +45,7 @@ Executa o ficheiro/classe focado, repete-o para detetar flakiness e executa a su
 
 ## Entrega
 
-Apresenta matriz de critérios, cenários criados/excluídos e motivo, dados/fixtures, locators relevantes, comandos/resultados, flakiness, evidência de falhas corrigidas e limites de cobertura.
+Apresenta matriz de critérios e níveis, cenários criados/excluídos e motivo, dados/fixtures, clock/seed/locale/timezone usados, locators relevantes, comandos/resultados, flakiness com owner/prazo, evidência de falhas corrigidas e limites de cobertura.
 
 ## Referências oficiais
 

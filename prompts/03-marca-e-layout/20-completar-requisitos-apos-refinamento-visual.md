@@ -17,6 +17,8 @@ repetido para cada superfície selecionada.
 - vertical slice ativa, requisitos, aceitação e exclusões registadas;
 - resultado do prompt 14, 16 ou 18 aplicável e evidência renderizada;
 - `PRODUCT_QUALITY_BASELINE.md`, benchmark, crítica e findings atuais;
+- `REQUIREMENTS_ENGINEERING_CONTRACT.md`, `VISUAL_SLICE_CONTRACT.md`, o brief
+  `design/slices/<SLICE-ID>-VISUAL_BRIEF.md` e `TEST_STRATEGY_CONTRACT.md`;
 - catálogo de componentes/estados, navegação e estratégia mobile aplicáveis;
 - `IMPLEMENTATION_STATUS.md`, `APP_CONTEXT.md` e `HELP_AND_ACADEMY.md`.
 
@@ -41,10 +43,14 @@ repetido para cada superfície selecionada.
 3. Completa, quando comprovado, navegação, hierarquia funcional, ações, conteúdo,
    validação, loading, vazio, erro, sucesso, permissão, sessão, offline,
    concorrência, recuperação, responsividade, teclado, foco e acessibilidade.
+   Usa tabelas de decisão/transição e exemplos/contraexemplos quando a
+   renderização revelar ramos ou estados que o texto anterior não distinguia.
 4. Atualiza ajuda contextual e Academia apenas quando a matriz
    `APP/PAGE/FNC/HLP/VID/CRS`, idiomas, fallback e owner estiverem aprovados.
 5. Reconcilia a especificação detalhada, contratos `APP/PAGE`, checklist do
-   programador, `ALL_FUNCTIONALITIES.md`, catálogos e relatório de cobertura.
+   programador, `ALL_FUNCTIONALITIES.md`, catálogos,
+   `REQUIREMENTS_QUALITY_MATRIX.md`, `quality/TEST_MATRIX.md` e relatório de
+   cobertura.
 6. Regista findings que pertencem ao layout ou à implementação nos respetivos
    prompts; não os escondas através de um requisito inventado.
 7. Revê adversarialmente o delta contra scope creep, IDs duplicados, estados

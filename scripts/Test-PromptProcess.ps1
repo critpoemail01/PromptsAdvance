@@ -68,9 +68,12 @@ $requiredDocuments = @(
     'CHANGE_CONTROL.md',
     'CLAUDE.md',
     'PRODUCT_EXCELLENCE.md',
+    'REQUIREMENTS_ENGINEERING_CONTRACT.md',
     'HELP_AND_ACADEMY.md',
     'PRODUCT_DEFINITION.md',
     'PRODUCT_QUALITY_BASELINE.md',
+    'VISUAL_SLICE_CONTRACT.md',
+    'TEST_STRATEGY_CONTRACT.md',
     'APP_CONTEXT.md',
     'IMPLEMENTATION_STATUS.md',
     'LIFECYCLE_GATE_EVIDENCE.json',
@@ -84,6 +87,7 @@ $requiredScripts = @(
     'scripts/Test-ImplementationReadinessGate.ps1',
     'scripts/Test-Prompt02PilotArtifact.ps1',
     'scripts/Test-Prompt03PilotArtifact.ps1',
+    'scripts/Test-PromptReferences.ps1',
     'scripts/Test-LifecycleGateEvidence.ps1',
     'scripts/Test-ProductQualityGate.ps1',
     'scripts/Test-SoftwareLifecycle.ps1',
@@ -276,6 +280,11 @@ Require-Pattern 'START_HERE.md' 'software-lifecycle\.ps1 continue.*-ProjectPath'
 Require-Pattern 'QUALITY_GATES.md' 'G04.*Dire..o profissional' 'Falta o gate profissional da primeira slice.'
 Require-Pattern 'QUALITY_GATES.md' 'Hierarquia e composi..o' 'O gate visual nao verifica hierarquia e composicao.'
 Require-Pattern 'QUALITY_GATES.md' 'rastreabilidade ponta a ponta' 'O gate de codigo nao exige rastreabilidade ponta a ponta.'
+Require-Pattern 'AGENTS.md' 'REQUIREMENTS_ENGINEERING_CONTRACT\.md.*VISUAL_SLICE_CONTRACT\.md.*TEST_STRATEGY_CONTRACT\.md' 'O routing duradouro nao inclui os novos contratos de qualidade.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"sliceWorkflows".*"page".*"implementationPrompt": "27".*"requirementsReconciliationPrompt": "20".*"acceptanceTestPrompt": "28".*"feature".*"implementationPrompt": "29".*"acceptanceTestPrompt": "30"' 'O manifesto nao conserva o routing semantico das fatias.'
+Require-Pattern 'REQUIREMENTS_ENGINEERING_CONTRACT.md' '(?s)(?=.*tabela de\s+decis.o)(?=.*tabela de transi..es)(?=.*Est.mulo)(?=.*Medida/toler.ncia)(?=.*Rastreabilidade orientada ao risco)' 'O contrato de requisitos nao cobre decisoes, estados, NFR e risco-oraculo.'
+Require-Pattern 'VISUAL_SLICE_CONTRACT.md' '(?s)duas ou tr.s alternativas de baixa fidelidade.*Decidir.*Implementar.*matriz responsiva' 'O contrato visual nao exige exploracao, decisao e responsividade verificavel.'
+Require-Pattern 'TEST_STRATEGY_CONTRACT.md' '(?s)Unit.rio.*Componente.*Integra..o/provider real.*Contrato/compatibilidade.*Browser/nativo.*Lane.*Flakiness.*Failure modes' 'O contrato de testes nao cobre niveis, lanes, flakiness e failure modes.'
 Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)^---.*name: advance-app-start.*description:.*---' 'A skill de criacao do lifecycle nao tem frontmatter valido.'
 Require-Pattern '.agents/skills/advance-app-start/SKILL.md' 'software-lifecycle\.ps1 start' 'A skill de criacao nao executa o inicializador deterministico.'
 Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)software-lifecycle\.ps1 record.*Summary.*RemainingWork' 'A skill de criacao nao fecha o prompt com resultado e trabalho em falta.'
@@ -287,6 +296,7 @@ Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'software-lifecyc
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'continue -ProjectPath' 'A skill nao resolve continuacao/adocao a partir da raiz da aplicacao.'
 Forbid-Pattern '.agents/skills/advance-app-continue/SKILL.md' '## Start a new initiative|software-lifecycle\.ps1 start -Name' 'A skill de continuacao voltou a acumular a criacao de iniciativas.'
 Require-Pattern '.agents/skills/advance-app-continue/references/workflow.md' 'page: 27 -> 14\|16\|18 -> 20 -> 28' 'A skill nao define routing de vertical slices.'
+Require-Pattern '.agents/skills/advance-app-continue/references/workflow.md' 'Test-PromptReferences\.ps1' 'A skill nao identifica o validador semantico do routing.'
 Require-Pattern '.agents/plugins/marketplace.json' '"name": "promptsadvance"' 'O marketplace Advance nao tem identidade estavel.'
 Require-Pattern '.agents/plugins/marketplace.json' '"path": "\./plugins/advance-app"' 'O marketplace Advance nao aponta para o plugin empacotado.'
 Require-Pattern '.agents/plugins/marketplace.json' '(?s)"installation": "AVAILABLE".*"authentication": "ON_INSTALL"' 'O marketplace Advance nao declara as politicas de instalacao.'
@@ -339,6 +349,7 @@ foreach ($surfaceLayoutPromptPath in $surfaceLayoutPromptPaths) {
 }
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-05.*prompt 13.*prompt 14, 16 ou 18.*15, 17 ou 19.*INITIAL_LAYOUT_RESEARCH\.md.*INITIAL_LAYOUT_SPEC\.md.*INITIAL_LAYOUT_CRITIQUE\.md' 'EVAL-05 nao exercita fundacao, melhoria, conclusao e artefactos visuais.'
 Require-Pattern 'pilot/cases/EVAL-05.md' '(?s)prompts 13, 16 e 17.*templates pagos premium.*INITIAL_LAYOUT_RESEARCH\.md.*INITIAL_LAYOUT_SPEC\.md.*INITIAL_LAYOUT_CRITIQUE\.md.*tarefa separada.*findings cr.ticos/altos' 'O caso EVAL-05 nao reproduz a exigencia visual ponta a ponta.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' '(?s)VISUAL_SLICE_CONTRACT\.md.*alternativas de baixa fidelidade.*dire..o selecionada' 'A fundacao visual nao usa exploracao em duas passagens.'
 Require-Pattern '.gitattributes' 'pilot/fixtures/lifecycle-gates/gate-artifact\.txt\s+text\s+eol=lf' 'O artefacto com hash dos gates nao fixa line endings portaveis.'
 Require-Pattern 'scripts/Test-SoftwareLifecycle.ps1' 'prompts-boilerplate-fixture-' 'O lifecycle E2E depende de um BoilerPlateAdvance externo ao checkout.'
 Require-Pattern 'scripts/Test-ProcessInDisposableCopy.ps1' 'prompts-boilerplate-source-' 'A copia descartavel depende de um BoilerPlateAdvance externo ao checkout.'
@@ -555,6 +566,7 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcio
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)status HTTP.*canonical.*robots' 'O contrato PAGE inline nao cobre semantica e descoberta de paginas publicas.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'relat.rio de cobertura' 'O prompt 03 nao possui gate de cobertura.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/REQUIREMENTS_SPECIFICATION\.md' 'O prompt 03 nao exige uma especificacao versionada canonica.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)(?=.*REQUIREMENTS_ENGINEERING_CONTRACT\.md)(?=.*REQUIREMENTS_QUALITY_MATRIX\.md)(?=.*decis.es, transi..es)(?=.*est.mulo.*medida/toler.ncia)(?=.*risco.*or.culo)' 'O prompt 03 nao aplica o contrato de qualidade dos requisitos.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/DEVELOPER_REQUIREMENTS_CHECKLIST\.md' 'O prompt 03 nao gera a checklist legivel para o programador.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'requirements/ALL_FUNCTIONALITIES\.md' 'O prompt 03 nao gera o ficheiro unico de todas as funcionalidades.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'ID \| Quem \| Onde \| Quando \| O qu.' 'O ficheiro unico do prompt 03 nao usa as cinco colunas obrigatorias.'
@@ -563,8 +575,11 @@ Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcio
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' 'OPERA..O-N.O-VISUAL' 'O prompt 03 inventa paginas para operacoes tecnicas nao visuais.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' 'ALL_FUNCTIONALITIES\.md.*ausente.*vazio.*formato obrigat.rio' 'O prompt 04 nao bloqueia o Gate A quando o ficheiro unico esta ausente ou invalido.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' '(?s)reconcilia..o mec.nica.*APP.*PAGE.*FNC.*RF-P.*AC' 'O prompt 04 nao exige paridade mecanica de todos os identificadores.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' '(?s)REQUIREMENTS_ENGINEERING_CONTRACT\.md.*REQUIREMENTS_QUALITY_MATRIX\.md.*tabelas de decis.o/transi..o.*invariante/or.culo' 'O Gate A nao audita a qualidade semantica e o oraculo dos requisitos.'
 Require-Pattern 'prompts/04-backend-e-funcionalidades/27-implementar-requisitos-de-pagina.md' '(?s)Definition of Ready.*approved_for_refinement.*n.o autoriza implementa..o' 'A slice de pagina nao refina requisitos antes do codigo.'
 Require-Pattern 'prompts/04-backend-e-funcionalidades/29-implementar-funcionalidades-especificas.md' '(?s)Definition of Ready.*approved_for_refinement.*n.o autoriza implementa..o' 'A slice funcional nao refina requisitos antes do codigo.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/27-implementar-requisitos-de-pagina.md' '(?s)TEST_STRATEGY_CONTRACT\.md.*quality/TEST_MATRIX\.md.*provider.*contrato' 'A slice de pagina nao conserva uma matriz de testes multinivel.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/29-implementar-funcionalidades-especificas.md' '(?s)TEST_STRATEGY_CONTRACT\.md.*quality/TEST_MATRIX\.md.*provider real.*compatibilidade OpenAPI' 'A slice funcional nao cobre provider real e compatibilidade de contrato.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/04-identificar-requisitos-em-falta.md' '(?s)funcionalidade com confirma..o.*dois ramos.*resultado\s+parcial.*Quem/Onde/Quando/O qu.' 'A revisao adversarial do prompt 04 nao tenta reconstruir uma funcionalidade ramificada.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)fonte can.nica\s+detalhada.*vista\s+derivada' 'O prompt 03 nao distingue a especificacao detalhada da vista do programador.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/03-levantar-requisitos-funcionais.md' '(?s)antes de desenvolver.*durante a implementa..o.*pronto para validar' 'A checklist do programador nao possui checkpoints de implementacao e validacao.'
@@ -639,6 +654,8 @@ Require-Pattern 'prompts/12-operacao-continua/75-medir-metricas-dora-e-melhoria-
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-13' 'O piloto nao conserva o caso de revisao independente.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-14.*naming natural' 'O piloto nao contem a regressao dirigida do prompt 02.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-15.*requisitos pesquisados por aplica..o e p.gina' 'O piloto nao contem a regressao dirigida do prompt 03.'
+Require-Pattern 'PROMPT_EVALUATION.md' 'ROUTE-EVAL-06: 21 -> 22 -> 23 -> 24 -> \(27 -> 14\|16\|18 -> 20 -> 28 \| 29 -> 14\|16\|18 -> 20 -> 30\)' 'EVAL-06 nao usa a numeracao canonica atual.'
+Forbid-Pattern 'PROMPT_EVALUATION.md' 'usando 19 e 25/26 ou 27/28' 'EVAL-06 conserva a referencia semantica obsoleta anterior a renumeracao.'
 Require-Pattern 'pilot/cases/EVAL-14.md' 'Navirevo.*Prumivo.*Rivelumi' 'O caso EVAL-14 nao inclui os nomes mecanicos rejeitados.'
 Require-Pattern 'pilot/cases/EVAL-14.md' '(?s)n.o existe consulta WIPO/EUIPO.*pausa interm.dia.*CAPTCHA.*valida..o jur.dica formal' 'O EVAL-14 nao impede a reintroducao da pausa juridica/manual no prompt 02.'
 Require-Pattern 'pilot/cases/EVAL-14.md' '(?s)(?=.*segunda c.pia descart.vel)(?=.*removendo apenas)(?=.*Idiomas materiais)(?=.*Custo m.ximo do.*com)(?=.*portugu.s europeu \(pt-PT\) \+ ingl.s\s+internacional)(?=.*30 EUR/ano, IVA inclu.do)(?=.*n.o pergunta)(?=.*n.o bloqueia)' 'O EVAL-14 nao cobre os defaults sem pergunta nem bloqueio.'
@@ -900,7 +917,8 @@ $stalePatterns = @(
     'prompts/08-qualidade-e-hardening/55-validar-cache',
     'prompts/08-qualidade-e-hardening/56-validar-seo',
     'prompts/09-entrega-e-distribuicao/55-configurar-ci',
-    'prompts/11-aceitacao-e-manutencao/64-publicar'
+    'prompts/11-aceitacao-e-manutencao/64-publicar',
+    'usando 19 e 25/26 ou 27/28'
 )
 
 foreach ($relativeScript in $requiredScripts) {
@@ -926,6 +944,17 @@ foreach ($pattern in $stalePatterns) {
             Add-Failure "Referencia obsoleta '$pattern' em $($file.FullName)"
         }
     }
+}
+
+$promptReferenceScript = Join-Path $root 'scripts/Test-PromptReferences.ps1'
+if (Test-Path -LiteralPath $promptReferenceScript -PathType Leaf) {
+    & $powerShellExe -NoProfile -ExecutionPolicy Bypass -File $promptReferenceScript *> $null
+    if ($LASTEXITCODE -ne 0) {
+        Add-Failure 'O validador semantico de identidades/routing dos prompts falhou.'
+    }
+}
+else {
+    Add-Failure 'O validador semantico de identidades/routing esta ausente.'
 }
 
 if ($failures.Count -gt 0) {

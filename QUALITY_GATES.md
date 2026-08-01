@@ -19,6 +19,9 @@ Validador: `scripts/Test-ProductDefinitionGate.ps1`.
 - requisitos `Must` da release com resultado, fonte, prioridade, aceitação,
   owner e slice candidata; a primeira slice e contratos transversais de alto
   risco estão totalmente refinados;
+- `REQUIREMENTS_ENGINEERING_CONTRACT.md` aplicado: obrigações atómicas,
+  tabelas de decisão/transição para regras materiais, exemplos/fronteiras,
+  cenários NFR mensuráveis e matriz `requisito -> risco -> oráculo -> teste`;
 - especificação canónica e vistas derivadas em paridade para o detalhe já
   aprovado; nenhuma linha genérica finge que uma slice futura está pronta;
 - cada slice posterior passa um Definition of Ready no prompt 27/29, atualiza a
@@ -80,6 +83,9 @@ Esta é a barreira contra layout genérico, bonito apenas em screenshot ou copia
 - temas ou referências premium usados apenas para princípios e com licença registada quando houver reutilização;
 - princípios próprios do produto e anti-padrões explícitos;
 - decisões justificadas por tarefa, evidência ou critério, não por “moderno” ou “premium”.
+- brief conforme `VISUAL_SLICE_CONTRACT.md`, com tese da tarefa/visual/interação,
+  duas ou três alternativas de baixa fidelidade, comparação uniforme, direção
+  humana selecionada, trade-offs e anti-direções; apenas a selecionada é implementada.
 
 ### Hierarquia e composição
 
@@ -135,6 +141,11 @@ Critérios:
   funcionalidade, sem vídeos finais sobre jornadas instáveis;
 - logs estruturados sem segredos/dados indevidos, métricas e traces úteis;
 - testes unitários, integração, contrato e browser proporcionais ao risco;
+- `TEST_STRATEGY_CONTRACT.md` aplicado e `quality/TEST_MATRIX.md` reconciliada,
+  incluindo componente, provider real, compatibilidade de contrato, limites
+  arquiteturais, visual, acessibilidade, performance e resiliência aplicáveis;
+- clock, seed, locale, timezone, dados e versões controlados; flakiness não é
+  ocultada por retries ilimitados, `skip`, sleeps ou thresholds relaxados;
 - dívida e exceções com owner/prazo, sem critérios `Must` ocultamente parciais.
 
 ## G06 — Segurança, conformidade e hardening
@@ -148,13 +159,17 @@ Critérios:
   tracking e autorização de acesso revistos quando ajuda multimédia for ativa;
 - acessibilidade avaliada em amostra representativa segundo metodologia W3C;
 - performance/carga com baseline, objetivos e ambiente registados;
-- resiliência, recovery e falhas de dependências testadas;
+- análise de failure modes por jornada crítica e resiliência, recovery e falhas
+  de dependências testadas; carga + fault injection apenas em ambiente
+  descartável autorizado, com hard stops e SLO/RTO/RPO aprovados;
 - PWA/offline/update e cache validados quando aplicáveis;
 - revisão geral baseada em risco sem falhas críticas abertas.
 
 ## G07 — Prontidão operacional
 
-- CI reprodutível com build, testes, segurança, acessibilidade e diffs visuais aplicáveis;
+- CI reprodutível com lanes `commit`, `pull request`, `nightly` e `release`,
+  ligadas à matriz de risco, com build, testes, segurança, acessibilidade e
+  diffs visuais aplicáveis;
 - estratégia de ambientes e promoção do mesmo artefacto;
 - SBOM e attestation de proveniência assinada gerados pela build, ligados ao
   repositório, workflow, commit e digest, e verificados antes da promoção;

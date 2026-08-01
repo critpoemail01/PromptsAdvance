@@ -11,6 +11,7 @@ Lê integralmente:
 - `AGENTS.md`;
 - `EXECUTION_CONTRACT.md`;
 - `PRODUCT_EXCELLENCE.md`;
+- `REQUIREMENTS_ENGINEERING_CONTRACT.md`;
 - `HELP_AND_ACADEMY.md`, quando ajuda contextual, vídeos ou Academia estiverem
   em âmbito;
 - `PRODUCT_DEFINITION.md`;
@@ -21,6 +22,7 @@ Lê integralmente:
 - `requirements/USER_RESEARCH_EVIDENCE.md`;
 - `requirements/REQUIREMENTS_SPECIFICATION.md`,
   `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md`,
+  `requirements/REQUIREMENTS_QUALITY_MATRIX.md`,
   `requirements/ALL_FUNCTIONALITIES.md`, `requirements/APPLICATION_CATALOG.md`,
   `requirements/PAGE_CATALOG.md` e contratos modulares `APP/PAGE`.
 
@@ -94,6 +96,12 @@ ao prompt 04 para nova auditoria.
      estão explicitamente `approved_for_refinement`;
    - jornadas críticas incluem happy path, alternativas, erros, recuperação e autorização;
    - NFR materiais são mensuráveis ou originam uma decisão bloqueante;
+   - regras condicionais/estados materiais têm tabelas de decisão/transição,
+     exemplos, contraexemplos e fronteiras suficientes para um único significado;
+   - cada NFR material identifica fonte, estímulo, ambiente, resposta,
+     medida/tolerância, método de prova e owner;
+   - `REQUIREMENTS_QUALITY_MATRIX.md` liga cada requisito de primeira slice/alto
+     risco a risco, invariante/oráculo, nível mínimo, cenário negativo e evidência;
    - conflitos e perguntas em aberto não foram escondidos em texto narrativo;
    - a especificação detalhada, a checklist e `ALL_FUNCTIONALITIES.md` usam a
      mesma versão e os mesmos IDs, prioridades, bloqueios e significados;
@@ -199,6 +207,8 @@ Antes de concluir, assume que a definição é vaga e tenta demonstrá-lo:
 1. pede a um leitor sem contexto que explique o problema, público, jornada, âmbito e sucesso apenas a partir dos artefactos;
 2. procura linguagem não mensurável, requisitos compostos, fontes circulares, contradições e decisões sem owner;
 3. tenta encontrar um requisito `Must` que permita duas implementações incompatíveis e ainda assim “passe”;
+   para uma regra condicional e uma transição de estado, tenta ainda encontrar
+   uma combinação ou fronteira sem resultado/oráculo definido;
 4. escolhe uma funcionalidade com confirmação, dois ramos, mutação e resultado
    parcial; tenta reconstruí-la apenas pelas linhas `Quem/Onde/Quando/O quê`; se
    precisares de inventar um passo, condição ou efeito, manda repetir o prompt 03;

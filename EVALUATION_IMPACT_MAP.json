@@ -8,7 +8,7 @@
   "rules": [
     {
       "name": "lifecycle-and-common-contract",
-      "pathRegex": "^(software-lifecycle\\.ps1|PROCESS_MANIFEST\\.json|AGENTS\\.md|EXECUTION_CONTRACT\\.md|\\.agents/skills/)",
+      "pathRegex": "^(software-lifecycle\\.ps1|PROCESS_MANIFEST\\.json|AGENTS\\.md|EXECUTION_CONTRACT\\.md|scripts/Test-PromptReferences\\.ps1|\\.agents/skills/)",
       "cases": ["EVAL-03", "EVAL-04", "EVAL-11", "EVAL-12", "EVAL-13"]
     },
     {
@@ -23,18 +23,23 @@
     },
     {
       "name": "requirements-and-gate-a",
-      "pathRegex": "(^|/)(03-levantar-requisitos-funcionais|04-identificar-requisitos-em-falta|09-completar-requisitos-apos-fundacao-tecnica|20-completar-requisitos-apos-refinamento-visual)\\.md$|^(PRODUCT_DEFINITION\\.md|HELP_AND_ACADEMY\\.md)$",
+      "pathRegex": "(^|/)(03-levantar-requisitos-funcionais|04-identificar-requisitos-em-falta|09-completar-requisitos-apos-fundacao-tecnica|20-completar-requisitos-apos-refinamento-visual)\\.md$|^(PRODUCT_DEFINITION\\.md|HELP_AND_ACADEMY\\.md|REQUIREMENTS_ENGINEERING_CONTRACT\\.md)$",
       "cases": ["EVAL-11", "EVAL-15"]
     },
     {
       "name": "visual-experience",
-      "pathRegex": "^(PRODUCT_EXCELLENCE\\.md|PRODUCT_QUALITY_BASELINE\\.md)$|^prompts/03-marca-e-layout/",
+      "pathRegex": "^(PRODUCT_EXCELLENCE\\.md|PRODUCT_QUALITY_BASELINE\\.md|VISUAL_SLICE_CONTRACT\\.md)$|^prompts/03-marca-e-layout/",
       "cases": ["EVAL-05", "EVAL-07"]
     },
     {
       "name": "vertical-slices",
-      "pathRegex": "^prompts/04-backend-e-funcionalidades/",
+      "pathRegex": "^prompts/04-backend-e-funcionalidades/|^TEST_STRATEGY_CONTRACT\\.md$",
       "cases": ["EVAL-02", "EVAL-06", "EVAL-08", "EVAL-10"]
+    },
+    {
+      "name": "test-strategy-and-robustness",
+      "pathRegex": "^TEST_STRATEGY_CONTRACT\\.md$|^prompts/(08-qualidade-e-hardening/(51|53|54)-|09-entrega-e-distribuicao/57-)",
+      "cases": ["EVAL-06", "EVAL-09", "EVAL-10", "EVAL-12"]
     },
     {
       "name": "security-data-and-release",
@@ -43,7 +48,7 @@
     },
     {
       "name": "evaluation-harness",
-      "pathRegex": "^(PROMPT_EVALUATION\\.md|PILOT_APPROVAL\\.md|EVALUATION_IMPACT_MAP\\.json|pilot/|scripts/(Invoke-PromptPilotCase|Test-PromptPilot|Test-ImplementationReadinessGate))",
+      "pathRegex": "^(PROMPT_EVALUATION\\.md|PILOT_APPROVAL\\.md|EVALUATION_IMPACT_MAP\\.json|pilot/|scripts/(Invoke-PromptPilotCase|Test-PromptPilot|Test-ImplementationReadinessGate|Test-PromptReferences))",
       "cases": ["EVAL-01", "EVAL-03", "EVAL-11", "EVAL-13", "EVAL-14", "EVAL-15"]
     }
   ],

@@ -72,9 +72,11 @@ page: 27 -> 14|16|18 -> 20 -> 28
 feature: 29 -> 14|16|18 -> 20 -> 30
 ```
 
-This is guidance, not an automatic route. Conditional prompts may be marked not
-applicable or skipped with a recorded reason. They must not silently pretend to
-be completed.
+`PROCESS_MANIFEST.json.routing.sliceWorkflows` is the machine-readable source
+of truth. `scripts/Test-PromptReferences.ps1` rejects divergence between this
+summary, the route arrays and EVAL-06. The programmer still selects/advances one
+prompt at a time; conditional prompts may be marked not applicable or skipped
+with a recorded reason and must not silently pretend to be completed.
 
 ## Result and recovery rules
 

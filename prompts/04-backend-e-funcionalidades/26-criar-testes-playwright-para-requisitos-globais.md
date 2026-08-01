@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Implementa testes UI end-to-end em Playwright para os requisitos globais `Must` de `[MATRIZ_DE_REQUISITOS]`. Reutiliza a infraestrutura de testes do projeto derivado de `BoilerPlateAdvance`, incluindo Microsoft.Testing.Platform, MSTest v4, `AppTestServer` e `Microsoft.Playwright.MSTest.v4`, quando continuarem presentes.
+Implementa testes UI end-to-end em Playwright para os requisitos globais `Must` de `[MATRIZ_DE_REQUISITOS]`, aplicando `TEST_STRATEGY_CONTRACT.md`. Reutiliza a infraestrutura de testes do projeto derivado de `BoilerPlateAdvance`, incluindo Microsoft.Testing.Platform, MSTest v4, `AppTestServer` e `Microsoft.Playwright.MSTest.v4`, quando continuarem presentes.
 
 ## Entradas
 
@@ -23,6 +23,8 @@ Define `[LOTE_DE_REQUISITOS]`, `[BROWSERS_E_VIEWPORTS]` e `[REPETICOES_ANTI_FLAK
 2. Confirma URLs, projetos ativos e método de arranque; não cries uma segunda infraestrutura concorrente.
 3. Converte requisitos em cenários e seleciona apenas os que precisam de browser. Mantém regras puras em testes unitários e contratos em integração.
 4. Define uma matriz `requisito → cenário → perfil → dados → assertions → evidência`.
+5. Reconcilia `quality/TEST_MATRIX.md`; envia invariantes, provider,
+   compatibilidade de contrato e limites arquiteturais para os níveis próprios.
 
 ## Implementação
 
@@ -47,7 +49,7 @@ Executa build e o subconjunto novo pelo comando Microsoft.Testing.Platform real 
 
 ## Entrega
 
-Apresenta matriz de cobertura, ficheiros, dados/fixtures, comandos/resultados, duração, testes repetidos, flakiness encontrada, artefactos e requisitos não cobertos com justificação.
+Apresenta matriz de cobertura e níveis, ficheiros, dados/fixtures, clock/seed/locale/timezone, comandos/resultados, duração, testes repetidos, flakiness com owner/prazo, artefactos e requisitos não cobertos com justificação.
 
 ## Referências oficiais
 

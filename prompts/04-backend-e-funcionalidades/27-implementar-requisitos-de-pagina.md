@@ -15,6 +15,9 @@ Recebe IDs estáveis e `[FORA_DO_AMBITO]`. Se o pedido abranger várias rotas ou
    dependências e prova. Atualiza primeiro a especificação canónica e reconcilia
    checklist/`ALL_FUNCTIONALITIES.md`. Se exigir decisão de produto, bloqueia
    antes de código; `approved_for_refinement` não autoriza implementação.
+   Aplica `REQUIREMENTS_ENGINEERING_CONTRACT.md`: exige tabelas de
+   decisão/transição, exemplos/fronteiras e oráculos para as regras materiais.
+   Lê `TEST_STRATEGY_CONTRACT.md` e atualiza `quality/TEST_MATRIX.md`.
 1. Confirma a superfície: `Client.Ssr`, `Client.Web`/`Client.Core` ou `Client.Maui`.
 2. Reproduz o estado atual e identifica layout, componentes, serviços, endpoint, modelo, policy e testes relacionados.
 3. Aplica o `PRODUCT_EXCELLENCE.md` ao padrão principal da página. Compara jornadas equivalentes de produtos profissionais e referências premium, adaptando apenas o que melhorar os critérios desta rota.
@@ -41,7 +44,7 @@ Inclui loading, vazio, erro, sem permissão, conteúdo longo e repetição.
 
 ## Testes
 
-Acrescenta testes no nível mais baixo que prove o comportamento e integração/browser apenas para o que atravessa camadas. Testa anónimo, autorizado e sem permissão quando aplicável; teclado, mobile/tablet/desktop; erros de API e dados limite. Usa dados isolados e secrets de ambiente, nunca credenciais no código.
+Acrescenta testes no nível mais baixo que prove o comportamento e integração/browser apenas para o que atravessa camadas. Testa anónimo, autorizado e sem permissão quando aplicável; teclado, mobile/tablet/desktop; erros de API e dados limite. Usa dados isolados e secrets de ambiente, nunca credenciais no código. Mantém a matriz `requisito/risco -> oráculo -> nível -> cenário negativo -> evidência`; não deixa Playwright compensar a ausência de testes de invariantes, provider ou contrato.
 
 Executa testes direcionados, build do `*.Web.slnf` e suite relevante. Se Playwright não existir, não o instales automaticamente para um único caso; usa testes existentes e browser local, registando a lacuna.
 

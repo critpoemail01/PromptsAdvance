@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-08-01.5",
+  "catalogVersion": "2026-08-01.6",
   "releaseChannel": "candidate",
   "name": "Professional Advance .NET Software Lifecycle",
   "promptCount": 75,
@@ -77,6 +77,21 @@
         "name": "help-and-academy",
         "promptIds": ["03", "04", "05", "06", "09", "13", "14", "15", "16", "17", "18", "19", "20", "27", "28", "29", "30", "31", "40", "63", "64", "65", "66"],
         "documents": ["HELP_AND_ACADEMY.md"]
+      },
+      {
+        "name": "requirements-engineering",
+        "promptIds": ["03", "04", "09", "20", "21", "22", "27", "29", "54"],
+        "documents": ["REQUIREMENTS_ENGINEERING_CONTRACT.md"]
+      },
+      {
+        "name": "visual-slice",
+        "promptIds": ["12", "13", "14", "15", "16", "17", "18", "19", "20", "27", "28", "29", "30", "45", "46", "63", "64", "65"],
+        "documents": ["VISUAL_SLICE_CONTRACT.md"]
+      },
+      {
+        "name": "test-strategy",
+        "promptIds": ["09", "11", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "41", "45", "46", "50", "51", "52", "53", "54", "55", "56", "57", "60", "61", "62", "63", "64", "65", "66"],
+        "documents": ["TEST_STRATEGY_CONTRACT.md"]
       }
     ]
   },
@@ -405,6 +420,20 @@
     "firstSliceFoundation": ["21", "22", "23", "24"],
     "pageSlice": ["27", "SURFACE_IMPROVEMENT", "20", "28"],
     "featureSlice": ["29", "SURFACE_IMPROVEMENT", "20", "30"],
+    "sliceWorkflows": {
+      "page": {
+        "implementationPrompt": "27",
+        "surfacePromptBySurface": { "ssr": "14", "web": "16", "maui": "18" },
+        "requirementsReconciliationPrompt": "20",
+        "acceptanceTestPrompt": "28"
+      },
+      "feature": {
+        "implementationPrompt": "29",
+        "surfacePromptBySurface": { "ssr": "14", "web": "16", "maui": "18" },
+        "requirementsReconciliationPrompt": "20",
+        "acceptanceTestPrompt": "30"
+      }
+    },
     "surfaceImprovement": {
       "ssr": "14",
       "web": "16",
@@ -423,9 +452,12 @@
     "EXECUTION_CONTRACT.md",
     "CHANGE_CONTROL.md",
     "PRODUCT_EXCELLENCE.md",
+    "REQUIREMENTS_ENGINEERING_CONTRACT.md",
     "HELP_AND_ACADEMY.md",
     "PRODUCT_DEFINITION.md",
     "PRODUCT_QUALITY_BASELINE.md",
+    "VISUAL_SLICE_CONTRACT.md",
+    "TEST_STRATEGY_CONTRACT.md",
     "APP_CONTEXT.md",
     "IMPLEMENTATION_STATUS.md",
     "QUALITY_GATES.md",

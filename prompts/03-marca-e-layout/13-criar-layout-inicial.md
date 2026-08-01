@@ -2,7 +2,10 @@
 
 ## Objetivo
 
-Pesquisa, propõe e implementa uma direção visual inicial coerente para `[NOME_PRODUTO]` nas quatro superfícies reais da solução:
+Pesquisa, propõe e implementa uma direção visual inicial coerente para
+`[NOME_PRODUTO]` nas quatro superfícies reais da solução, aplicando
+`VISUAL_SLICE_CONTRACT.md` a `[REQUISITOS_DE_PRODUTO]`,
+`[IDENTIDADE_VISUAL]`, `[REFERENCIAS_VISUAIS]` e à baseline aprovada:
 
 - `App.Server.Api` ou o projeto real `*.Server.Api`;
 - `App.Client.Ssr` ou o projeto real `*.Client.Ssr`;
@@ -19,10 +22,13 @@ O resultado é uma fundação visual executável e os shells iniciais necessári
 - A identidade é específica do produto e não parece um dashboard genérico, um template comprado sem adaptação ou uma UI de IA.
 - A primeira slice real é renderizada nas quatro superfícies aplicáveis e revista antes da entrega.
 - Findings críticos ou altos da crítica de Product Design/UX são corrigidos e novamente verificados.
+- Existe `design/slices/<SLICE-ID>-VISUAL_BRIEF.md` com tese da tarefa/visual/
+  interação, conteúdo real, matriz responsiva/estados, anti-direções,
+  alternativas de baixa fidelidade e direção selecionada por revisor identificado.
 
 ## Entradas e descoberta
 
-1. Lê `PRODUCT_DEFINITION.md`, `PRODUCT_EXCELLENCE.md`, `PRODUCT_QUALITY_BASELINE.md`, requisitos, identidade aprovada, `MODULES.md`, rotas, projetos, tokens, componentes, layouts e `CODEX_LAYOUT_TOOLING.md` quando existir.
+1. Lê `PRODUCT_DEFINITION.md`, `PRODUCT_EXCELLENCE.md`, `PRODUCT_QUALITY_BASELINE.md`, `VISUAL_SLICE_CONTRACT.md`, requisitos, identidade aprovada, `MODULES.md`, rotas, projetos, tokens, componentes, layouts e `CODEX_LAYOUT_TOOLING.md` quando existir.
 2. Descobre os nomes reais na solution e cria a matriz `papel → projeto → rotas/ecrãs → utilizador → responsabilidade`. Não cries um projeto duplicado apenas porque o prefixo ou `Client.Web`/`Cliente.Web` difere dos exemplos.
 3. Confirma `[VERTICAL_SLICE_ATUAL]`, atores, permissões, dados/contratos reais, plataformas MAUI e viewports. Valores materiais ausentes ficam explícitos; não inventes negócio, métricas, claims ou permissões.
 4. Inventaria o baseline atual por `preservar | melhorar | substituir | remover`, com evidência renderizada. Preserva comportamento e acessibilidade que já estejam corretos.
@@ -54,10 +60,10 @@ Regras da pesquisa:
 ## Direção proposta
 
 1. Sintetiza cinco a dez princípios de experiência específicos do produto e os anti-padrões a evitar.
-2. Apresenta no máximo três direções realmente distintas numa comparação curta: `direção | adequação ao produto | ganho | custo/risco | referências | decisão`.
+2. Apresenta duas ou três direções realmente distintas em baixa fidelidade numa comparação curta: `direção | adequação ao produto | ganho | custo/risco | referências | decisão`; não implementa várias versões polidas.
 3. Recomenda uma direção com base na jornada, público, densidade, identidade, acessibilidade e viabilidade técnica. Não combines automaticamente elementos incompatíveis de várias referências.
 4. Se a direção for coerente com a identidade/baseline aprovada e a implementação for local e reversível, implementa a recomendação sem uma pausa artificial. Uma mudança material de marca, framework ou compra continua a exigir a autorização correspondente.
-5. Conserva a decisão, mapa de navegação e regras responsivas em `design/INITIAL_LAYOUT_SPEC.md`.
+5. Conserva a decisão, mapa de navegação e regras responsivas em `design/INITIAL_LAYOUT_SPEC.md` e no brief da slice.
 
 ## Layout inicial por superfície
 
@@ -102,7 +108,13 @@ Uma autorrevisão do implementador continua obrigatória, mas não é apresentad
 
 ## Entrega
 
-Começa pelo resultado e indica `concluído`, `parcial` ou `bloqueado`. Resume a direção recomendada, as quatro superfícies implementadas, a opinião crítica e as correções efetuadas. Liga `INITIAL_LAYOUT_RESEARCH.md`, `INITIAL_LAYOUT_SPEC.md`, `INITIAL_LAYOUT_CRITIQUE.md`, `PRODUCT_QUALITY_BASELINE.md`, renders/snapshots e ficheiros alterados. Apresenta comandos/resultados, acessibilidade, licenças, decisões `manter|remover`, riscos e `Falta para terminar` de forma concreta.
+Começa pelo resultado e indica `concluído`, `parcial` ou `bloqueado`. Resume a
+direção recomendada, alternativas comparadas, revisor/decisão, as quatro
+superfícies implementadas, a opinião crítica e as correções efetuadas. Liga o
+brief da slice, `INITIAL_LAYOUT_RESEARCH.md`, `INITIAL_LAYOUT_SPEC.md`,
+`INITIAL_LAYOUT_CRITIQUE.md`, `PRODUCT_QUALITY_BASELINE.md`, renders/snapshots e
+ficheiros alterados. Apresenta comandos/resultados, acessibilidade, licenças,
+decisões `manter|remover`, riscos e `Falta para terminar` de forma concreta.
 
 Não declares “qualidade de excelência garantida” apenas por teres aplicado uma rubrica. Declara o que foi observado, por quem, em que versão e com que limitações.
 

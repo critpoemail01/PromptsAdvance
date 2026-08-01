@@ -6,7 +6,7 @@ Melhora, dentro da `[VERTICAL_SLICE_ATUAL]`, o cliente .NET MAUI/Blazor Hybrid p
 
 ## Entradas e rota de validação
 
-Define `[PLATAFORMA_PRIMARIA]`, `[PLATAFORMAS_MAUI]`, versões mínimas, `[JORNADAS_PRIORITARIAS]` e dispositivos/emuladores autorizados. Usa primeiro a infraestrutura nativa existente no repositório; se não houver automação UI, documenta uma matriz manual reproduzível ou propõe Appium/testes equivalentes sem instalar tooling novo por iniciativa própria.
+Define `[PLATAFORMA_PRIMARIA]`, `[PLATAFORMAS_MAUI]`, versões mínimas, `[JORNADAS_PRIORITARIAS]`, `VISUAL_SLICE_CONTRACT.md` e dispositivos/emuladores autorizados. Cria/atualiza o brief da slice antes de editar. Usa primeiro a infraestrutura nativa existente no repositório; se não houver automação UI, documenta uma matriz manual reproduzível ou propõe Appium/testes equivalentes sem instalar tooling novo por iniciativa própria.
 
 ## Exigência herdada do prompt 13
 
@@ -38,6 +38,9 @@ Este prompt aplica à slice MAUI o mesmo nível de pesquisa, proveniência, qual
 3. Aplica o `PRODUCT_EXCELLENCE.md` e o contrato herdado do prompt 13 com aplicações móveis comparáveis, referências premium e guidelines oficiais; conserva proveniência e licenças nos artefactos duráveis.
 4. Mapeia `jornada → componentes partilhados → integrações nativas → estados do ciclo de vida`.
 5. Não edites recursos ou configurações de plataformas não selecionadas.
+6. Compara duas ou três alternativas de baixa fidelidade para navegação,
+   densidade ou interação nativa; regista a escolha humana e implementa apenas
+   essa direção.
 
 ## Implementação
 
@@ -55,7 +58,7 @@ Executa build/test partilhados e compila MAUI apenas para workloads instalados. 
 
 ## Entrega
 
-Começa pelo resultado e por `Falta para terminar`. Apresenta plataformas testadas, benchmark nativo e padrões adotados, jornadas, diferenças nativas, componentes partilhados, evidência em emulador/dispositivo, comandos/resultados, licenças, revisão Product Design/UX, correções e bloqueios. Liga os três artefactos `INITIAL_LAYOUT_*` atualizados.
+Começa pelo resultado e por `Falta para terminar`. Apresenta plataformas testadas, brief, alternativas e direção selecionada, benchmark nativo e padrões adotados, jornadas, diferenças nativas intencionais, componentes partilhados, evidência em emulador/dispositivo, comandos/resultados, licenças, revisão Product Design/UX, correções e bloqueios externos. Liga os três artefactos `INITIAL_LAYOUT_*` atualizados.
 
 ## Referências oficiais
 

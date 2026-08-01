@@ -11,6 +11,7 @@
 | Owner de produto | Fixture Owner | aprovado | approval/owner.md |
 | Revisor de Product Design/UX | Fixture UX Reviewer | aprovado | reviews/ux.md |
 | Revisor de engenharia/frontend | Fixture Engineering Reviewer | aprovado | reviews/frontend.md |
+| Contrato visual aplicado | VISUAL_SLICE_CONTRACT.md | confirmado | design/slices/SLICE-001-VISUAL_BRIEF.md |
 | Data da aprovação | 2026-07-28 | confirmado | approval/g04.md |
 
 ## Benchmark aprovado
@@ -51,6 +52,12 @@
 | Campo | Valor/evidência | Estado |
 |---|---|---|
 | Requisitos Must cobertos | FR-001 | passou |
+| Brief da slice | design/slices/SLICE-001-VISUAL_BRIEF.md | passou |
+| Tese da tarefa/visual/interação | resolver a fila com hierarquia operacional | passou |
+| Alternativas de baixa fidelidade comparadas | design/alternatives/SLICE-001.md | passou |
+| Direção selecionada, revisor e trade-offs | reviews/direction.md | passou |
+| Anti-direções rejeitadas | design/anti-directions.md | passou |
+| Matriz responsiva e de estados | design/responsive-state-matrix.md | passou |
 | Dados/backend reais usados | tests/integration.md | passou |
 | Atores e permissões exercitados | tests/authz.md | passou |
 | Estados de erro/recuperação exercitados | tests/states.md | passou |

@@ -214,6 +214,8 @@ Estes campos definem o destino esperado, mas não autorizam a ação externa. A 
 | Checklist legível do programador | A preencher | pendente | `requirements/DEVELOPER_REQUIREMENTS_CHECKLIST.md` |
 | Ficheiro único de todas as funcionalidades | A preencher | pendente | `requirements/ALL_FUNCTIONALITIES.md` |
 | Matriz de requisitos | A preencher | pendente | — |
+| Contrato de engenharia de requisitos | `REQUIREMENTS_ENGINEERING_CONTRACT.md` | pendente | Processo Advance |
+| Matriz de qualidade dos requisitos | A preencher | pendente | `requirements/REQUIREMENTS_QUALITY_MATRIX.md` |
 | Catálogo de aplicações | A preencher | pendente | `requirements/APPLICATION_CATALOG.md` |
 | Contratos por aplicação | A preencher | pendente | `requirements/applications/` |
 | Catálogo de páginas/ecrãs | A preencher | pendente | `requirements/PAGE_CATALOG.md` |
@@ -239,6 +241,7 @@ Aliases:
 - `[CHECKLIST_REQUISITOS_PROGRAMADOR]`, `[DEVELOPER_REQUIREMENTS_CHECKLIST]`
 - `[FICHEIRO_UNICO_FUNCIONALIDADES]`, `[ALL_FUNCTIONALITIES]`
 - `[MATRIZ_DE_REQUISITOS]`
+- `[CONTRATO_ENGENHARIA_REQUISITOS]`, `[MATRIZ_QUALIDADE_REQUISITOS]`
 - `[CATALOGO_DE_APLICACOES]`, `[CONTRATOS_POR_APLICACAO]`
 - `[CATALOGO_DE_PAGINAS]`, `[CONTRATOS_POR_PAGINA]`
 - `[MAPA_DE_NAVEGACAO]`, `[MAPA_DE_PASSOS]`
@@ -263,6 +266,8 @@ Aliases:
 | Evidência e localização das licenças | A preencher | pendente | Registo de licenças |
 | Baseline visual | A preencher | pendente | — |
 | Baseline profissional de produto/UX/UI | `PRODUCT_QUALITY_BASELINE.md` | pendente | Benchmark/aprovação |
+| Contrato visual por slice | `VISUAL_SLICE_CONTRACT.md` | pendente | Processo Advance |
+| Brief visual da slice atual | A preencher | pendente | `design/slices/<SLICE-ID>-VISUAL_BRIEF.md` |
 | Estratégia mobile Web/PWA | A preencher | pendente | Produto/UX |
 | Catálogo de componentes e estados | A preencher | pendente | Design system |
 | Plano/resultados de usabilidade | A preencher | pendente | Investigação com utilizadores |
@@ -291,6 +296,7 @@ Aliases:
 - `[BROWSERS_E_DISPOSITIVOS]`, `[BROWSERS_E_VIEWPORTS]`, `[BROWSERS_PLATAFORMAS_E_VERSOES]`
 - `[CLIENTES_EMAIL_ALVO]`
 - `[PRODUCT_QUALITY_BASELINE]`
+- `[CONTRATO_VISUAL_SLICE]`, `[BRIEF_VISUAL_SLICE]`
 - `[ESTRATEGIA_MOBILE_WEB]`
 - `[CATALOGO_DE_COMPONENTES_E_ESTADOS]`
 - `[PLANO_E_RESULTADOS_DE_USABILIDADE]`
@@ -375,6 +381,23 @@ Aliases:
 - `[DESTINO_DE_TELEMETRIA]`
 - `[CLOUD_PROVIDER]`, `[FERRAMENTA_IAC]`, `[RECURSOS_EXTERNOS]`
 - `[PLATAFORMAS_E_LOJAS]`, `[PLATAFORMA_ATUAL]`, `[LOJA_ATUAL]`
+
+## Estratégia e matriz de testes
+
+| Campo | Valor ou caminho | Estado | Fonte |
+|---|---|---|---|
+| Contrato de estratégia de testes | `TEST_STRATEGY_CONTRACT.md` | pendente | Processo Advance |
+| Estratégia da aplicação | A preencher | pendente | `quality/TEST_STRATEGY.md` |
+| Matriz requisito/risco/teste | A preencher | pendente | `quality/TEST_MATRIX.md` |
+| Provider real para integração | A preencher | pendente | Arquitetura/ambiente de teste |
+| Lanes de CI | A preencher | pendente | CI |
+| Política de flakiness | A preencher | pendente | Estratégia de testes |
+
+Aliases:
+
+- `[CONTRATO_ESTRATEGIA_TESTES]`
+- `[ESTRATEGIA_DE_TESTES]`, `[MATRIZ_DE_TESTES]`
+- `[PROVIDER_REAL_DE_TESTE]`, `[LANES_DE_CI]`, `[POLITICA_DE_FLAKINESS]`
 
 ## Ambientes e endpoints
 

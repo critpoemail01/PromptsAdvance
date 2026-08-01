@@ -9,6 +9,8 @@ Implementa um único lote coerente de requisitos `Must` de `[MATRIZ_DE_REQUISITO
 - `[MATRIZ_DE_REQUISITOS]` com IDs, fontes, prioridades, dependências e critérios de aceitação.
 - `[LOTE_DE_REQUISITOS]` com uma única capacidade transversal e, por omissão, no máximo três requisitos `Must`.
 - `[DECISOES_APROVADAS]` para contratos, dados, permissões, retenção ou cobrança afetados.
+- `REQUIREMENTS_ENGINEERING_CONTRACT.md` e `TEST_STRATEGY_CONTRACT.md`, com
+  `REQUIREMENTS_QUALITY_MATRIX.md` e `quality/TEST_MATRIX.md` reconciliadas.
 
 Se o lote não for fornecido, propõe o menor corte vertical elegível e termina antes de editar. Se exceder uma capacidade coerente, divide-o e executa apenas a primeira parte explicitamente aprovada.
 
@@ -47,7 +49,7 @@ Se o lote não for fornecido, propõe o menor corte vertical elegível e termina
 
 ## Qualidade e testes
 
-Para cada requisito, cobre happy path, validação, autorização, erro/recuperação e observabilidade. Inclui acessibilidade e estados de UI. Executa build/test pelo `*.Web.slnf` e Microsoft.Testing.Platform; compila MAUI apenas quando alterado e o workload existir. Não alteres baselines ou desatives testes para os fazer passar.
+Para cada requisito, cobre happy path, validação, autorização, erro/recuperação e observabilidade no nível mais baixo adequado, mantendo a matriz `risco -> oráculo -> nível -> evidência`. Inclui acessibilidade e estados de UI; usa provider real descartável e diff de contrato quando material. Executa build/test pelo `*.Web.slnf` e Microsoft.Testing.Platform; compila MAUI apenas quando alterado e o workload existir. Não alteres baselines ou desatives testes para os fazer passar.
 
 ## Critérios de conclusão
 

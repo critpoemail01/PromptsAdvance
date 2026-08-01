@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Valida como a aplicação reage e recupera de falhas transitórias e persistentes em `[DEPENDENCIAS_CRITICAS]`, incluindo rede, base de dados, fornecedores, jobs, SignalR e armazenamento quando ativos.
+Valida como a aplicação reage e recupera de falhas transitórias e persistentes em `[DEPENDENCIAS_CRITICAS]`, incluindo rede, base de dados, fornecedores, jobs, SignalR e armazenamento quando ativos. Aplica `TEST_STRATEGY_CONTRACT.md`.
 
 ## Autoridade para fault injection
 
@@ -22,6 +22,9 @@ Usa `[AMBIENTE_DESCARTAVEL_AUTORIZADO]` e define dependências, intensidade, dur
 2. Mapeia `dependência → operação → timeout → retry → idempotência → fallback → sinal`.
 3. Define falhas controladas e ambiente descartável; não provoca falhas em produção.
 4. Usa objetivos/SLOs aprovados; não inventa tempos de indisponibilidade tolerados.
+5. Cria uma análise de failure modes por jornada/dependência com causa, efeito
+   local e no utilizador/dados, deteção, mitigação, recuperação, teste e owner;
+   prioriza por impacto, probabilidade e detetabilidade.
 
 ## Execução
 
@@ -31,6 +34,9 @@ Usa `[AMBIENTE_DESCARTAVEL_AUTORIZADO]` e define dependências, intensidade, dur
 - Confirma atomicidade ou compensação quando a falha ocorre entre passos.
 - Reinicia serviço/processo e verifica recuperação de jobs e estado persistido.
 - Mede latência, número de tentativas, carga adicional e tempo de recuperação.
+- Quando autorizado e seguro, combina a falha prioritária com carga realista
+  para observar cascatas e recuperação; aplica hard stops e não chama serviços
+  externos reais.
 
 ## Validação
 

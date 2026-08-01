@@ -79,6 +79,7 @@ $requiredIdentity = @(
     '^Owner de produto$',
     '^Revisor de Product Design/UX$',
     '^Revisor de engenharia/frontend$',
+    '^Contrato visual aplicado$',
     '^Data da aprova..o$'
 )
 foreach ($fieldPattern in $requiredIdentity) {
@@ -148,8 +149,22 @@ foreach ($row in $rubric) {
 }
 
 $firstSlice = @(Get-TableRows (Get-Section 'Primeira vertical slice'))
-if ($firstSlice.Count -lt 8) {
+if ($firstSlice.Count -lt 14) {
     $issues.Add('The first vertical-slice evidence table is incomplete.')
+}
+$requiredFirstSlice = @(
+    '^Brief da slice$',
+    '^Tese da tarefa/visual/intera..o$',
+    '^Alternativas de baixa fidelidade comparadas$',
+    '^Dire..o selecionada, revisor e trade-offs$',
+    '^Anti-dire..es rejeitadas$',
+    '^Matriz responsiva e de estados$'
+)
+foreach ($fieldPattern in $requiredFirstSlice) {
+    $row = @($firstSlice | Where-Object { $_[0] -match $fieldPattern })
+    if ($row.Count -ne 1) {
+        $issues.Add("First-slice decision evidence is missing: $fieldPattern")
+    }
 }
 foreach ($row in $firstSlice) {
     if ($row.Count -lt 3 -or

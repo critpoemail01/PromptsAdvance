@@ -19,6 +19,9 @@ Corrige apenas discrepâncias suportadas por uma invariante aprovada, contrato e
 ## Preparação
 
 1. Lê `AGENTS.md`, `README.md`, `MODULES.md`, `DbContext`, configurações de entidades, migrations, repositórios/serviços, testes e pipeline.
+   Lê `REQUIREMENTS_ENGINEERING_CONTRACT.md` e
+   `TEST_STRATEGY_CONTRACT.md` e liga cada invariante ao respetivo oráculo na
+   matriz de testes.
 2. Confirma o provider real por ambiente. A base usa EF Core/SQLite por defeito, mas não assumes que o projeto final o manteve.
 3. Inventaria contextos, schemas, tabelas, dados geridos/seeding, migrations aplicadas/conhecidas e formas atuais de atualização.
 4. Regista uma matriz:
@@ -61,6 +64,8 @@ Usa bases descartáveis e dados sem informação pessoal:
 - confirmar isolamento e limpeza dos testes.
 
 Executa restore, build e testes do `*.Web.slnf` com Microsoft.Testing.Platform. Regista também os comandos EF usados, o provider e a versão. Se não for possível testar o provider de produção, não generalizes resultados obtidos com SQLite ou InMemory.
+Testa diferenças de tradução SQL, constraints e concorrência numa instância
+descartável do provider real sempre que esses comportamentos forem materiais.
 
 ## Entrega
 

@@ -11,6 +11,9 @@ O corte deve indicar IDs de requisitos, ator, trigger, resultado observável e e
 ## Preparação
 
 1. Lê `AGENTS.md`, `README.md`, `MODULES.md`, projetos `Server.Api`, `Server.Shared`, `Shared` e `Tests`.
+   Lê também `REQUIREMENTS_ENGINEERING_CONTRACT.md` e
+   `TEST_STRATEGY_CONTRACT.md`; cria/atualiza `quality/TEST_STRATEGY.md` e
+   `quality/TEST_MATRIX.md` para o corte.
 2. Confirma módulos mantidos/removidos, provider EF atual, migrations, Identity, roles/policies, OpenAPI/Scalar, ProblemDetails, rate limiting, Hangfire, SignalR e health checks.
 3. Confirma que o corte fornecido é pequeno e completa-o com casos de uso, invariantes, atores, permissões, erros e critérios de aceitação.
 4. Se faltarem decisões de negócio irreversíveis, documenta-as e implementa apenas uma fundação reversível.
@@ -29,7 +32,7 @@ O corte deve indicar IDs de requisitos, ator, trigger, resultado observável e e
 
 ## Testes e validação
 
-Cria testes unitários para invariantes e integração para happy path, validação, 401, 403, not found, conflito/idempotência e rollback. Testa migrations numa base descartável. Executa:
+Cria testes unitários para invariantes e integração para happy path, validação, 401, 403, not found, conflito/idempotência e rollback. Testa migrations numa base descartável do provider real quando o comportamento depender dele. Liga cada requisito/risco ao oráculo e nível mínimo na matriz; executa diff de compatibilidade OpenAPI quando o contrato público mudar. Executa:
 
 ```text
 dotnet restore <Projeto>.Web.slnf --locked-mode

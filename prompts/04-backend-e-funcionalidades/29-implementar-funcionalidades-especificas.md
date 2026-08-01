@@ -15,6 +15,9 @@ Recebe uma única funcionalidade, IDs de requisitos/aceitação, atores/permiss�
    dependências e prova. Atualiza primeiro a especificação canónica e reconcilia
    checklist/`ALL_FUNCTIONALITIES.md`. Se exigir decisão de produto, bloqueia
    antes de código; `approved_for_refinement` não autoriza implementação.
+   Aplica `REQUIREMENTS_ENGINEERING_CONTRACT.md`: exige tabelas de
+   decisão/transição, exemplos/fronteiras e oráculos para as regras materiais.
+   Lê `TEST_STRATEGY_CONTRACT.md` e atualiza `quality/TEST_MATRIX.md`.
 1. Lê instruções e encontra funcionalidades análogas no projeto.
 2. Quando existir experiência visível, aplica o `PRODUCT_EXCELLENCE.md` e compara a jornada completa com produtos profissionais relevantes; não limites a referência ao screenshot do estado ideal.
    Quando existir unidade de ajuda associada, lê `HELP_AND_ACADEMY.md` e inclui
@@ -39,7 +42,7 @@ Recebe uma única funcionalidade, IDs de requisitos/aceitação, atores/permiss�
 
 ## Validação
 
-Cria testes para invariantes, contrato e integração; usa browser/E2E para o fluxo crítico quando a infraestrutura existir. Inclui casos anónimo, sem permissão, dados inválidos/limite, repetição, falha externa e concorrência relevantes. Executa restore/build/test do `*.Web.slnf` e revê migration, OpenAPI e diff.
+Cria testes para invariantes, arquitetura, contrato e integração; usa o provider real descartável quando a semântica depender dele e browser/E2E para o fluxo crítico quando a infraestrutura existir. Inclui casos anónimo, sem permissão, dados inválidos/limite, repetição, falha externa e concorrência relevantes. Executa restore/build/test do `*.Web.slnf`, revê migration e executa diff de compatibilidade OpenAPI/eventos quando aplicável. Mantém a matriz por requisito/risco e não duplica cobertura sem valor.
 
 ## Conclusão
 

@@ -15,6 +15,7 @@ Este passo ocorre depois dos prompts 07 e 08. Usa também a evidência dos promp
 
 - `PRODUCT_DEFINITION.md` e decisão atual do Gate G01;
 - artefactos canónicos produzidos pelo prompt 03 em `requirements/`;
+- `REQUIREMENTS_ENGINEERING_CONTRACT.md` e `TEST_STRATEGY_CONTRACT.md`;
 - `IMPLEMENTATION_STATUS.md`, `APP_CONTEXT.md` e `HELP_AND_ACADEMY.md`;
 - aplicação criada/adotada, comandos reais, projetos, módulos e superfícies
   confirmados pelos prompts 07 e 08;
@@ -44,9 +45,12 @@ Este passo ocorre depois dos prompts 07 e 08. Usa também a evidência dos promp
 4. Completa páginas, operações não visuais, dados, permissões, integrações,
    estados, recuperação, NFR, segurança, ajuda e critérios de aceitação que a
    fundação tornou concretos.
+   Para regras materiais acrescenta tabelas de decisão/transição, exemplos e
+   fronteiras; para NFR acrescenta estímulo, ambiente, resposta, medida e prova.
 5. Reconcilia mecanicamente a especificação detalhada, contratos por aplicação
    e página, checklist do programador, `ALL_FUNCTIONALITIES.md`, catálogos e
-   matrizes de cobertura.
+   matrizes de cobertura, incluindo `REQUIREMENTS_QUALITY_MATRIX.md` e
+   `quality/TEST_MATRIX.md` quando já existir.
 6. Revê o delta adversarialmente: procura requisitos inventados a partir do
    código, IDs duplicados, páginas omitidas, contratos contraditórios e trabalho
    técnico apresentado como decisão de produto.

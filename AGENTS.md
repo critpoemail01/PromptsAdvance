@@ -17,6 +17,7 @@ Antes de executar qualquer tarefa:
    por estarem ligados: abre os adicionais quando o prompt, uma decisão em falta
    ou a superfície alterada os tornar materiais.
 3. Se a tarefa afetar produto, requisitos, marca, conteúdo, UI, UX, jornadas, emails, monetização ou retenção, o task packet deve incluir e o executor lê integralmente o [PRODUCT_EXCELLENCE.md](PRODUCT_EXCELLENCE.md).
+   Para requisitos inclui [REQUIREMENTS_ENGINEERING_CONTRACT.md](REQUIREMENTS_ENGINEERING_CONTRACT.md); para experiências visíveis inclui [VISUAL_SLICE_CONTRACT.md](VISUAL_SLICE_CONTRACT.md); para implementação, validação, hardening ou CI inclui [TEST_STRATEGY_CONTRACT.md](TEST_STRATEGY_CONTRACT.md).
 4. Antes de uma tarefa da etapa 2 ou posterior, lê o [PRODUCT_DEFINITION.md](PRODUCT_DEFINITION.md) e executa `scripts/Test-ProductDefinitionGate.ps1` quando aplicável. Trata uma falha como diagnóstico e comunica o que falta; não bloqueies um `próximo` explícito salvo quando a lacuna tornar o objetivo tecnicamente impossível ou inseguro.
 5. Antes de avaliar arquitetura, UI, implementação, hardening, release ou operação, lê [QUALITY_GATES.md](QUALITY_GATES.md) e usa o gate correspondente como checklist de qualidade.
    Para G06–G10, atualiza e valida `LIFECYCLE_GATE_EVIDENCE.json`; texto livre em `GateEvidence` não substitui identidades, hashes, candidata, autorização ou artefactos exigidos.

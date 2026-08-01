@@ -114,12 +114,14 @@ Liga aqui a especificação e a matriz produzidas pelo prompt 03.
 | Especificação versionada | A preencher | pendente |
 | Checklist do programador por página/funcionalidade | A preencher | pendente |
 | Matriz de rastreabilidade | A preencher | pendente |
+| Matriz de qualidade requisito/risco/oráculo/teste | A preencher | pendente |
+| Tabelas de decisão/transição e exemplos de fronteira | A preencher | pendente |
 | Catálogo e contratos `APP` | A preencher | pendente |
 | Catálogo e contratos `PAGE` | A preencher | pendente |
 | Cobertura `jornada × APP × PAGE/operação` | A preencher | pendente |
 | Estados, ações e fatias downstream por página | A preencher | pendente |
 | Requisitos `Must` aprovados | A preencher | pendente |
-| Requisitos não funcionais bloqueantes | A preencher | pendente |
+| Cenários NFR mensuráveis e bloqueios | A preencher | pendente |
 | Atores e permissões iniciais | A preencher | pendente |
 | Dados sensíveis e obrigações conhecidas | A preencher | pendente |
 | Ajuda contextual/Academia: aplicabilidade e matriz | A preencher ou não aplicável com razão | pendente |
@@ -164,8 +166,8 @@ Decisões em aberto sobre problema, público, jornada principal, requisitos `Mus
 | DOR-03 | Alternativas, procura, acesso e diferenciação têm pesquisa atual e evidência direta do problema com utilizadores representativos, ou exceção aprovada com risco, owner, prazo e plano | pendente | A preencher | A preencher |
 | DOR-04 | Existe um nome de trabalho aprovado e a triagem realizada não encontrou conflito material | pendente | A preencher | A preencher |
 | DOR-05 | A jornada principal, o resultado, as aplicações, páginas/operações, o âmbito do MVP e as exclusões são inequívocos | pendente | A preencher | A preencher |
-| DOR-06 | Todos os `Must` da release têm ID, fonte, resultado, aceitação, owner e slice; primeira slice/alto risco estão detalhados e as vistas derivadas têm paridade; restantes estão explicitamente `approved_for_refinement`, não falsamente prontos | pendente | A preencher | A preencher |
-| DOR-07 | Segurança, privacidade, acessibilidade, desempenho, operação e outras NFR materiais têm requisitos mensuráveis ou decisão bloqueante | pendente | A preencher | A preencher |
+| DOR-06 | Todos os `Must` têm ID, fonte, resultado, aceitação, owner e slice; regras materiais têm decisão/estado, exemplos/fronteiras e oráculo; primeira slice/alto risco estão detalhados e as vistas derivadas têm paridade; restantes estão `approved_for_refinement`, não falsamente prontos | pendente | A preencher | A preencher |
+| DOR-07 | Segurança, privacidade, acessibilidade, desempenho, operação e outras NFR materiais usam cenário fonte/estímulo/ambiente/resposta/medida/prova/owner ou decisão bloqueante | pendente | A preencher | A preencher |
 | DOR-08 | Métrica, baseline, meta, horizonte e critério de continuar/parar estão definidos e a solução foi testada antes da implementação, ou existe exceção aprovada e limitada | pendente | A preencher | A preencher |
 | DOR-09 | Orçamento, prazo, competências e adequação ao `BoilerPlateAdvance` tornam o primeiro corte plausível | pendente | A preencher | A preencher |
 | DOR-10 | Não existem conflitos ou decisões materiais em aberto; exceções reversíveis têm owner, prazo e teste | pendente | A preencher | A preencher |

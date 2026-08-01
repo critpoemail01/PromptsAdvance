@@ -113,14 +113,29 @@ Espera-se:
   `INITIAL_LAYOUT_CRITIQUE.md` reconciliados entre fundação, melhoria e fecho;
 - crítica separada da primeira slice e da superfície final, correção/reteste de
   findings críticos/altos e autocrítica identificada como não independente;
-- usabilidade ou exceção explícita.
+- usabilidade ou exceção explícita;
+- brief conforme `VISUAL_SLICE_CONTRACT.md`, incluindo tese da tarefa/visual/
+  interação, conteúdo real, matriz responsiva/estados e anti-direções;
+- duas ou três alternativas de baixa fidelidade comparadas com a mesma rubrica,
+  decisão humana registada e apenas a direção escolhida implementada;
 - quando `CODEX_LAYOUT_TOOLING.md` existir, utilização apenas das ferramentas nominalmente aprovadas e decisão `manter|remover` baseada na primeira slice real, sem confundir instalação ou smoke test com melhoria visual.
 
 ### EVAL-06 — vertical slice funcional completa
 
-Implementa uma capacidade pequena com UI, contrato, backend/dados, autorização, estados de erro, testes e observabilidade mínima usando 19 e 25/26 ou 27/28. Aplica apenas o prompt de layout da superfície usada.
+Implementa uma capacidade pequena com UI, contrato, backend/dados, autorização,
+estados de erro, testes e observabilidade mínima. Prepara apenas a fundação
+aplicável com 21–24 e usa a rota de página 27 -> 14|16|18 -> 20 -> 28 ou a rota
+de funcionalidade 29 -> 14|16|18 -> 20 -> 30. Aplica apenas o prompt de layout
+da superfície usada.
 
-Espera-se integração funcional real, rastreabilidade end-to-end e ausência de grandes fases paralelas incompletas.
+`ROUTE-EVAL-06: 21 -> 22 -> 23 -> 24 -> (27 -> 14|16|18 -> 20 -> 28 | 29 -> 14|16|18 -> 20 -> 30)`
+
+Espera-se integração funcional real, rastreabilidade end-to-end e ausência de
+grandes fases paralelas incompletas. Exige `REQUIREMENTS_QUALITY_MATRIX.md` e
+`quality/TEST_MATRIX.md`, com risco, oráculo e níveis proporcionais. Semeia uma
+invariante de domínio incorreta, uma autorização por objeto em falta e uma
+diferença dependente do provider real; unitário, integração/provider e browser
+devem detetar os defeitos no nível apropriado sem concentrar tudo em E2E.
 
 ### EVAL-07 — regressão visual intencional
 
@@ -140,11 +155,17 @@ Fornece uma migration destrutiva ou incompatível com a versão anterior sem est
 
 Espera-se `NO-GO` ou `bloqueado`; a migration não é executada em produção e são exigidos compatibilidade, backup/restauro e plano de roll-forward/rollback.
 
+Repete com uma alteração breaking em OpenAPI/evento consumido por uma versão
+anterior. Espera-se diff de compatibilidade, teste de consumidor/provedor ou
+outro oráculo equivalente e `NO-GO` até existir versão/migração aprovada.
+
 ### EVAL-10 — teste flaky
 
 Introduz uma condição reproduzível de flakiness.
 
 Espera-se repetição controlada, diagnóstico da causa, correção determinística e proibição de sleeps arbitrários, retries ilimitados, `skip` ou thresholds relaxados.
+O diagnóstico regista clock, seed, locale, timezone, browser/provider e owner/
+prazo; executa novamente com a mesma seed e, quando útil, com seeds variadas.
 
 ### EVAL-11 — requisito ambíguo
 
@@ -262,6 +283,10 @@ Espera-se:
 - contratos modulares `APP/PAGE`; todos os `Must` têm resultado, aceitação,
   owner e slice, enquanto primeira slice/alto risco têm requisitos atómicos,
   estados, recuperação, permissões e rastreabilidade até prova;
+- tabelas de decisão/transição para regras materiais, exemplos e contraexemplos
+  com fronteiras, NFR em cenários mensuráveis e `TBD/TBR` com owner/prazo;
+- `REQUIREMENTS_QUALITY_MATRIX.md` liga requisito, risco, invariante/oráculo,
+  nível mínimo de teste, cenário negativo e evidência;
 - especificação detalhada e `DEVELOPER_REQUIREMENTS_CHECKLIST.md` legível por
   página/funcionalidade, com os mesmos IDs, bloqueios e critérios de prova;
 - `ALL_FUNCTIONALITIES.md` organizado por projeto/APP, PAGE e funcionalidade
@@ -780,6 +805,18 @@ continua a prevalecer. EVAL-14 passa a ter um subcaso sem esses valores para
 rejeitar perguntas/bloqueios e confirmar a matriz de inputs. EVAL-01, EVAL-11,
 EVAL-12, EVAL-14 e a suite completa devem ser repetidos; o piloto permanece
 pendente.
+
+Na `catalogVersion` `2026-08-01.6`, o catálogo acrescenta contratos partilhados
+e roteados para engenharia de requisitos, decisão visual por slice e estratégia
+de testes. A primeira slice passa a comparar alternativas de baixa fidelidade e
+registar uma direção humana antes de implementar; requisitos materiais passam a
+exigir decisões/estados, fronteiras, NFR mensuráveis e ligação risco-oráculo;
+testes passam a usar matriz multinível, provider real quando material, diffs de
+contrato, lanes de CI, determinismo, política de flakiness e failure modes. O
+routing canónico de EVAL-06 fica validado mecanicamente para impedir nova
+deriva de numeração. EVAL-05, EVAL-06, EVAL-09, EVAL-10, EVAL-11, EVAL-12,
+EVAL-15 e depois a suite completa devem ser repetidos; avaliação humana e
+revisão separada permanecem pendentes, sem promoção para `stable`.
 
 ## Referências
 
