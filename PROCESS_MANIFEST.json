@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-08-01.12",
+  "catalogVersion": "2026-08-02.2",
   "releaseChannel": "candidate",
   "name": "Professional Advance .NET Software Lifecycle",
   "promptCount": 76,
@@ -18,6 +18,9 @@
     "brownfieldOverlapConfirmationRequired": true,
     "officialBoilerplateComparisonRequired": true,
     "brownfieldBoilerplateAdaptationConsentRequired": true,
+    "existingLayoutResetOrImproveDecisionRequired": true,
+    "visualDirectionOptionsPerClient": 3,
+    "visualDirectionSelectionPerClientRequired": true,
     "taskLedgerRequired": false,
     "findingsGateRequired": false,
     "adversarialReviewRequired": true,

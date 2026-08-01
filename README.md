@@ -326,7 +326,7 @@ Os prompts 25/26 tratam requisitos globais quando já existe base funcional sufi
 ### 3 — Fundação visual e gates de superfície
 
 12. [Criar ícone e marca](prompts/03-marca-e-layout/12-criar-icone-e-marca.md)
-13. [Criar fundação visual mínima](prompts/03-marca-e-layout/13-criar-layout-inicial.md)
+13. [Propor e escolher a direção visual das três aplicações cliente](prompts/03-marca-e-layout/13-criar-layout-inicial.md)
 14. [Melhorar a fatia em Client.Ssr](prompts/03-marca-e-layout/14-melhorar-layout-client-ssr.md)
 15. [Concluir Client.Ssr após jornadas Must](prompts/03-marca-e-layout/15-concluir-layout-client-ssr.md)
 16. [Melhorar a fatia em Client.Web](prompts/03-marca-e-layout/16-melhorar-layout-client-web.md)

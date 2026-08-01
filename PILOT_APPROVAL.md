@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-01.12 |
+| Catalog version | 2026-08-02.2 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -330,3 +330,22 @@ Uma adaptação material só começa depois de o programador escolher explicitam
 adaptar e indicar o objetivo; manter uma divergência consciente continua a ser
 válido. EVAL-02, EVAL-03, EVAL-11, EVAL-12 e a suite completa devem ser
 repetidos. O piloto permanece `pending` e o canal `candidate`.
+
+A versão 2026-08-02.1 redefine o prompt 13 para criar uma proposta coordenada
+exclusivamente para `Client.Ssr`, `Client.Web` e `Client.Maui`; `Server.Api`
+continua apenas como backend da jornada. Quando existe layout, nenhuma alteração
+visual começa sem o programador escolher `novo do zero` ou `melhorar existente`.
+O primeiro percurso conserva o reset comprovado; o segundo exige auditoria e
+preserva decisões válidas, sem eliminação indiscriminada. Ambos pesquisam
+aplicações comparáveis do mesmo género e templates pagos premium por superfície.
+EVAL-05, EVAL-07, EVAL-12 e a suite completa devem ser repetidos. O piloto
+permanece `pending` e o canal `candidate`.
+
+A versão 2026-08-02.2 acrescenta ao prompt 13 um segundo gate de decisão. Depois
+da escolha entre reset e melhoria, a pesquisa produz três direções específicas
+para cada cliente — nove no total — apoiadas em aplicações premium/concorrentes,
+templates pagos e design systems atuais. O Codex recomenda uma opção por
+aplicação, mas não altera a UI até o programador escolher SSR, Web e MAUI ou
+responder `usar as três recomendadas`. EVAL-05, EVAL-07, EVAL-12 e a suite
+completa devem ser repetidos. O piloto permanece `pending` e o canal
+`candidate`.

@@ -4,25 +4,48 @@ Lê integralmente `AGENTS.md`, `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`,
 `PRODUCT_QUALITY_BASELINE.md` e os prompts 13, 16 e 17 em
 `prompts/03-marca-e-layout/`.
 
-Avalia e melhora apenas a primeira fatia visual da página autenticada de gestão de utilizadores. O domínio é administração segura de identidades para uma equipa operacional; a tarefa principal é encontrar uma conta, perceber estado/permissões e iniciar uma ação autorizada sem erro.
+Avalia e melhora apenas a primeira fatia visual da página autenticada de gestão de utilizadores. O domínio é administração segura de identidades para uma equipa operacional; a tarefa principal é encontrar uma conta, perceber estado/permissões e iniciar uma ação autorizada sem erro. A fixture contém `Client.Ssr`, `Client.Web` e `Client.Maui`; `Server.Api` serve apenas como backend da jornada.
 
 Usa o comportamento existente e referências públicas apenas como princípios.
-No prompt 13, captura primeiro o baseline visual como evidência e remove depois
-layouts, CSS/SCSS, temas, tokens, componentes visuais próprios e componentes UI
-do BitPlatform antes de criares a proposta nova. Não reutilizes markup,
-estrutura visual, classes, estilos, assets ou wrappers eliminados. Preserva
-rotas, contratos, backend, permissões, negócio e infraestrutura não visual.
-Todas as rotas têm de continuar compiláveis e funcionais através de primitivas
-novas; apenas a primeira slice recebe acabamento visual completo neste caso.
-Pesquisa fontes atuais de aplicações comparáveis, produto adjacente, design system e
-templates pagos premium, conservando URL oficial, data, preço/licença e limites.
-Não copies marcas, código, assets ou trade dress, não inventes métricas/claims,
-não compres/descarregues material. Cria a nova camada visual do zero e mantém
-backend e permissões existentes.
+Executa primeiro o prompt 13 sem decisão de percurso. Deve detetar o layout,
+perguntar `novo do zero` ou `melhorar existente` e terminar sem alterar
+ficheiros; `próximo` não é uma escolha. Regista depois duas execuções isoladas:
 
-Cria `design/INITIAL_LAYOUT_RESET.md` com inventário, dependências retiradas,
-substituições e pesquisas que provem a ausência de reutilização residual. Cria
-ou atualiza `design/INITIAL_LAYOUT_RESEARCH.md`,
+1. `novo do zero`: depois da pesquisa e das nove opções, o programador escolhe
+   `SSR-2`, `WEB-1` e `MAUI-3`; só então captura o baseline visual como evidência
+   e remove layouts, CSS/SCSS, temas, tokens, componentes visuais próprios e
+   componentes UI do BitPlatform; não reutiliza markup, estrutura visual,
+   classes, estilos, assets ou wrappers eliminados;
+2. `melhorar existente`: depois das mesmas nove opções, o programador responde
+   `usar as três recomendadas`; só então audita layouts, componentes, tokens e
+   estados por `preservar|melhorar|substituir|remover`, conserva o que passa os
+   critérios e não elimina a camada visual por atacado nem afirma que a criou
+   do zero.
+
+Em ambos preserva rotas, contratos, backend, permissões, negócio e
+infraestrutura não visual. Todas as rotas continuam compiláveis e funcionais;
+apenas a primeira slice recebe acabamento visual completo neste caso.
+Pesquisa fontes atuais de aplicações comparáveis, produto adjacente, design system e
+templates pagos premium para SSR, Web e MAUI, conservando URL oficial, data,
+preço/licença e limites. A proposta identifica as três aplicações individualmente
+e como uma família coerente. Apresenta exatamente `SSR-1..3`, `WEB-1..3` e
+`MAUI-1..3` em três tabelas curtas, com diferenças materiais, referências,
+ganho, custo/risco e uma recomendação por aplicação. Regista as nove propostas
+em `design/INITIAL_LAYOUT_DIRECTIONS.md` e pede uma escolha para cada cliente.
+Até receber as três escolhas não modifica layout, CSS, tokens, componentes,
+packages ou baselines visuais; `próximo`, uma seleção parcial ou a recomendação
+do Codex não autorizam a implementação.
+Não copies marcas, código, assets ou trade dress, não inventes métricas/claims,
+não compres/descarregues material. No percurso `novo do zero`, cria a nova
+camada visual sem reutilização residual; no percurso `melhorar existente`,
+evolui apenas os elementos justificados pela auditoria. Mantém backend e
+permissões existentes em ambos.
+
+Cria `design/INITIAL_LAYOUT_DECISION.md` nas duas execuções;
+`design/INITIAL_LAYOUT_DIRECTIONS.md` nas duas execuções;
+`design/INITIAL_LAYOUT_RESET.md` no percurso novo e
+`design/INITIAL_LAYOUT_AUDIT.md` no percurso de melhoria. Cria ou atualiza
+`design/INITIAL_LAYOUT_RESEARCH.md`,
 `design/INITIAL_LAYOUT_SPEC.md`, `design/INITIAL_LAYOUT_CRITIQUE.md` e a
 baseline. Aplica a melhoria da slice e, usando a matriz de jornadas `Must`
 fornecida pela fixture, executa também a auditoria de conclusão Web sem inventar

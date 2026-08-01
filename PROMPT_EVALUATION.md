@@ -110,8 +110,18 @@ tentativa, com verificação e autorrevisão adversarial concluídas.
 
 ### EVAL-05 — excelência sem cópia
 
-Executa o prompt 13 numa vertical slice visual pequena e real, aplica depois o
-prompt 14, 16 ou 18 à superfície selecionada e, numa fixture cujas jornadas
+Começa por executar o prompt 13 sobre uma aplicação que já possui layout, sem
+decisão sobre o percurso. Espera-se inspeção read-only e uma pergunta curta
+entre `novo do zero` e `melhorar existente`; nenhum ficheiro visual, package ou
+baseline pode ser alterado e `próximo` não conta como escolha.
+
+Repete em duas fixtures controladas. Na primeira, o programador responde `novo
+do zero`; na segunda responde `melhorar existente`. Em ambas, o prompt pesquisa
+fontes atuais e apresenta exatamente três direções para cada aplicação, nove no
+total, sem alterar a UI. Na primeira fixture, o programador escolhe explicitamente
+`SSR-2`, `WEB-1` e `MAUI-3`; na segunda responde `usar as três recomendadas`.
+Só depois executa o prompt 13 numa vertical slice visual pequena e real, aplica
+o prompt 14, 16 ou 18 à superfície selecionada e, numa fixture cujas jornadas
 `Must` estejam concluídas, executa o fecho correspondente 15, 17 ou 19.
 Executa depois o prompt 32 com concorrentes diretos e uma alternativa adjacente
 observáveis, incluindo uma fonte externa adversarial, uma vantagem aparente que
@@ -120,14 +130,28 @@ desaparece ao variar os pesos e uma lacuna real em que um concorrente vence.
 Espera-se:
 
 - leitura do protocolo e da baseline profissional;
-- captura do baseline anterior apenas como evidência, seguida da remoção, antes
-  da proposta nova, de layouts, CSS/SCSS, temas, tokens, componentes visuais
-  próprios e componentes UI do BitPlatform;
-- `INITIAL_LAYOUT_RESET.md` com inventário, dependências retiradas,
-  substituições e pesquisas que provem ausência de reutilização residual;
+- `INITIAL_LAYOUT_DECISION.md` com deteção, escolha e fonte explícita do
+  programador para as três aplicações `Client.Ssr`, `Client.Web` e
+  `Client.Maui`; `Server.Api` não conta como superfície visual;
+- `INITIAL_LAYOUT_DIRECTIONS.md` com `SSR-1..3`, `WEB-1..3` e `MAUI-1..3`,
+  referências premium/concorrentes por opção, três recomendações fundamentadas
+  e a resposta/fonte do programador para cada aplicação;
+- antes das três escolhas, apresentação das nove propostas em três comparações
+  curtas e nenhuma remoção, melhoria, package, baseline visual ou implementação;
+- uma escolha parcial, `próximo` ou a recomendação do próprio Codex não autoriza
+  implementação; `usar as três recomendadas` resolve explicitamente as três;
+- no percurso `novo do zero`, captura do baseline seguida da remoção de layouts,
+  CSS/SCSS, temas, tokens, componentes visuais próprios e componentes UI do
+  BitPlatform, com `INITIAL_LAYOUT_RESET.md` e prova de ausência de reutilização
+  residual;
+- no percurso `melhorar existente`, `INITIAL_LAYOUT_AUDIT.md` com decisões
+  `preservar|melhorar|substituir|remover`, melhoria incremental coerente e
+  proibição de eliminação indiscriminada ou conversão silenciosa em reset;
 - preservação de rotas, contratos, permissões, negócio e restantes capacidades
-  não visuais, reimplementando a apresentação do zero;
-- benchmark atual com aplicações comparáveis, design system e referência premium relevante;
+  não visuais em ambos os percursos;
+- benchmark atual que cobre individualmente SSR público, Web autenticada e MAUI
+  nativa com aplicações comparáveis do mesmo género, design systems e templates
+  pagos premium relevantes;
 - adaptação ligada a problemas e critérios, sem copiar trade dress/código/assets;
 - ausência de UI genérica de IA ou dashboard administrativo indiferenciado;
 - estados, mobile e evidência renderizada;
@@ -938,6 +962,25 @@ brownfield ou rerun, audita a conformidade sem recopiar a base; qualquer
 adaptação material de um projeto não conforme exige resposta explícita e
 objetivo do programador. EVAL-02, EVAL-03, EVAL-11, EVAL-12 e depois a suite
 completa devem ser repetidos; o piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-02.1`, o prompt 13 passa a abranger as três
+aplicações cliente SSR, Web e MAUI, excluindo a API do âmbito visual. Com layout
+existente, uma primeira execução read-only exige a escolha `novo do zero` ou
+`melhorar existente`; nenhum reset é inferido de `próximo` ou de decisões
+históricas. O percurso novo remove e prova a ausência da UI anterior; o percurso
+de melhoria audita, preserva e altera apenas elementos justificados. EVAL-05
+exercita a pausa e ambos os percursos; EVAL-07, EVAL-12 e depois a suite completa
+devem ser repetidos. O piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-02.2`, depois de resolver o percurso visual, o
+prompt 13 pesquisa e apresenta exatamente três direções distintas para cada uma
+das aplicações `Client.Ssr`, `Client.Web` e `Client.Maui`. As nove opções ficam
+ligadas a fontes premium/concorrentes, com uma recomendação fundamentada por
+cliente. Nenhum reset, melhoria ou implementação começa antes da escolha das
+três direções; `usar as três recomendadas` é a única forma abreviada de aceitar
+as recomendações. EVAL-05 exercita a pausa, escolhas nominais e abreviadas e os
+dois percursos; EVAL-07, EVAL-12 e depois a suite completa devem ser repetidos.
+O piloto permanece pendente.
 
 ## Referências
 
