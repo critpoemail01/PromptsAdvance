@@ -1,6 +1,6 @@
 ---
 name: advance-app-continue
-description: Continue, adopt, validate, recover, or rerun an Advance application lifecycle one prompt at a time. Use for an existing application, lifecycle, or filesystem project path, when the user asks for the next prompt, a specific prompt, a rerun, or an honest readiness/result assessment.
+description: Continue, adopt, validate, recover, rerun, run, or stop an Advance application and its lifecycle. Use for an existing application, lifecycle, or filesystem project path when the user asks for the next prompt, a specific prompt, a rerun, an honest readiness/result assessment, or says to run/start/stop the app (including "corre a app").
 ---
 
 # Advance App Continue
@@ -37,6 +37,38 @@ For `Continue the Advance project at <path>`, run:
 The lifecycle remains isolated from the application and must not overwrite its
 files, Git history, branches, remotes, or local changes. Prompt 01 adapts to a
 brownfield application by discovering the implemented product and gaps.
+
+## Run the local application
+
+Treat `run the app`, `start the app`, `corre a app`, and equivalent wording as
+an operational request, not as permission to execute or advance a lifecycle
+prompt. Resolve the application root from lifecycle state, `APP_CONTEXT.md`, or
+the current repository, then discover exactly one executable project for each
+of these roles:
+
+- `<App>.Server.Api`;
+- `<App>.Client.Ssr`;
+- `<App>.Client.Web` (also accept `<App>.Cliente.Web` only when that is the real
+  project name in the repository).
+
+Use the real `.csproj`, solution, launch profiles, SDK and commands from the
+repository. Never substitute `Server.Web`, `Client.Core`, `Client.Maui`,
+`Client.Windows`, or another project for a missing role. If any role is missing
+or ambiguous, report the exact matches and stop without starting a partial app,
+unless the programmer explicitly asks for a partial run.
+
+Start the API first and wait until its listener or health endpoint is ready;
+then start SSR and Web concurrently in separate persistent terminal sessions.
+Reuse an already healthy matching process instead of launching a duplicate.
+Keep all three processes alive after replying and report, for each role, the
+project, session/process identifier, URL, and readiness or error. Do not claim
+the app is running when one of the three exited or never became reachable.
+
+Default to the local development environment. This request does not authorize
+deployment, production, external services, data resets, migrations with side
+effects, or secrets. When asked to stop the app, terminate only the exact
+sessions/processes started or identified for these three roles; never kill all
+`dotnet` processes broadly.
 
 ## Before executing a requested prompt
 

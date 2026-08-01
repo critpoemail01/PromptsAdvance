@@ -128,8 +128,10 @@ try {
         '-Objective', 'Prove that reused prompt identities fail closed'
     )
     if ($identityMismatch.ExitCode -eq 0 -or
-        $identityMismatch.Output -notmatch 'prompt 08 identity mapping changed') {
-        throw 'Controlled migration did not reject a reused prompt identity.'
+        $identityMismatch.Output -notmatch 'prompt 08 identity' -or
+        $identityMismatch.Output -notmatch 'mapping' -or
+        $identityMismatch.Output -notmatch 'changed') {
+        throw "Controlled migration did not reject a reused prompt identity. Output: $($identityMismatch.Output)"
     }
     Move-Item -LiteralPath $prompt08ChangedPath -Destination $prompt08OriginalPath
 

@@ -1,6 +1,6 @@
 ---
 name: advance-app-continue
-description: Continue, adopt, validate, recover, request, or rerun an Advance application lifecycle from any Codex project, exactly one prompt at a time and under explicit programmer control.
+description: Continue, adopt, validate, recover, request, rerun, run, or stop an Advance application and lifecycle from any Codex project. Use under explicit programmer control, including when the user says to run/start/stop the app or "corre a app".
 ---
 
 # Advance App Continue
@@ -29,6 +29,9 @@ current working directory. Do not search the entire filesystem.
    `<catalog>/.agents/skills/advance-app-continue/SKILL.md` completely.
 4. Follow that canonical skill and use the resolved catalog's
    `software-lifecycle.ps1` for application-path discovery or adoption.
+   For `run/start/corre a app`, follow its local-run procedure and start the
+   exact `Server.Api`, `Client.Ssr`, and real `Client.Web`/`Cliente.Web`
+   projects without advancing lifecycle state.
 5. When an existing lifecycle uses an older compatible catalog, use the
    canonical `software-lifecycle.ps1` as the migration entry point. Automatic
    upgrades still require a `stable` source and exact approved pilot. If the

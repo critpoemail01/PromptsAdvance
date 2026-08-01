@@ -26,9 +26,10 @@ este ciclo. Se o delta afetar naming, executa todo o prompt. Uma afirmação de
 “não afetado” sem análise de impacto é bloqueante.
 
 1. Confirma em `PRODUCT_DEFINITION.md` e `IMPLEMENTATION_STATUS.md` que o prompt 01 terminou com decisão `avançar` e deixou uma única oportunidade, problema, público, mercados, MVP preliminar e posicionamento rastreáveis.
-2. Resolve `[DESCRIÇÃO_DA_APP]`, `[PÚBLICO]`, `[MERCADOS]`, `[POSICIONAMENTO]`, idiomas materiais, palavras proibidas e `[CUSTO_MAXIMO_ANUAL_DOMINIO]`.
-3. O limite de custo tem de indicar valor, moeda, período e impostos, por exemplo `25 EUR + IVA por ano`. Não interpretes “barato” ou “não muito caro” como orçamento.
-4. Se faltar uma entrada material, existirem várias oportunidades sem seleção ou o prompt 01 não tiver decisão `avançar`, termina `bloqueado` com a decisão mínima necessária. Não escolhas a oportunidade nem inventes o orçamento.
+2. Resolve `[DESCRIÇÃO_DA_APP]`, `[PÚBLICO]`, `[MERCADOS]`, `[POSICIONAMENTO]`, idiomas materiais, palavras proibidas e `[CUSTO_MAXIMO_ANUAL_DOMINIO]`; uma decisão explícita do produto prevalece sempre sobre os defaults seguintes.
+3. Se os idiomas materiais não forem fornecidos, assume por defeito `português europeu (pt-PT) + inglês internacional`, regista `default reversível do prompt 02` e avança sem pedir confirmação.
+4. Se o limite não for fornecido, assume por defeito `30 EUR/ano, IVA incluído`, tanto no registo inicial como em cada renovação do `.com`; regista valor, moeda, período, impostos e `default reversível do prompt 02`.
+5. Não bloqueies apenas pela ausência destes dois valores. Se faltar outra entrada material, existirem várias oportunidades sem seleção, houver conflito explícito ou o prompt 01 não tiver decisão `avançar`, termina `bloqueado` com a decisão mínima necessária; não escolhas a oportunidade nem inventes outros limites.
 
 ## Prioridade das regras
 

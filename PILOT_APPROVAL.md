@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-01.1 |
+| Catalog version | 2026-08-01.5 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -236,3 +236,40 @@ associada a cada ID seja diferente, evitando reinterpretar resultados existentes
 Esta migração altera identidades lógicas e exige repetir EVAL-05, EVAL-06,
 EVAL-11, EVAL-15 e a suite completa; o piloto permanece `pending` e o canal
 permanece `candidate`.
+
+A versão 2026-08-01.2 acrescenta o pedido operacional `corre a app`. A skill
+de continuação descobre os projetos reais `Server.Api`, `Client.Ssr` e
+`Client.Web`/`Cliente.Web`, inicia-os em sessões persistentes separadas, exige
+readiness dos três e não altera o lifecycle. Não substitui projetos ausentes,
+não inicia uma app parcial sem pedido explícito e não amplia autorizações de
+deploy ou produção. EVAL-04, EVAL-11, EVAL-12 e a suite completa devem ser
+repetidos; o piloto permanece `pending` e o canal permanece `candidate`.
+
+A versão 2026-08-01.3 reestrutura o prompt 13 para pesquisar e implementar a
+direção visual inicial em `Server.Api`, `Client.Ssr`,
+`Client.Web`/`Cliente.Web` e `Client.Maui`, incluindo o projeto concreto
+`TagLyght.Client.Maui` quando existir. Exige pesquisa atual de aplicações
+comparáveis e templates pagos premium com fonte/licença, três artefactos
+duráveis de research/spec/crítica e revisão Product Design/UX separada antes
+de declarar a direção concluída. EVAL-05, EVAL-07, EVAL-12 e a suite completa
+devem ser repetidos; o piloto permanece `pending` e o canal permanece
+`candidate`.
+
+A versão 2026-08-01.4 estende o mesmo contrato aos prompts 14–19. Cada melhoria
+SSR, Web ou MAUI atualiza research/spec/crítica, confirma produtos comparáveis
+e referências pagas premium com proveniência/licença, mede tooling e corrige
+findings críticos/altos após revisão separada. Cada prompt de conclusão audita
+essa evidência para toda a superfície, atualiza fontes desatualizadas e não
+transforma autocrítica em parecer profissional. O programador pode aceitar a
+lacuna e avançar, mas ela permanece explícita. EVAL-05, EVAL-07, EVAL-12 e a
+suite completa devem ser repetidos; o piloto permanece `pending` e o canal
+permanece `candidate`.
+
+A versão 2026-08-01.5 introduz defaults reversíveis no prompt 02 quando o
+programador não fornece idiomas materiais ou orçamento do domínio: `português
+europeu (pt-PT) + inglês internacional` e `30 EUR/ano, IVA incluído` para
+registo e renovação do `.com`. O prompt avança sem perguntar nem bloquear,
+regista os defaults na matriz de inputs e continua a dar precedência a decisões
+explícitas. EVAL-14 ganha o subcaso sem estes valores. EVAL-01, EVAL-11,
+EVAL-12, EVAL-14 e a suite completa devem ser repetidos; o piloto permanece
+`pending` e o canal permanece `candidate`.

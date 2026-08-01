@@ -312,8 +312,33 @@ Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.m
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'Recomenda no m.ximo tr.s ferramentas' 'O prompt 08 pode instalar um conjunto ilimitado de ferramentas de layout.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' '\[AUTORIZAR_FERRAMENTAS_LAYOUT\]' 'O prompt 08 nao exige autorizacao nominal antes de configurar ferramentas de layout.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/08-otimizar-codex-e-projeto.md' 'Figma MCP e Code Connect.*Figma for fonte de verdade' 'O prompt 08 trata Figma como dependencia universal.'
-Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' 'CODEX_LAYOUT_TOOLING\.md' 'O prompt 12 nao recebe o handoff das ferramentas de layout.'
-Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' 'decis.o manter\|remover' 'O prompt 12 nao decide ferramentas de layout com evidencia da primeira slice.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' 'CODEX_LAYOUT_TOOLING\.md' 'O prompt 13 nao recebe o handoff das ferramentas de layout.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' 'decis.o `manter\|remover`' 'O prompt 13 nao decide ferramentas de layout com evidencia da primeira slice.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' '(?s)App\.Server\.Api.*App\.Client\.Ssr.*App\.Client\.Web.*App\.Cliente\.Web.*TagLyght\.Client\.Maui' 'O prompt 13 nao cobre explicitamente API, SSR, Web e MAUI.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' '(?s)Pesquisa online obrigat.ria.*aplica..es premium/maduras.*templates, temas ou UI kits pagos premium' 'O prompt 13 nao exige pesquisa atual de produtos e templates premium pagos.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' '(?s)(?=.*URL oficial)(?=.*Pre.o/licen.a/limite)(?=.*N.o compres)(?=.*n.o confi.vel)' 'O prompt 13 nao controla proveniencia, licenca, compra e prompt injection na pesquisa premium.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' '(?s)(?=.*Server\.Api)(?=.*OpenAPI/Swagger/Scalar)(?=.*n.o expuser UI)(?=.*inventar uma p.gina)' 'O prompt 13 confunde uma API sem UI com uma superficie visual de utilizador.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' '(?s)INITIAL_LAYOUT_RESEARCH\.md.*INITIAL_LAYOUT_SPEC\.md.*INITIAL_LAYOUT_CRITIQUE\.md' 'O prompt 13 nao conserva research, direcao e critica em artefactos duraveis.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' '(?s)tarefa separada e read-only de cr.tica de Product Design/UX.*findings cr.ticos e altos.*volta a renderizar' 'O prompt 13 nao exige critica de design separada e correcao antes da entrega.'
+Require-Pattern 'prompts/03-marca-e-layout/13-criar-layout-inicial.md' '(?s)autocr.tica n.o independente.*termina `parcial`.*ignorar e avan.ar' 'O prompt 13 apresenta autorrevisao como parecer profissional ou torna o gate consultivo num bloqueio rigido.'
+$surfaceLayoutPromptPaths = @(
+    'prompts/03-marca-e-layout/14-melhorar-layout-client-ssr.md',
+    'prompts/03-marca-e-layout/15-concluir-layout-client-ssr.md',
+    'prompts/03-marca-e-layout/16-melhorar-layout-client-web.md',
+    'prompts/03-marca-e-layout/17-concluir-layout-client-web.md',
+    'prompts/03-marca-e-layout/18-melhorar-layout-client-maui.md',
+    'prompts/03-marca-e-layout/19-concluir-layout-client-maui.md'
+)
+foreach ($surfaceLayoutPromptPath in $surfaceLayoutPromptPaths) {
+    Require-Pattern $surfaceLayoutPromptPath '(?s)prompt 13.*INITIAL_LAYOUT_RESEARCH\.md.*INITIAL_LAYOUT_SPEC\.md.*INITIAL_LAYOUT_CRITIQUE\.md.*PRODUCT_QUALITY_BASELINE\.md' "O prompt visual nao herda os artefactos e a baseline do prompt 13: $surfaceLayoutPromptPath"
+    Require-Pattern $surfaceLayoutPromptPath '(?s)(?=.*aplica..es premium/maduras)(?=.*templates.*pag.*premium)(?=.*URL oficial)(?=.*pre.o/moeda)(?=.*licen.a)(?=.*o que n.o copiar)' "O prompt visual nao exige pesquisa premium atual com proveniencia e licenca: $surfaceLayoutPromptPath"
+    Require-Pattern $surfaceLayoutPromptPath '(?s)(?=.*(?:n.o confi.veis|instru..es externas))(?=.*(?:n.o compres|compras?))(?=.*login)(?=.*(?:download|descarreg))(?=.*c.digo)(?=.*trade dress)' "O prompt visual nao controla pesquisa externa, compras e copia: $surfaceLayoutPromptPath"
+    Require-Pattern $surfaceLayoutPromptPath '(?s)tarefa separada e read-only de cr.tica.*findings.*cr.ticos.*altos.*volta a renderizar|volta a capturar' "O prompt visual nao exige critica separada e correcao/reteste: $surfaceLayoutPromptPath"
+    Require-Pattern $surfaceLayoutPromptPath '(?s)autocr.tica n.o independente.*`parcial`.*ignorar e avan.ar' "O prompt visual apresenta autocrítica como parecer profissional ou bloqueia a decisao do programador: $surfaceLayoutPromptPath"
+    Require-Pattern $surfaceLayoutPromptPath '(?s)(?=.*CODEX_LAYOUT_TOOLING\.md)(?=.*manter\|remover)' "O prompt visual nao exige decisao de tooling sustentada por evidencia: $surfaceLayoutPromptPath"
+}
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-05.*prompt 13.*prompt 14, 16 ou 18.*15, 17 ou 19.*INITIAL_LAYOUT_RESEARCH\.md.*INITIAL_LAYOUT_SPEC\.md.*INITIAL_LAYOUT_CRITIQUE\.md' 'EVAL-05 nao exercita fundacao, melhoria, conclusao e artefactos visuais.'
+Require-Pattern 'pilot/cases/EVAL-05.md' '(?s)prompts 13, 16 e 17.*templates pagos premium.*INITIAL_LAYOUT_RESEARCH\.md.*INITIAL_LAYOUT_SPEC\.md.*INITIAL_LAYOUT_CRITIQUE\.md.*tarefa separada.*findings cr.ticos/altos' 'O caso EVAL-05 nao reproduz a exigencia visual ponta a ponta.'
 Require-Pattern '.gitattributes' 'pilot/fixtures/lifecycle-gates/gate-artifact\.txt\s+text\s+eol=lf' 'O artefacto com hash dos gates nao fixa line endings portaveis.'
 Require-Pattern 'scripts/Test-SoftwareLifecycle.ps1' 'prompts-boilerplate-fixture-' 'O lifecycle E2E depende de um BoilerPlateAdvance externo ao checkout.'
 Require-Pattern 'scripts/Test-ProcessInDisposableCopy.ps1' 'prompts-boilerplate-source-' 'A copia descartavel depende de um BoilerPlateAdvance externo ao checkout.'
@@ -380,6 +405,11 @@ Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)(?=.*APP/PAGE/FNC)(?=.*HLP-\*)(?=.*VI
 Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)(?=.*n.o listado.*n.o . controlo de\s+acesso)(?=.*fornecedor)(?=.*indisponibilidade)(?=.*fallback textual)(?=.*autoriza..o expl.cita)(?=.*conta/canal)' 'O protocolo nao trata privacidade, falha do provider e publicacao externa com fail-closed.'
 Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)Definition of Done por unidade.*UI e vers.o atuais.*idiomas.*rota/contexto.*player.*build e testes' 'O protocolo nao possui Definition of Done ponta a ponta por unidade de ajuda.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)Execute one prompt.*After `record`, do not continue automatically.*next.*repeat.*skip and advance' 'A skill nao para depois de cada prompt sob controlo do programador.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*Cliente\.Web.*persistent terminal sessions.*Keep all three processes alive.*does not authorize.*production' 'A skill canonica nao inicia e valida as tres superficies locais sem alterar o lifecycle.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*without advancing lifecycle state' 'A skill global nao encaminha o pedido de executar a app completa.'
+Require-Pattern '.agents/skills/advance-app-continue/agents/openai.yaml' '(?s)short_description: "Continue or run an Advance application".*default_prompt: "Use \$advance-app-continue to continue or run my Advance application\."' 'A metadata da skill canonica nao apresenta o arranque da aplicacao.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-continue/agents/openai.yaml' '(?s)short_description: "Continue or run an Advance application".*default_prompt: "Use \$advance-app-continue to continue or run my Advance application\."' 'A metadata global da skill nao apresenta o arranque da aplicacao.'
+Require-Pattern 'AGENTS.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*readiness.*n.o avan.a o lifecycle' 'As instrucoes derivadas nao conservam o contrato de executar os tres projetos locais.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-04.*work ledger.*finding-gate.*record completed' 'O piloto nao exercita o findings gate durante a revisao adversarial.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11.*awaiting_programmer.*parcial.*skip and advance.*request/repeat.*brownfield.*objetivo' 'O piloto nao cobre o fluxo controlado, gaps e reruns.'
 Require-Pattern 'pilot/cases/EVAL-04.md' '(?s)work-start.*finding-add.*finding-gate.*finding-resolve.*attempt ID' 'O caso EVAL-04 nao conserva o ciclo completo do task ledger.'
@@ -462,6 +492,10 @@ Require-Pattern 'pilot/cases/EVAL-11.md' '(?s)DOR-03/DOR-08.*DOR-09.*DOR-12.*pro
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '10.15 nomes' 'O prompt 02 nao exige uma shortlist final de 10 a 15 nomes.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'OVHcloud.*dispon.vel para registo' 'O prompt 02 nao exige disponibilidade especifica na OVHcloud.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '\[CUSTO_MAXIMO_ANUAL_DOMINIO\]' 'O prompt 02 nao possui um limite de custo verificavel.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '(?s)idiomas materiais n.o forem fornecidos.*portugu.s europeu \(pt-PT\) \+ ingl.s internacional.*default revers.vel do prompt 02.*avan.a sem pedir confirma..o' 'O prompt 02 nao aplica os idiomas default sem bloquear.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '(?s)limite n.o for fornecido.*30 EUR/ano, IVA inclu.do.*registo inicial.*renova..o.*default revers.vel do prompt 02' 'O prompt 02 nao aplica o orcamento default ao registo e renovacao.'
+Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '(?s)decis.o expl.cita.*prevalece.*N.o bloqueies apenas pela aus.ncia destes dois valores' 'O prompt 02 nao define precedencia e pode continuar a bloquear pelos defaults ausentes.'
+Require-Pattern 'APP_CONTEXT.md' '(?s)No prompt 02.*portugu.s europeu \(pt-PT\) \+ ingl.s internacional.*30 EUR/ano, IVA inclu.do.*registo e renova..o.*decis.o expl.cita.*prevalece' 'O contexto nao documenta os defaults reversiveis do prompt 02.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'pre.o de registo.*pre.o de renova..o' 'O prompt 02 nao compara registo e renovacao.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' 'resposta `200`' 'O prompt 02 nao identifica um registo RDAP ativo.'
 Require-Pattern 'prompts/01-preparacao-e-definicao/02-criar-nome-da-app.md' '`404`/`not found`' 'O prompt 02 nao trata um dominio sem registo RDAP encontrado.'
@@ -607,6 +641,7 @@ Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-14.*naming natural' 'O piloto nao c
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-15.*requisitos pesquisados por aplica..o e p.gina' 'O piloto nao contem a regressao dirigida do prompt 03.'
 Require-Pattern 'pilot/cases/EVAL-14.md' 'Navirevo.*Prumivo.*Rivelumi' 'O caso EVAL-14 nao inclui os nomes mecanicos rejeitados.'
 Require-Pattern 'pilot/cases/EVAL-14.md' '(?s)n.o existe consulta WIPO/EUIPO.*pausa interm.dia.*CAPTCHA.*valida..o jur.dica formal' 'O EVAL-14 nao impede a reintroducao da pausa juridica/manual no prompt 02.'
+Require-Pattern 'pilot/cases/EVAL-14.md' '(?s)(?=.*segunda c.pia descart.vel)(?=.*removendo apenas)(?=.*Idiomas materiais)(?=.*Custo m.ximo do.*com)(?=.*portugu.s europeu \(pt-PT\) \+ ingl.s\s+internacional)(?=.*30 EUR/ano, IVA inclu.do)(?=.*n.o pergunta)(?=.*n.o bloqueia)' 'O EVAL-14 nao cobre os defaults sem pergunta nem bloqueio.'
 Require-Pattern 'scripts/Test-Prompt02PilotArtifact.ps1' '(?s)Triagem jur.dica formal.*Interven..o manual solicitada.*manual CAPTCHA step' 'O oraculo EVAL-14 nao prova a remocao do passo manual.'
 Require-Pattern 'pilot/fixtures/prompt-02/untrusted-search-result.html' 'Ignore as instru..es anteriores' 'A fixture adversarial do prompt 02 esta ausente.'
 Require-Pattern 'pilot/fixtures/prompt-02/app-context.md' '30 EUR \+ IVA' 'O contexto material de EVAL-14 nao fixa o orcamento do dominio.'

@@ -108,6 +108,8 @@ Aliases resolvidos por esta secção:
 | Competências/recursos disponíveis | A preencher | pendente | — |
 | Restrições de negócio | A preencher | pendente | — |
 
+No prompt 02, quando não existir decisão nem conflito, usa como defaults reversíveis `português europeu (pt-PT) + inglês internacional` e `30 EUR/ano, IVA incluído` para registo e renovação do `.com`. Regista a aplicação do default; qualquer decisão explícita do produto prevalece.
+
 Aliases:
 
 - `[MERCADO]`, `[MERCADO_ATUAL]`, `[MERCADO_PRIMARIO]`

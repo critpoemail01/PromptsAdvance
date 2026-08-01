@@ -1,4 +1,4 @@
 interface:
   display_name: "Advance App Continue"
-  short_description: "Continue the gated Advance app lifecycle"
-  default_prompt: "Use $advance-app-continue to continue an Advance application lifecycle."
+  short_description: "Continue or run an Advance application"
+  default_prompt: "Use $advance-app-continue to continue or run my Advance application."

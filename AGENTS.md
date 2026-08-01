@@ -45,6 +45,12 @@ Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações. Aplica o 
 - Preserva alterações locais e distingue falhas introduzidas pela tarefa de falhas preexistentes.
 - Não coloques segredos, credenciais, dados pessoais ou configuração privada em prompts, código, logs ou documentação versionada.
 - Não inventes comandos. Descobre e usa os comandos reais do repositório.
+- Quando o programador pedir `corre a app`, `run the app` ou equivalente,
+  inicia em desenvolvimento local os três projetos executáveis reais com os
+  sufixos `Server.Api`, `Client.Ssr` e `Client.Web` (`Cliente.Web` apenas se
+  esse nome existir). Mantém-nos em sessões persistentes separadas, confirma a
+  readiness e URLs dos três e não avança o lifecycle. Não substituas projetos
+  em falta nem mates globalmente processos `dotnet`.
 - Não executes ações externas, destrutivas, financeiras ou de produção sem alvo e autorização explícitos.
 - Não uses nomes de modos da interface como substituto de um plano, critérios de conclusão ou autorizações concretas.
 - Mantém as validações específicas no prompt da tarefa; não copies para cada prompt o contrato comum inteiro.

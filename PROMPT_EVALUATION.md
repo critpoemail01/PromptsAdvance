@@ -98,7 +98,9 @@ tentativa, com verificação e autorrevisão adversarial concluídas.
 
 ### EVAL-05 — excelência sem cópia
 
-Executa o prompt 14, 16 ou 18 numa vertical slice visual pequena e real.
+Executa o prompt 13 numa vertical slice visual pequena e real, aplica depois o
+prompt 14, 16 ou 18 à superfície selecionada e, numa fixture cujas jornadas
+`Must` estejam concluídas, executa o fecho correspondente 15, 17 ou 19.
 
 Espera-se:
 
@@ -107,7 +109,11 @@ Espera-se:
 - adaptação ligada a problemas e critérios, sem copiar trade dress/código/assets;
 - ausência de UI genérica de IA ou dashboard administrativo indiferenciado;
 - estados, mobile e evidência renderizada;
-- crítica da primeira slice, usabilidade ou exceção explícita.
+- `INITIAL_LAYOUT_RESEARCH.md`, `INITIAL_LAYOUT_SPEC.md` e
+  `INITIAL_LAYOUT_CRITIQUE.md` reconciliados entre fundação, melhoria e fecho;
+- crítica separada da primeira slice e da superfície final, correção/reteste de
+  findings críticos/altos e autocrítica identificada como não independente;
+- usabilidade ou exceção explícita.
 - quando `CODEX_LAYOUT_TOOLING.md` existir, utilização apenas das ferramentas nominalmente aprovadas e decisão `manter|remover` baseada na primeira slice real, sem confundir instalação ou smoke test com melhoria visual.
 
 ### EVAL-06 — vertical slice funcional completa
@@ -213,6 +219,11 @@ inputs completos, orçamento explícito e o caso reproduzível de
 rejeitados `Navirevo`, `Prumivo` e `Rivelumi` e o conteúdo externo não confiável
 da fixture indicada pelo caso.
 
+Repete o caso sem idiomas materiais nem custo máximo do domínio. O executor tem
+de aplicar `português europeu (pt-PT) + inglês internacional` e `30 EUR/ano,
+IVA incluído` como defaults reversíveis, sem pergunta nem resultado bloqueado;
+os restantes inputs e gates mantêm-se.
+
 Espera-se:
 
 - `NAMING_RESEARCH.md` retomável, com estados e evidência por candidato;
@@ -225,6 +236,8 @@ Espera-se:
   WIPO/EUIPO nem pausa para CAPTCHA/login/intervenção do utilizador; validação
   jurídica formal conservada como passo posterior à decisão do nome;
 - revalidação final dos domínios e timestamps;
+- defaults de idiomas/orçamento usados apenas quando ausentes, identificados na
+  matriz de inputs e substituídos por qualquer decisão explícita;
 - `parcial` ou `bloqueado`, sem disponibilidade inventada, quando não for
   possível demonstrar 10 nomes elegíveis.
 
@@ -728,6 +741,45 @@ antigas, routing `08 -> 09 -> 10` e `14|16|18 -> 20 -> 28|30`, além da ordem
 programmer-controlled do manifesto e da recusa de upgrade quando um ID passa a
 representar outro prompt. EVAL-05, EVAL-06, EVAL-11, EVAL-15 e a suite completa
 devem ser repetidos; o piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-01.2`, `corre a app` passa a ser uma operação
+local explícita da skill de continuação: resolve exatamente `Server.Api`,
+`Client.Ssr` e o projeto real `Client.Web`/`Cliente.Web`, inicia a API antes dos
+clientes em sessões persistentes, exige readiness dos três e não avança nem
+regista prompts. Projetos ausentes/ambíguos falham sem substituições ou arranque
+parcial implícito; deploy e produção continuam fora do âmbito. EVAL-04,
+EVAL-11, EVAL-12 e a suite completa devem ser repetidos; o piloto permanece
+pendente.
+
+Na `catalogVersion` `2026-08-01.3`, o prompt 13 passa a criar a direção e os
+shells iniciais de `Server.Api`, `Client.Ssr`, `Client.Web`/`Cliente.Web` e
+`Client.Maui`, resolvendo os nomes reais sem inventar projetos. A proposta exige
+pesquisa online atual de produtos comparáveis e templates pagos premium com
+fonte, data, preço/licença e limites contra cópia; distingue a experiência de
+documentação da API das superfícies de utilizador. Antes da entrega exige
+renders, crítica Product Design/UX separada, correção de findings altos/críticos
+e identifica honestamente uma mera autocrítica como não independente. EVAL-05,
+EVAL-07, EVAL-12 e a suite completa devem ser repetidos; o piloto permanece
+pendente.
+
+Na `catalogVersion` `2026-08-01.4`, os prompts de melhoria 14, 16 e 18 passam a
+atualizar por slice os mesmos artefactos, pesquisa premium/licenças, direção,
+tooling e crítica separada exigidos pelo prompt 13. Os prompts de conclusão 15,
+17 e 19 auditam esse contrato para todas as jornadas e plataformas da
+superfície, atualizam fontes insuficientes, corrigem findings críticos/altos e
+devolvem mudanças materiais ao prompt de melhoria correspondente. Uma
+autocrítica não é parecer profissional nem bloqueia a decisão explícita do
+programador de avançar com a lacuna registada. EVAL-05, EVAL-07, EVAL-12 e a
+suite completa devem ser repetidos; o piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-01.5`, o prompt 02 deixa de bloquear quando faltam
+apenas idiomas materiais e orçamento do `.com`. Assume, regista e apresenta
+como defaults reversíveis `português europeu (pt-PT) + inglês internacional` e
+`30 EUR/ano, IVA incluído` para registo e renovação; uma decisão explícita
+continua a prevalecer. EVAL-14 passa a ter um subcaso sem esses valores para
+rejeitar perguntas/bloqueios e confirmar a matriz de inputs. EVAL-01, EVAL-11,
+EVAL-12, EVAL-14 e a suite completa devem ser repetidos; o piloto permanece
+pendente.
 
 ## Referências
 

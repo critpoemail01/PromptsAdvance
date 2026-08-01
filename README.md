@@ -82,6 +82,13 @@ altera a árvore da aplicação, `.git`, histórico, alterações locais ou remo
 durante a inicialização. O prompt 07 executa a baseline de adoção; código
 existente só satisfaz requisitos e gates quando houver evidência verificável.
 
+Para executar a aplicação local basta pedir `corre a app`. A skill resolve o
+prefixo e os projetos reais do repositório e mantém, em sessões separadas,
+`<App>.Server.Api`, `<App>.Client.Ssr` e `<App>.Client.Web`; aceita
+`<App>.Cliente.Web` apenas se esse for o nome realmente existente. A API fica
+ready antes dos dois clientes, e a resposta apresenta as três URLs e o estado
+de cada processo. Este pedido não avança prompts nem autoriza deploy/produção.
+
 1. Cria uma tarefa por prompt.
 2. Executa o prompt atual, valida-o e regista um resultado honesto.
 3. Se ficar incompleto, lista concretamente o que falta implementar.

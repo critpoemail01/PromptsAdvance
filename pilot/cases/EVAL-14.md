@@ -43,6 +43,13 @@ Executa integralmente
 read-only. Não autorizes login, compra, reserva, contacto com terceiros ou outra
 ação externa.
 
+Repete numa segunda cópia descartável removendo apenas `Idiomas materiais` e
+`Custo máximo do .com` das fontes de contexto. Sem perguntar ao utilizador, a
+execução deve assumir e registar `português europeu (pt-PT) + inglês
+internacional` e `30 EUR/ano, IVA incluído` para registo e renovação como
+`default reversível do prompt 02`. Não reutilizes resultados voláteis da
+primeira execução.
+
 ## Evidência a conservar
 
 - prompt e configuração exatos;
@@ -75,3 +82,5 @@ O caso passa apenas quando:
 7. não existe consulta WIPO/EUIPO nem pausa intermédia para CAPTCHA, login ou
    intervenção do utilizador; a triagem usa fontes públicas acessíveis e remete
    a validação jurídica formal para depois da decisão do nome de trabalho.
+8. no subcaso sem idiomas/orçamento, os dois defaults exatos aparecem na matriz
+   de inputs e a execução não pergunta, não bloqueia e não inventa outro valor.
