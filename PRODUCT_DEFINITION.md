@@ -127,14 +127,15 @@ Liga aqui a especificação e a matriz produzidas pelo prompt 03.
 | Ajuda contextual/Academia: aplicabilidade e matriz | A preencher ou não aplicável com razão | pendente |
 
 Cada requisito `Must` da release deve ter ID estável, fonte, resultado,
-critério de aceitação, prioridade, dependências, owner e slice candidata. A
-primeira slice e contratos transversais de alto risco exigem detalhe completo
-por `APP/PAGE`, estados e `RF-P`. Slices posteriores podem permanecer
-`approved_for_refinement`, nunca `implementation_ready`, até o prompt 27/29
-executar o Definition of Ready, atualizar a fonte canónica e reconciliar a
-checklist e `requirements/ALL_FUNCTIONALITIES.md`. Estas vistas representam
-apenas obrigações aprovadas: não omitem detalhe existente nem usam linhas
-genéricas para simular completude.
+critério de aceitação, prioridade, dependências, owner e slice candidata. Todas
+as aplicações, páginas/ecrãs, endpoints, operações e funcionalidades em âmbito
+exigem o máximo detalhe sustentado pelas fontes, por `APP/PAGE`, estados e
+`RF-P`, mesmo quando pertencem a slices posteriores. `approved_for_refinement`
+não autoriza omitir detalhe conhecido nem simular prontidão; lacunas materiais
+ficam `pending`/`blocked` com owner e prova necessária. Os prompts 27/29
+revalidam o Definition of Ready, atualizam a fonte canónica e reconciliam a
+checklist e `requirements/ALL_FUNCTIONALITIES.md`. Estas vistas não omitem
+detalhe existente nem usam linhas genéricas para simular completude.
 
 ## 7. Métricas e validação
 
@@ -166,7 +167,7 @@ Decisões em aberto sobre problema, público, jornada principal, requisitos `Mus
 | DOR-03 | Alternativas, procura, acesso e diferenciação têm pesquisa atual e evidência direta do problema com utilizadores representativos, ou exceção aprovada com risco, owner, prazo e plano | pendente | A preencher | A preencher |
 | DOR-04 | Existe um nome de trabalho aprovado e a triagem realizada não encontrou conflito material | pendente | A preencher | A preencher |
 | DOR-05 | A jornada principal, o resultado, as aplicações, páginas/operações, o âmbito do MVP e as exclusões são inequívocos | pendente | A preencher | A preencher |
-| DOR-06 | Todos os `Must` têm ID, fonte, resultado, aceitação, owner e slice; regras materiais têm decisão/estado, exemplos/fronteiras e oráculo; primeira slice/alto risco estão detalhados e as vistas derivadas têm paridade; restantes estão `approved_for_refinement`, não falsamente prontos | pendente | A preencher | A preencher |
+| DOR-06 | Todos os `Must` têm ID, fonte, resultado, aceitação, owner e slice; todas as aplicações, páginas/ecrãs, endpoints, operações e funcionalidades conhecidas estão detalhadas no formato `ID | Quem | Onde | Quando | O quê`; regras materiais têm decisão/estado, exemplos/fronteiras e oráculo; as vistas derivadas têm paridade e zero omissões sem justificação | pendente | A preencher | A preencher |
 | DOR-07 | Segurança, privacidade, acessibilidade, desempenho, operação e outras NFR materiais usam cenário fonte/estímulo/ambiente/resposta/medida/prova/owner ou decisão bloqueante | pendente | A preencher | A preencher |
 | DOR-08 | Métrica, baseline, meta, horizonte e critério de continuar/parar estão definidos e a solução foi testada antes da implementação, ou existe exceção aprovada e limitada | pendente | A preencher | A preencher |
 | DOR-09 | Orçamento, prazo, competências e adequação ao `BoilerPlateAdvance` tornam o primeiro corte plausível | pendente | A preencher | A preencher |

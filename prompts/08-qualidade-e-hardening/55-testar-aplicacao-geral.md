@@ -7,7 +7,9 @@ Audita a qualidade da aplicação derivada de `BoilerPlateAdvance` dentro de `[J
 ## Entradas e limites
 
 - Define jornadas, atores, superfícies, browsers/dispositivos e ambiente.
-- Define o orçamento: tempo máximo, carga permitida, serviços que podem ser chamados e profundidade de cobertura.
+- Define o orçamento adicional: tempo máximo, carga permitida, serviços que
+  podem ser chamados e profundidade das auditorias de risco. O orçamento não
+  autoriza omitir a suite funcional obrigatória por `RF-P`.
 - Define dados/contas descartáveis e efeitos externos proibidos.
 - Se uma entrada material faltar, testa apenas o que for seguro e observável, marca a cobertura como parcial e não expande o âmbito por iniciativa própria.
 - Não substitui as auditorias especializadas de segurança, performance, acessibilidade, PWA, SSR, SEO, cache ou resiliência; usa os resultados dessas tarefas quando existirem.
@@ -19,12 +21,18 @@ Audita a qualidade da aplicação derivada de `BoilerPlateAdvance` dentro de `[J
 - A conclusão distingue falha do produto, limitação do ambiente e zona não testada.
 - Correções autorizadas são pequenas, têm teste de regressão e não alteram contratos ou arquitetura.
 - A execução termina ao atingir o orçamento ou a matriz definida.
+- Todos os `RF-P` têm teste Playwright primário reconciliado e executado em
+  mobile/tablet/desktop quando Web/SSR; API e MAUI têm a equivalência definida
+  em `TEST_STRATEGY_CONTRACT.md`.
 
 ## Planeamento
 
 1. Lê instruções, arquitetura, CI e testes existentes.
 2. Confirma superfícies ativas e ambientes autorizados.
-3. Cria uma matriz de risco apenas para o âmbito selecionado, por jornada, impacto, probabilidade, dados/permissões e plataforma.
+3. Reconcilia primeiro o censo completo de `RF-P` com
+   `quality/PLAYWRIGHT_REQUIREMENTS_COVERAGE.md`; depois cria uma matriz de risco
+   para aprofundar o âmbito selecionado, por jornada, impacto, probabilidade,
+   dados/permissões e plataforma.
    Reconcilia `quality/TEST_MATRIX.md`, identifica requisitos sem oráculo e
    cobre o nível mais baixo adequado antes de expandir E2E.
 4. Prioriza: autenticação/recuperação, autorização, fluxos de negócio, integridade, pagamentos quando existentes, site público/SSR, erros e atualização PWA.
@@ -35,12 +43,17 @@ Audita a qualidade da aplicação derivada de `BoilerPlateAdvance` dentro de `[J
 - Testes unitários para invariantes e lógica pura.
 - Integração para API, Identity, EF/migrations, configuração e dependências substituídas.
 - HTTP para SSR, status, headers, health e metadata.
-- Browser/E2E para jornadas críticas e regressões visuais/interativas.
+- Playwright primário para cada `RF-P`, executado nos projetos
+  mobile/tablet/desktop quando aplicáveis; E2E adicionais para jornadas críticas
+  e regressões visuais/interativas.
 - Avaliação manual para acessibilidade; ferramentas automáticas não provam conformidade WCAG.
 - Testes de contrato/compatibilidade e limites arquiteturais para interfaces e
   dependências materiais; provider real descartável para semântica EF/SQL.
 
-Valida happy paths e também: dados vazios/limite/inválidos, 401/403/404/409/429/500, repetição, concorrência, timeouts, rede lenta/offline, sessão expirada, deep links, mobile/tablet/desktop, teclado e idiomas/temas existentes.
+Valida um teste primário por requisito e também: dados
+vazios/limite/inválidos, 401/403/404/409/429/500, repetição, concorrência,
+timeouts, rede lenta/offline, sessão expirada, deep links,
+mobile/tablet/desktop, teclado e idiomas/temas existentes.
 
 Quando ajuda/Academia estiver ativa, amostra a matriz `APP/PAGE/FNC -> HLP ->
 VID -> contexto -> CRS`: confirma versão da UI, idiomas, pesquisa/links, perfis,
@@ -51,7 +64,10 @@ chama nem altera o canal externo durante uma auditoria diagnóstica.
 
 Usa dados isolados e descartáveis. Credenciais entram por variáveis de ambiente (`[TEST_USER_EMAIL]`, `[TEST_USER_PASSWORD]`) e nunca ficam em ficheiros/logs. Não uses produção, não envies emails/notificações, não faças compras e não cliques em anúncios reais.
 
-No Playwright, usa isolamento, locators acessíveis, web-first assertions e traces em falha; evita sleeps fixos. Se não estiver instalado, não o adiciones sem justificar uma estratégia E2E duradoura.
+No Playwright, usa isolamento, locators acessíveis, web-first assertions e
+traces em falha; evita sleeps fixos. Se a infraestrutura estiver ausente,
+implementa a estratégia duradoura ou termina `parcial` com todos os `RF-P`
+afetados — não declares a aplicação funcionalmente testada.
 
 Antes de corrigir, confirma que o defeito está incluído em `[AUTORIZAÇÃO_DE_CORREÇÃO]`, que a causa é inequívoca e que a alteração não muda produto, dados, API ou arquitetura. Caso contrário, limita-te ao diagnóstico e a uma proposta.
 
@@ -61,7 +77,12 @@ Executa os comandos do repositório: locked restore, build `*.Web.slnf` e testes
 
 ## Entrega
 
-Apresenta orçamento consumido, cobertura e ambiente, matriz de resultados, desvios aos princípios de experiência, defeitos com passos/esperado/observado/evidência, severidade, causa provável, correções efetuadas, comandos/resultados, testes flaky e riscos não cobertos. Não uses “sem bugs”; limita conclusões ao âmbito executado.
+Apresenta orçamento consumido, a matriz completa
+`RF-P → teste → mobile/tablet/desktop → resultado`, cobertura nativa/API,
+ambiente, desvios aos princípios de experiência, defeitos com
+passos/esperado/observado/evidência, severidade, causa provável, correções,
+comandos/resultados, testes flaky e riscos não cobertos. Não uses “sem bugs”;
+limita conclusões ao âmbito executado.
 
 ## Referências oficiais
 

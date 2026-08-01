@@ -12,14 +12,49 @@ Mantém:
   de determinismo/flakiness, ferramentas e responsabilidades;
 - `quality/TEST_MATRIX.md` — uma linha por requisito/risco material, atualizada
   em cada slice.
+- `quality/PLAYWRIGHT_REQUIREMENTS_COVERAGE.md` — censo de todos os `RF-P`,
+  teste Playwright primário e resultados por resolução/plataforma.
 
 ## Matriz mínima
 
-| Requisito/risco | Invariante/oráculo | Unitário | Componente | Integração/provider real | Contrato/compatibilidade | Browser/nativo | Visual | A11y | Performance/resiliência | Evidência |
-|---|---|---|---|---|---|---|---|---|---|---|
+| Requisito/risco | Invariante/oráculo | Unitário | Componente | Integração/provider real | Contrato/compatibilidade | Playwright/teste nativo | Mobile | Tablet | Desktop | Visual | A11y | Performance/resiliência | Evidência |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 
 Usa `sim`, `não aplicável` com razão ou `bloqueado` com owner/prazo. Não marques
 uma célula como coberta apenas porque outro nível executou uma jornada feliz.
+
+## Cobertura Playwright obrigatória por requisito funcional
+
+- Cada `RF-P` definido tem exatamente um teste Playwright primário identificável
+  pelo próprio ID no título, tag/trait ou metadata. Um teste primário não pode
+  substituir dois requisitos; cenários negativos ou critérios adicionais podem
+  criar testes suplementares com o mesmo ID.
+- Cada `RF-P` visível em Web/SSR executa o mesmo teste primário em três projetos
+  determinísticos: `mobile`, `tablet` e `desktop`. Cada projeto regista viewport,
+  browser/device, orientação, device scale factor quando relevante e resultado.
+  Usa as resoluções aprovadas em `PRODUCT_QUALITY_BASELINE.md`; quando ainda não
+  existirem, adota e regista provisoriamente `390×844`, `768×1024` e `1440×900`,
+  respetivamente. Uma decisão posterior pode substituí-las, mas nunca pode
+  reduzir as três classes nem usar a mesma resolução para representar duas.
+- Cada `RF-P` de `Server.Api` ou operação não visual usa Playwright
+  `APIRequestContext`/equivalente da stack para provar contrato, autorização,
+  efeito e erro. Resoluções são `não aplicável` apenas quando não existe
+  consumidor visual; quando existe, liga também aos testes do consumidor
+  executados em mobile, tablet e desktop.
+- Um `RF-P` exclusivamente nativo MAUI mantém a linha no censo e exige um teste
+  UI nativo automatizado equivalente nas classes de largura/plataformas
+  aprovadas. Playwright cobre a API/contrato partilhado ou a superfície Web
+  equivalente, mas não é apresentado como prova de uma UI nativa que não
+  controla.
+- `quality/PLAYWRIGHT_REQUIREMENTS_COVERAGE.md` usa:
+
+| RF-P | APP/unidade | Teste primário/ficheiro | Oráculo | Mobile | Tablet | Desktop | API/nativo equivalente | Resultado/evidência |
+|---|---|---|---|---|---|---|---|---|
+
+- IDs ausentes, duplicados, testes sem execução, `skip`/`fixme`, projetos de
+  viewport em falta ou resultado diferente não justificado impedem concluir o
+  prompt, a slice e G05. Geração dinâmica só é aceite quando o relatório ainda
+  apresenta um caso independente e diagnosticável por `RF-P` e projeto.
 
 ## Escolha do nível
 
@@ -37,8 +72,9 @@ uma célula como coberta apenas porque outro nível executou uma jornada feliz.
   equipas, processos ou versões.
 - **Arquitetura:** automatiza limites entre módulos/camadas quando uma referência
   proibida possa compilar e degradar o desenho.
-- **Browser/nativo:** jornadas críticas, integrações reais visíveis,
-  autorização, efeitos persistidos, recuperação e regressão interativa.
+- **Browser/nativo:** cada requisito funcional tem a prova primária acima;
+  jornadas críticas acrescentam combinações ponta a ponta, integrações reais
+  visíveis, autorização, efeitos persistidos, recuperação e regressão interativa.
 - **Visual, acessibilidade, performance e resiliência:** gates próprios para
   riscos que testes funcionais não observam.
 
@@ -47,9 +83,9 @@ uma célula como coberta apenas porque outro nível executou uma jornada feliz.
 | Lane | Objetivo | Conteúdo mínimo | Budget/política |
 |---|---|---|---|
 | Commit | feedback rápido | build, unitários, componentes e checks estáticos afetados | rápida e determinística |
-| Pull request | integração e regressão | integração/provider, contrato, arquitetura, browser focado, a11y e diff visual | bloqueia defeitos materiais |
+| Pull request | integração e regressão | integração/provider, contrato, arquitetura, Playwright dos `RF-P` afetados em mobile/tablet/desktop, a11y e diff visual | bloqueia defeitos materiais |
 | Nightly | amplitude | cross-browser/dispositivo, dados volumosos, concorrência, mutation/property quando adotados, performance e resiliência segura | findings com owner; sem esconder falhas |
-| Release | candidata imutável | suite de risco, migrations, segurança, acessibilidade, performance, recuperação e smoke sobre o mesmo SHA/artefacto | fail-closed |
+| Release | candidata imutável | todos os `RF-P` reconciliados e verdes nos projetos aplicáveis, suite de risco, migrations, segurança, acessibilidade, performance, recuperação e smoke sobre o mesmo SHA/artefacto | fail-closed |
 
 Não uses uma lane posterior para justificar ausência permanente de feedback
 rápido no nível mais baixo adequado.
@@ -89,7 +125,15 @@ efeitos externos reais.
 
 ## Conclusão honesta
 
-Entrega cobertura por requisito/risco, comandos e exit codes, ambientes e
+Entrega cobertura Playwright/nativa por `RF-P` e por mobile/tablet/desktop,
+além da cobertura por requisito/risco, comandos e exit codes, ambientes e
 providers usados, mutações/falhas provocadas, artefactos, zonas não testadas,
 flakiness e riscos residuais. Nunca uses “sem bugs” ou “cobertura total” fora do
 âmbito e dos oráculos demonstrados.
+
+## Referências oficiais
+
+- https://playwright.dev/docs/test-projects
+- https://playwright.dev/docs/api-testing
+- https://playwright.dev/docs/api/class-apirequestcontext
+- https://playwright.dev/docs/test-annotations

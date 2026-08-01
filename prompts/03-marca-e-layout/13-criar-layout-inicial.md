@@ -12,11 +12,23 @@ Pesquisa, propõe e implementa uma direção visual inicial coerente para
 - `App.Client.Web`, `App.Cliente.Web` ou o projeto real equivalente;
 - `TagLyght.Client.Maui` ou o projeto real `*.Client.Maui`.
 
-O resultado é uma fundação visual executável e os shells iniciais necessários à primeira `[VERTICAL_SLICE_ATUAL]`, não o desenho antecipado de todas as páginas. Os prompts 14, 16 e 18 refinam depois, respetivamente, SSR, Web e MAUI.
+O resultado é uma fundação visual nova, executável e criada do zero, com os
+shells iniciais necessários à primeira `[VERTICAL_SLICE_ATUAL]`, não o desenho
+antecipado de todas as páginas. Este prompt substitui integralmente a camada
+visual anterior: não reaproveita layouts, CSS, temas, tokens, componentes
+visuais próprios nem componentes UI do BitPlatform. Os prompts 14, 16 e 18
+refinam depois, respetivamente, SSR, Web e MAUI.
+
+Para este prompt, o reset é uma exceção explícita à regra genérica de preservar
+componentes existentes: essa exceção aplica-se apenas à camada visual aqui
+identificada. As regras de preservação continuam válidas para comportamento,
+dados, contratos, segurança e infraestrutura não visual.
 
 ## Resultado obrigatório
 
 - As quatro superfícies têm um papel, uma arquitetura de informação e um layout inicial coerentes entre si.
+- O layout, CSS e sistema de componentes visuais anteriores foram removidos antes da nova implementação; nenhuma classe, token, shell ou componente UI do BitPlatform anterior continua a sustentar a proposta.
+- Todas as rotas existentes voltam a compilar e a disponibilizar o comportamento funcional através dos shells e primitivas novas; só a primeira slice recebe neste prompt o refinamento visual completo, mas nenhuma rota fica dependente da camada visual eliminada.
 - A proposta resulta de pesquisa online atual sobre aplicações premium comparáveis, produtos adjacentes, design systems maduros e templates pagos premium.
 - Cor, tipografia, espaçamento, grelha, elevação, movimento, ícones, densidade e estados usam tokens e regras partilhadas.
 - A identidade é específica do produto e não parece um dashboard genérico, um template comprado sem adaptação ou uma UI de IA.
@@ -25,14 +37,64 @@ O resultado é uma fundação visual executável e os shells iniciais necessári
 - Existe `design/slices/<SLICE-ID>-VISUAL_BRIEF.md` com tese da tarefa/visual/
   interação, conteúdo real, matriz responsiva/estados, anti-direções,
   alternativas de baixa fidelidade e direção selecionada por revisor identificado.
+- Existe `design/INITIAL_LAYOUT_RESET.md` com o inventário da camada visual
+  eliminada, dependências retiradas, equivalentes novos e provas de que não há
+  reutilização residual.
 
 ## Entradas e descoberta
 
 1. Lê `PRODUCT_DEFINITION.md`, `PRODUCT_EXCELLENCE.md`, `PRODUCT_QUALITY_BASELINE.md`, `VISUAL_SLICE_CONTRACT.md`, requisitos, identidade aprovada, `MODULES.md`, rotas, projetos, tokens, componentes, layouts e `CODEX_LAYOUT_TOOLING.md` quando existir.
 2. Descobre os nomes reais na solution e cria a matriz `papel → projeto → rotas/ecrãs → utilizador → responsabilidade`. Não cries um projeto duplicado apenas porque o prefixo ou `Client.Web`/`Cliente.Web` difere dos exemplos.
 3. Confirma `[VERTICAL_SLICE_ATUAL]`, atores, permissões, dados/contratos reais, plataformas MAUI e viewports. Valores materiais ausentes ficam explícitos; não inventes negócio, métricas, claims ou permissões.
-4. Inventaria o baseline atual por `preservar | melhorar | substituir | remover`, com evidência renderizada. Preserva comportamento e acessibilidade que já estejam corretos.
+4. Captura o baseline visual apenas como evidência `antes` e inventaria-o por
+   `eliminar | substituir por novo | não visual a preservar`. Não classifiques
+   layouts, CSS, temas, tokens ou componentes visuais como `preservar` ou
+   `melhorar`: servem somente para identificar funcionalidades, estados e
+   regressões que a nova proposta deve voltar a suportar.
 5. Se um dos quatro projetos não existir ou não for executável, trabalha nas superfícies comprovadas e termina `parcial`, indicando exatamente o projeto, decisão ou comando em falta. Não inventes uma superfície substituta.
+
+## Reset visual obrigatório antes da proposta
+
+Executa esta fase antes de criares tokens, shells, componentes ou estilos
+novos. O objetivo é impedir que a proposta seja apenas uma remodelação do
+layout anterior.
+
+1. Regista em `design/INITIAL_LAYOUT_RESET.md` cada layout/shell, folha CSS ou
+   SCSS, tema, token, asset puramente visual, componente visual próprio e
+   componente UI do BitPlatform usado nas quatro superfícies, com
+   `origem → utilização → ação de remoção → substituição necessária`.
+2. Captura renders do estado anterior e o mapa das funcionalidades/estados que
+   têm de continuar disponíveis; estes renders são evidência, não referência a
+   reutilizar no novo design.
+3. Remove primeiro do código da aplicação todos os layouts/shells, CSS/SCSS,
+   temas, tokens e componentes visuais anteriores abrangidos. Remove também as
+   utilizações de componentes UI do BitPlatform, incluindo wrappers próprios,
+   classes e estilos que dependam deles.
+4. Retira packages/referências exclusivamente visuais do BitPlatform quando
+   deixarem de ser necessários. Não removas infraestrutura BitPlatform não
+   visual, contratos, serviços ou bootstrap técnico sem provar que são apenas
+   dependências da UI substituída.
+5. Não copies markup, estrutura DOM/visual, seletores, valores, variantes ou
+   assets da implementação eliminada para os componentes novos. Não uses o
+   layout antigo como scaffold temporário da proposta final.
+6. Preserva rotas, contratos, autenticação/autorização, regras de negócio,
+   dados, telemetria, localização, conteúdo aprovado e comportamentos
+   funcionais. Reimplementa do zero a sua apresentação e interação sem reduzir
+   funcionalidades ou acessibilidade.
+7. Não apagues código gerado, caches, dependências vendorizadas ou ficheiros
+   fora da camada visual. Se uma dependência visual estiver acoplada a
+   comportamento necessário e não puder ser separada com segurança, documenta
+   a evidência, termina `parcial` e indica a separação concreta em falta.
+8. Antes de avançar para a proposta, executa pesquisas reproduzíveis no
+   repositório e confirma no artefacto de reset que já não existem imports,
+   tags, namespaces, classes, seletores, assets ou referências aos layouts e
+   componentes UI removidos. Uma lista de ficheiros apagados, isoladamente,
+   não prova o reset.
+9. Mantém a solução compilável durante a substituição: troca todas as
+   referências necessárias por primitivas novas e semanticamente mínimas. A
+   primeira slice recebe o acabamento completo neste prompt; as restantes
+   rotas podem ficar visualmente básicas para refinamento posterior, mas não
+   podem ficar quebradas, vazias, inacessíveis ou ligadas à UI antiga.
 
 ## Pesquisa online obrigatória
 
@@ -69,19 +131,23 @@ Regras da pesquisa:
 
 | Superfície | Layout inicial esperado |
 |---|---|
-| `Server.Api` | Experiência real de documentação/desenvolvimento: identidade, navegação OpenAPI/Swagger/Scalar existente, grupos de endpoints, autenticação, exemplos, erros e ligação a health/status apenas quando aprovados. Se a API não expuser UI, documenta e preserva essa decisão em vez de inventar uma página de utilizador. |
+| `Server.Api` | Experiência nova de documentação/desenvolvimento construída sobre o contrato OpenAPI real: identidade, navegação, grupos de endpoints, autenticação, exemplos, erros e ligação a health/status apenas quando aprovados. Pode preservar o gerador/contrato OpenAPI como infraestrutura não visual, mas não o layout, tema ou CSS anterior de OpenAPI/Swagger/Scalar. Se a API não expuser UI, documenta e preserva essa decisão em vez de inventar uma página de utilizador. |
 | `Client.Ssr` | Shell público indexável com header, navegação, conteúdo principal, CTA factual, footer e a primeira rota pública real, sem depender de hidratação para o essencial. |
 | `Client.Web`/`Cliente.Web` | Shell autenticado com navegação, contexto da página, ação principal, zona de conteúdo e feedback/recuperação adequados à primeira jornada real. |
 | `TagLyght.Client.Maui`/`*.Client.Maui` | Shell nativo para as plataformas aprovadas, com navegação, safe areas, back, teclado, toque, orientação/janela e primeira jornada coerentes com as convenções da plataforma. |
 
 ## Implementação
 
-1. Define tokens semânticos para superfícies, texto, bordas, foco, estados, contraste, tipografia, espaçamento, grelha, elevação e movimento reduzido.
-2. Implementa apenas primitivas e componentes transversais necessários aos quatro shells e à primeira slice: botões, links, campos, navegação, feedback, diálogos, cards/listas e skeletons quando aplicáveis.
-3. Reutiliza `Client.Core` apenas onde for tecnicamente adequado. Mantém diferenças intencionais entre SSR, Web/PWA e MAUI e não força padrões Web numa experiência nativa.
+1. Cria do zero tokens semânticos para superfícies, texto, bordas, foco, estados, contraste, tipografia, espaçamento, grelha, elevação e movimento reduzido; não derives valores dos tokens ou CSS eliminados.
+2. Cria do zero as primitivas e componentes transversais necessários para substituir todas as referências visuais anteriores e suportar os quatro shells; aplica o acabamento completo apenas à primeira slice: botões, links, campos, navegação, feedback, diálogos, cards/listas e skeletons quando aplicáveis. Não reutilizes componentes visuais próprios nem componentes UI do BitPlatform.
+3. Reutiliza de `Client.Core` apenas contratos, modelos, serviços e lógica não visual tecnicamente adequados. Mantém diferenças intencionais entre SSR, Web/PWA e MAUI e não forces padrões Web numa experiência nativa.
 4. Trata os estados realistas aplicáveis: normal, loading, vazio, erro, sucesso, offline, sem permissão, sessão expirada, disabled, focus e conteúdo extremo.
 5. Usa dados/backend e autorização reais na primeira slice. Usa placeholders explicitamente identificados apenas quando o conteúdo ainda não está aprovado.
-6. Preserva a stack e o design system existentes. Não introduzas outro framework para imitar uma referência premium.
+6. Preserva a stack de execução e a arquitetura não visual quando continuarem
+   adequadas, mas substitui o design system existente. Não introduzas outro
+   framework UI nem uma biblioteca concorrente apenas para imitar uma
+   referência premium; a nova camada visual deve ser explicitamente aprovada e
+   criada para este produto.
 7. Mantém um catálogo `componente → variantes → estados → superfícies → acessibilidade → snapshot`.
 8. Exercita cada ferramenta aprovada em `CODEX_LAYOUT_TOOLING.md` na slice real e regista a decisão `manter|remover` com ganho observável; instalação ou smoke test isolado não prova melhoria.
 
@@ -104,6 +170,11 @@ Uma autorrevisão do implementador continua obrigatória, mas não é apresentad
 - Valida navegação, consola/rede, erros HTTP, foco, teclado, contraste, zoom/reflow, toque, safe areas e conteúdo longo.
 - Executa checks automáticos de acessibilidade e avaliação manual proporcional.
 - Captura evidência reproduzível por superfície/viewport/tema/estado e configura regressão visual para componentes estáveis. Não atualizes baselines automaticamente.
+- Compara o inventário de `INITIAL_LAYOUT_RESET.md` com o código final e executa
+  buscas por referências, namespaces, tags, classes, seletores e assets antigos
+  e por componentes UI do BitPlatform. Qualquer reutilização residual mantém o
+  resultado `parcial` até ser removida ou explicitamente excluída por ser
+  infraestrutura não visual.
 - Executa a revisão adversarial do `EXECUTION_CONTRACT.md` e confirma que a implementação continua limitada à primeira slice e aos shells iniciais.
 
 ## Entrega
@@ -112,9 +183,11 @@ Começa pelo resultado e indica `concluído`, `parcial` ou `bloqueado`. Resume a
 direção recomendada, alternativas comparadas, revisor/decisão, as quatro
 superfícies implementadas, a opinião crítica e as correções efetuadas. Liga o
 brief da slice, `INITIAL_LAYOUT_RESEARCH.md`, `INITIAL_LAYOUT_SPEC.md`,
-`INITIAL_LAYOUT_CRITIQUE.md`, `PRODUCT_QUALITY_BASELINE.md`, renders/snapshots e
-ficheiros alterados. Apresenta comandos/resultados, acessibilidade, licenças,
-decisões `manter|remover`, riscos e `Falta para terminar` de forma concreta.
+`INITIAL_LAYOUT_CRITIQUE.md`, `INITIAL_LAYOUT_RESET.md`,
+`PRODUCT_QUALITY_BASELINE.md`, renders/snapshots e ficheiros alterados.
+Apresenta comandos/resultados, acessibilidade, licenças, decisões
+`manter|remover`, prova da remoção da UI anterior, riscos e `Falta para
+terminar` de forma concreta.
 
 Não declares “qualidade de excelência garantida” apenas por teres aplicado uma rubrica. Declara o que foi observado, por quem, em que versão e com que limitações.
 

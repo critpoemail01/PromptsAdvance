@@ -51,6 +51,10 @@ repetido para cada superfície selecionada.
    programador, `ALL_FUNCTIONALITIES.md`, catálogos,
    `REQUIREMENTS_QUALITY_MATRIX.md`, `quality/TEST_MATRIX.md` e relatório de
    cobertura.
+   Mantém exatamente o formato
+   `Projeto - PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL - FUNCIONALIDADE -> ID | Quem | Onde | Quando | O quê`
+   e atualiza todas as funcionalidades/estados afetados pela evidência visual,
+   sem amostragem, resumo ou reutilização de IDs.
 6. Regista findings que pertencem ao layout ou à implementação nos respetivos
    prompts; não os escondas através de um requisito inventado.
 7. Revê adversarialmente o delta contra scope creep, IDs duplicados, estados
@@ -63,6 +67,8 @@ Conclui apenas quando:
 - os requisitos da slice refletem a experiência observada sem copiar a UI;
 - cada alteração tem fonte, owner, aceitação e prova esperada;
 - todas as vistas derivadas permanecem em paridade;
+- nenhuma página/ecrã, funcionalidade, condição, estado ou recuperação
+  observada no refinamento fica omitida ou sem lacuna explícita;
 - findings de design e implementação estão encaminhados ao prompt correto;
 - `IMPLEMENTATION_STATUS.md` conserva resultado, evidência e trabalho restante.
 

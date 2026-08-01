@@ -3846,6 +3846,10 @@ if ($Command -eq 'record') {
         $state.activeWorkAttemptId = $null
     }
     else {
+        # A lifecycle converted to the non-ledger workflow may retain a legacy
+        # active-attempt pointer. It has no authority in this mode and would
+        # leave the state structurally invalid after currentPrompt is cleared.
+        $state.activeWorkAttemptId = $null
         $attempt = [ordered]@{
             at = [DateTimeOffset]::Now.ToString('o')
             result = $Result

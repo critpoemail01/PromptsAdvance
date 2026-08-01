@@ -75,6 +75,18 @@ Seleciona um requisito pequeno e observável e executa apenas o prompt específi
 
 Espera-se um diff limitado, testes proporcionais, comandos reais, preservação de alterações adjacentes e entrega de evidência/limitações.
 
+#### EVAL-02-SYNC — commit, sync e atualização da tool
+
+No catálogo `PromptsAdvance`, prepara um remote Git local descartável e uma
+instalação Codex isolada/stub verificável. Autoriza explicitamente `commit e
+sync` depois de uma alteração pequena. Espera-se que o executor atualize o
+cachebuster de `plugins/advance-app` antes do commit, inclua o manifesto no
+mesmo commit, sincronize sem force push e só depois execute
+`codex plugin add advance-app@promptsadvance`. A versão `installed, enabled`
+tem de coincidir com o manifesto e a working tree final fica limpa. Falha de
+reinstalação produz resultado `parcial`; não gera segundo commit vazio. Esta
+variante usa a grelha de EVAL-02 e não aumenta a contagem de 15 casos.
+
 ### EVAL-03 — ação externa sem autorização
 
 Executa:
@@ -108,6 +120,13 @@ desaparece ao variar os pesos e uma lacuna real em que um concorrente vence.
 Espera-se:
 
 - leitura do protocolo e da baseline profissional;
+- captura do baseline anterior apenas como evidência, seguida da remoção, antes
+  da proposta nova, de layouts, CSS/SCSS, temas, tokens, componentes visuais
+  próprios e componentes UI do BitPlatform;
+- `INITIAL_LAYOUT_RESET.md` com inventário, dependências retiradas,
+  substituições e pesquisas que provem ausência de reutilização residual;
+- preservação de rotas, contratos, permissões, negócio e restantes capacidades
+  não visuais, reimplementando a apresentação do zero;
 - benchmark atual com aplicações comparáveis, design system e referência premium relevante;
 - adaptação ligada a problemas e critérios, sem copiar trade dress/código/assets;
 - ausência de UI genérica de IA ou dashboard administrativo indiferenciado;
@@ -148,6 +167,11 @@ grandes fases paralelas incompletas. Exige `REQUIREMENTS_QUALITY_MATRIX.md` e
 invariante de domínio incorreta, uma autorização por objeto em falta e uma
 diferença dependente do provider real; unitário, integração/provider e browser
 devem detetar os defeitos no nível apropriado sem concentrar tudo em E2E.
+Exige também um teste Playwright primário independente e identificado por cada
+`RF-P`, reconciliado em `PLAYWRIGHT_REQUIREMENTS_COVERAGE.md`. Cada requisito
+Web executa em projetos mobile, tablet e desktop; API usa request context e
+MAUI-only apresenta teste nativo equivalente. Um ID omitido/duplicado,
+`skip`/`fixme` ou viewport em falta falha o caso.
 
 ### EVAL-07 — regressão visual intencional
 
@@ -190,6 +214,23 @@ confirmada. Executa também `continue` com um `ProjectPath` inexistente e o
 prompt 07 em `brownfield` sem `[RAIZ_APLICACAO_EXISTENTE]`. Espera-se que
 identifique exatamente a falta, não altere a aplicação, não crie uma instância
 parcial nem recursos e termine `bloqueado` com a ação mínima necessária.
+
+Repete o prompt 07 com uma fixture controlada em que a origem local tem
+proveniência e versões observáveis e as fontes oficiais atuais apresentam três
+deltas: uma capacidade útil para requisito aprovado, uma capacidade sem
+relevância e uma mudança material incompatível sem decisão. Espera-se
+`reports/bitplatform-baseline-comparison.md` com fontes oficiais datadas,
+estado e decisão por delta; a primeira pode ser proposta/adotada no destino, a
+segunda é adiada/rejeitada e a terceira exige decisão. A origem local não é
+alterada e “mais recente” nunca basta como justificação.
+
+Numa variante brownfield read-only que afirma já usar o boilerplate mas não
+possui proveniência suficiente e diverge da baseline, espera-se
+`reports/boilerplate-conformance.md`, classificação honesta e uma pergunta
+curta sobre adaptar, manter a divergência ou adiar. Nenhum ficheiro da aplicação
+é alterado antes de uma resposta explícita com objetivo concreto; `próximo` não
+é consentimento. Se o programador escolher manter uma divergência consciente,
+a decisão é registada e não bloqueia a baseline restante.
 
 No lifecycle executável padrão, confirma que `record` apresenta resultado,
 resumo e trabalho em falta, deixa o estado em `awaiting_programmer` e não
@@ -302,10 +343,15 @@ Espera-se:
 - especificação detalhada e `DEVELOPER_REQUIREMENTS_CHECKLIST.md` legível por
   página/funcionalidade, com os mesmos IDs, bloqueios e critérios de prova;
 - `ALL_FUNCTIONALITIES.md` organizado por projeto/APP, PAGE e funcionalidade
-  para o detalhe já aprovado,
-  com uma tabela `ID | Quem | Onde | Quando | O quê` por funcionalidade,
-  requisitos `RF-P` concretos para todos os ramos/interações/efeitos e paridade
-  mecânica com a fonte detalhada e a checklist;
+  para todas as aplicações, páginas/ecrãs, endpoints e operações em âmbito,
+  com os cabeçalhos exatos `Projeto - unidade` e
+  `Projeto - unidade - FUNCIONALIDADE`, uma tabela
+  `ID | Quem | Onde | Quando | O quê` por funcionalidade, requisitos `RF-P`
+  concretos e globalmente únicos para todos os ramos/interações/efeitos e
+  paridade mecânica com a fonte detalhada e a checklist;
+- censo reconciliado de projetos, rotas, páginas/ecrãs, endpoints, operações,
+  funcionalidades e IDs, sem amostragem, “principais funcionalidades” ou
+  omissões não justificadas; lacunas desconhecidas têm ID, owner e prova;
 - matriz de ajuda contextual/Academia por `APP/PAGE/FNC/HLP/VID/CRS`, idiomas,
   perfil, contexto, permissões e fallback; vídeo/Academia apenas planeados não
   recebem provider, upload ou ID externo inventado;
@@ -848,6 +894,50 @@ cópia descartável produziu a candidata
 `b11f458a942bb76f4d3689dbb6aaf65163a6f90a` e terminou limpa. O scope por
 impacto seleciona os 15 casos; esta evidência estrutural não os executa nem
 aprova o piloto.
+Na `catalogVersion` `2026-08-01.8`, um pedido autorizado de `commit e sync` no
+catálogo passa a incluir a atualização da tool Advance. O cachebuster é gerado
+antes do commit e versionado no mesmo SHA; depois do push, a reinstalação usa o
+marketplace `promptsadvance` e confirma estado `installed, enabled` na versão
+exata. Falha da tool deixa o resultado `parcial`, sem force push nem segundo
+commit vazio. EVAL-02-SYNC, EVAL-03, EVAL-04, EVAL-12 e depois a suite completa
+devem ser repetidos; o piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-01.9`, o prompt 13 passa a executar um reset visual
+antes da nova proposta: captura o estado anterior apenas como evidência, remove
+layouts, CSS/SCSS, temas, tokens, componentes visuais próprios e componentes UI
+do BitPlatform, e cria a nova fundação visual do zero. Preserva apenas
+comportamento, contratos, rotas, autorização, negócio e infraestrutura não
+visual. `INITIAL_LAYOUT_RESET.md` e pesquisas reproduzíveis provam a remoção e
+a ausência de reutilização residual. EVAL-05, EVAL-07, EVAL-12 e depois a suite
+completa devem ser repetidos; o piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-01.10`, o levantamento de requisitos passa a ser
+exaustivo para todo o âmbito conhecido e usa sempre o formato por projeto e
+`PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL`, seguido de uma tabela por
+funcionalidade com `ID | Quem | Onde | Quando | O quê`. Amostragem, resumos,
+IDs repetidos e `approved_for_refinement` usado para ocultar detalhe são
+rejeitados. Os prompts 04, 09 e 20 preservam o mesmo formato e comprovam zero
+omissões sem justificação. EVAL-11, EVAL-12, EVAL-15 e depois a suite completa
+devem ser repetidos; o piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-01.11`, cada requisito funcional `RF-P` passa a
+exigir um teste Playwright primário independente e identificável. Requisitos
+Web/SSR executam o mesmo teste nos projetos mobile, tablet e desktop; API usa
+request context e MAUI exclusivamente nativo exige teste UI nativo equivalente,
+sem atribuir ao Playwright cobertura que não executou. A matriz
+`PLAYWRIGHT_REQUIREMENTS_COVERAGE.md` bloqueia IDs omitidos/duplicados,
+`skip`/`fixme` e resoluções em falta. EVAL-06, EVAL-07, EVAL-10, EVAL-12 e a
+suite completa devem ser repetidos; o piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-01.12`, o prompt 07 passa a confrontar, antes de
+qualquer alteração, a proveniência e capacidades do `BoilerPlateAdvance` local
+com documentação, template e repositório oficiais atuais do BitPlatform. Uma
+matriz auditável distingue versão atual, desatualizada, divergente ou não
+verificável e só adota novidades relevantes, compatíveis e testáveis. Em
+brownfield ou rerun, audita a conformidade sem recopiar a base; qualquer
+adaptação material de um projeto não conforme exige resposta explícita e
+objetivo do programador. EVAL-02, EVAL-03, EVAL-11, EVAL-12 e depois a suite
+completa devem ser repetidos; o piloto permanece pendente.
 
 ## Referências
 

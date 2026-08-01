@@ -6,14 +6,23 @@ Lê integralmente `AGENTS.md`, `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`,
 
 Avalia e melhora apenas a primeira fatia visual da página autenticada de gestão de utilizadores. O domínio é administração segura de identidades para uma equipa operacional; a tarefa principal é encontrar uma conta, perceber estado/permissões e iniciar uma ação autorizada sem erro.
 
-Usa o código existente e referências públicas apenas como princípios. Pesquisa
-fontes atuais de aplicações comparáveis, produto adjacente, design system e
+Usa o comportamento existente e referências públicas apenas como princípios.
+No prompt 13, captura primeiro o baseline visual como evidência e remove depois
+layouts, CSS/SCSS, temas, tokens, componentes visuais próprios e componentes UI
+do BitPlatform antes de criares a proposta nova. Não reutilizes markup,
+estrutura visual, classes, estilos, assets ou wrappers eliminados. Preserva
+rotas, contratos, backend, permissões, negócio e infraestrutura não visual.
+Todas as rotas têm de continuar compiláveis e funcionais através de primitivas
+novas; apenas a primeira slice recebe acabamento visual completo neste caso.
+Pesquisa fontes atuais de aplicações comparáveis, produto adjacente, design system e
 templates pagos premium, conservando URL oficial, data, preço/licença e limites.
 Não copies marcas, código, assets ou trade dress, não inventes métricas/claims,
-não compres/descarregues material e não redesenhes toda a aplicação. Mantém
+não compres/descarregues material. Cria a nova camada visual do zero e mantém
 backend e permissões existentes.
 
-Cria ou atualiza `design/INITIAL_LAYOUT_RESEARCH.md`,
+Cria `design/INITIAL_LAYOUT_RESET.md` com inventário, dependências retiradas,
+substituições e pesquisas que provem a ausência de reutilização residual. Cria
+ou atualiza `design/INITIAL_LAYOUT_RESEARCH.md`,
 `design/INITIAL_LAYOUT_SPEC.md`, `design/INITIAL_LAYOUT_CRITIQUE.md` e a
 baseline. Aplica a melhoria da slice e, usando a matriz de jornadas `Must`
 fornecida pela fixture, executa também a auditoria de conclusão Web sem inventar

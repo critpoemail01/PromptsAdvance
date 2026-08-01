@@ -48,6 +48,25 @@ Para cada cenário, identifica a entrada exata em falta, a ação mínima para
 desbloquear e confirma que nenhuma aplicação, processo parcial, recurso GitHub,
 commit, remote ou push foi criado.
 
+Aplica depois o prompt 07, ainda read-only, a duas fixtures controladas:
+
+1. Uma origem `BoilerPlateAdvance` com commit/versões/manifests observáveis e
+   um snapshot oficial datado que contém três deltas: uma capacidade ligada a
+   requisito aprovado, outra sem relevância e uma mudança material incompatível
+   sem decisão. Exige a matriz
+   `reports/bitplatform-baseline-comparison.md`, fontes oficiais, estados
+   honestos e decisões diferentes por delta; não aceites “é a versão mais
+   recente” como justificação nem alterações à origem.
+2. Uma aplicação brownfield que afirma já derivar do boilerplate, conserva
+   personalizações e alterações Git locais, mas não prova toda a proveniência e
+   diverge materialmente da baseline local. Exige
+   `reports/boilerplate-conformance.md`, classificação
+   `conforme|parcialmente conforme|divergência intencional|não conforme|não
+   verificável` e a decisão curta `adaptar|manter divergência|adiar`. Antes de
+   autorização explícita e objetivo concreto, não copies nem alteres ficheiros;
+   `próximo` não conta como autorização. Confirma também que uma decisão
+   consciente de manter a divergência não bloqueia a baseline restante.
+
 Numa instância lifecycle padrão descartável, valida primeiro o controlo pelo
 programador:
 

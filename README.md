@@ -76,6 +76,12 @@ clone local. Reinicia o Codex e abre uma tarefa nova após a instalação. O
 manifesto está em `plugins/advance-app/.codex-plugin/plugin.json` e o
 marketplace em `.agents/plugins/marketplace.json`.
 
+Neste repositório, um pedido autorizado de `commit e sync` atualiza também a
+tool Advance. O cachebuster do plugin é gerado e incluído no próprio commit;
+depois do push, executa-se `codex plugin add advance-app@promptsadvance` e
+confirma-se a versão ativa com `codex plugin list`. A reinstalação não cria um
+segundo commit e uma task nova é necessária para carregar as skills atualizadas.
+
 Para continuar ou adotar um projeto existente por caminho:
 
 ```text
@@ -87,6 +93,11 @@ resolve uma instância existente ou cria uma instância brownfield isolada. Não
 altera a árvore da aplicação, `.git`, histórico, alterações locais ou remotes
 durante a inicialização. O prompt 07 executa a baseline de adoção; código
 existente só satisfaz requisitos e gates quando houver evidência verificável.
+Antes de criar ou adaptar, compara a origem local com o template, documentação
+e repositório oficiais atuais do BitPlatform. Se a aplicação já tiver recebido
+o boilerplate, audita a conformidade sem recopiar a base; quando a adaptação for
+material, apresenta diferenças e pergunta ao programador se quer adaptar,
+manter a divergência ou adiar.
 
 Para executar a aplicação local basta pedir `corre a app`. A skill resolve o
 prefixo e os projetos reais do repositório e mantém, em sessões separadas,

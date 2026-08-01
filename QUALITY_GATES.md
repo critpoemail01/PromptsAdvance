@@ -17,13 +17,15 @@ Validador: `scripts/Test-ProductDefinitionGate.ps1`.
   representativos, ou exceção aprovada com risco, owner, prazo e plano;
 - MVP, exclusões, orçamento, prazo e métrica de decisão;
 - requisitos `Must` da release com resultado, fonte, prioridade, aceitação,
-  owner e slice candidata; a primeira slice e contratos transversais de alto
-  risco estão totalmente refinados;
+  owner e slice candidata; todas as aplicações, páginas/ecrãs, endpoints,
+  operações e funcionalidades conhecidas estão detalhadas ao máximo no formato
+  `ID | Quem | Onde | Quando | O quê`, sem amostragem ou omissões não justificadas;
 - `REQUIREMENTS_ENGINEERING_CONTRACT.md` aplicado: obrigações atómicas,
   tabelas de decisão/transição para regras materiais, exemplos/fronteiras,
   cenários NFR mensuráveis e matriz `requisito -> risco -> oráculo -> teste`;
-- especificação canónica e vistas derivadas em paridade para o detalhe já
-  aprovado; nenhuma linha genérica finge que uma slice futura está pronta;
+- especificação canónica e vistas derivadas em paridade para todo o âmbito
+  conhecido; nenhuma linha genérica, resumo ou `approved_for_refinement` oculta
+  detalhe ou finge que uma slice futura está pronta;
 - cada slice posterior passa um Definition of Ready no prompt 27/29, atualiza a
   fonte canónica e reconcilia checklist e `ALL_FUNCTIONALITIES.md` antes de código;
 - quando ajuda contextual/Academia estiver em âmbito, existe matriz
@@ -141,6 +143,13 @@ Critérios:
   funcionalidade, sem vídeos finais sobre jornadas instáveis;
 - logs estruturados sem segredos/dados indevidos, métricas e traces úteis;
 - testes unitários, integração, contrato e browser proporcionais ao risco;
+- exatamente um teste Playwright primário identificável por cada `RF-P`, sem
+  agregação, omissão, `skip` ou `fixme`; requisitos Web/SSR executados em
+  mobile, tablet e desktop, API via request context/contrato e MAUI-only com
+  teste UI nativo equivalente;
+- `quality/PLAYWRIGHT_REQUIREMENTS_COVERAGE.md` reconciliado mecanicamente com
+  `ALL_FUNCTIONALITIES.md` e relatórios de execução, com zero IDs ausentes ou
+  duplicados e resultado verde por projeto aplicável;
 - `TEST_STRATEGY_CONTRACT.md` aplicado e `quality/TEST_MATRIX.md` reconciliada,
   incluindo componente, provider real, compatibilidade de contrato, limites
   arquiteturais, visual, acessibilidade, performance e resiliência aplicáveis;

@@ -17,7 +17,12 @@ plataformas/capacidades aprovadas e entrega evidência reproduzível de restore,
 build e testes. Uma adoção não declara o comportamento existente correto nem
 concluído sem o verificar.
 
-Deves validar o boilerplate local com o online https://bitplatform.dev/ para ver se ha alguma funcionalidade nova, que faca sentido acrescentar ao que existe
+Antes de copiar, adaptar ou declarar a base atualizada, confronta o
+`BoilerPlateAdvance` local com a versão oficial atual do bit Boilerplate. A
+comparação não autoriza copiar cegamente a versão mais recente: identifica o
+que mudou, determina se cada capacidade serve requisitos aprovados e só adota
+alterações compatíveis, justificadas e verificáveis no projeto de destino. A
+origem local permanece imutável.
 
 ## Dados obrigatórios
 
@@ -52,6 +57,57 @@ fontes de verdade. Não cries/substituas `origin`, não reescrevas histórico, n
 faças commit/push e não mudes visibilidade ou regras sem uma autorização
 separada que nomeie a ação e o alvo exatos.
 
+## Comparação obrigatória com o bit Boilerplate oficial
+
+Executa esta comparação read-only nos dois modos e em qualquer repetição deste
+prompt, antes de alterar a aplicação:
+
+1. Identifica a proveniência da origem local através de evidência concreta:
+   commit/tag quando existir, versão do template, SDK em `global.json`, target
+   frameworks, packages centrais, manifests, opções/capacidades instaladas,
+   estrutura de soluções/projetos, `.docs` e documentação do próprio
+   boilerplate. Nomes de ficheiros ou semelhança visual não provam proveniência.
+2. Consulta fontes oficiais atuais, registando URL, data/hora da consulta,
+   versão/tag/commit quando disponível e evidência observada. Usa, por esta
+   ordem:
+   - documentação do template em `https://bitplatform.dev/templates`;
+   - criação, estrutura, execução e wiki oficiais ligadas nessa documentação;
+   - repositório oficial `https://github.com/bitfoundation/bitplatform`, os seus
+     tags/releases, fontes do template e manifests;
+   - metadados oficiais dos packages referenciados, quando necessários para
+     resolver versões.
+3. Não uses blogs, snippets, forks, respostas de IA ou uma página isolada como
+   prova de versão atual. Não descarregues nem executes scripts/instruções
+   remotos sem os inspecionar. Se as fontes oficiais divergirem, privilegia o
+   release/template estável e regista a divergência; o branch de desenvolvimento
+   não é automaticamente uma baseline de produção.
+4. Produz `reports/bitplatform-baseline-comparison.md` no processo isolado com
+   a proveniência local e uma matriz:
+
+   `capacidade/estrutura | evidência local | evidência oficial | estado | relevância para requisitos | compatibilidade/risco | decisão | validação`
+
+   Usa apenas os estados `atual`, `desatualizado`, `divergente` ou `não
+   verificável`, e as decisões `manter`, `adotar`, `adiar` ou `rejeitar`.
+   Abrange pelo menos SDK/framework, packages, estrutura de projetos, modos de
+   API/renderização, Identity/autorização, multi-tenancy, persistência,
+   offline/sincronização, caching/Redis, jobs, SignalR/notificações, PWA/update,
+   MAUI, Aspire, observabilidade/health, segurança, testes, CI/CD e documentação.
+5. `Mais recente` não significa `adequado`. Adota uma novidade apenas quando:
+   - responde a requisito, risco ou qualidade aprovados;
+   - é compatível com a arquitetura, plataformas, licença e versões suportadas;
+   - não cria integração, custo, serviço externo ou superfície sem decisão;
+   - existe um lote coerente com migração, configuração, documentação e testes;
+   - o benefício e a validação são superiores ao risco da mudança.
+6. Em `greenfield`, aplica no destino as decisões `adotar` durante a criação e
+   conserva as restantes na matriz. Uma mudança material de framework,
+   identidade, multi-tenancy, contratos públicos, persistência ou topologia que
+   não esteja já aprovada exige a decisão mínima do programador antes de ser
+   aplicada.
+7. Se a Internet, a versão oficial ou a proveniência local não puderem ser
+   verificadas, não declares a base atualizada. Continua apenas com alterações
+   independentes dessa incerteza, marca o resultado `partial` e lista a
+   evidência necessária para terminar.
+
 ## Critérios de sucesso
 
 - `[MODO_INICIATIVA]`, raiz da aplicação, raiz do processo e baseline Git estão
@@ -71,6 +127,10 @@ separada que nomeie a ação e o alvo exatos.
 - Em `brownfield`, existe inventário `as-is`, baseline de comandos/resultados,
   classificação de falhas preexistentes e mapa de gaps para a arquitetura
   aprovada; `.git`, remotes e alterações locais permanecem intactos.
+- Existe uma comparação oficial datada e rastreável; cada novidade relevante
+  tem decisão explícita e nenhuma foi adotada apenas por ser mais recente.
+- Quando a aplicação já contém o boilerplate, a sua conformidade e proveniência
+  foram verificadas sem recopiar a base nem apagar personalizações.
 - O destino não conserva caminhos absolutos, imports ou dependências de runtime para a pasta de origem.
 - Os módulos mantidos estão completos; os removidos não deixam packages, configuração, registos, endpoints, recursos ou testes órfãos.
 - Restore, build e testes passam, ou cada impedimento externo fica demonstrado.
@@ -107,16 +167,45 @@ salta as secções greenfield.
      observabilidade, operação e qualidade profissional;
    - classificação `preexistente`, `introduzido pela adoção` ou `não
      verificável` para cada finding.
-7. Compara com o `BoilerPlateAdvance` apenas ao nível de capacidades e
-   princípios aprovados. Não copies ficheiros, namespaces, identidade ou
-   módulos por atacado e não transformes diferenças em defeitos sem requisito.
-8. Mantém os artefactos do lifecycle na raiz isolada do processo. Só adiciona
+7. Determina se o projeto já foi derivado do `BoilerPlateAdvance` e compara-o
+   com a baseline local aprovada através de evidência de proveniência,
+   estrutura, projetos, packages, capacidades e contratos. Classifica o projeto
+   como `conforme`, `parcialmente conforme`, `divergência intencional`, `não
+   conforme` ou `não verificável`; diferenças justificadas pela evolução do
+   produto não são defeitos por si só.
+8. Produz `reports/boilerplate-conformance.md` com a baseline comparada, os
+   ficheiros/capacidades amostrados, diferenças, personalizações a preservar,
+   impacto, risco e proposta mínima de adaptação. Se o boilerplate já tiver sido
+   aplicado, trata a execução como auditoria de conformidade: não voltes a
+   copiar ou renomear toda a base.
+9. Se o resultado for `não conforme`, `parcialmente conforme` com gaps
+   materiais ou `não verificável` e a adaptação alterar o projeto, para antes
+   dessa adaptação e pergunta de forma clara:
+
+   `O projeto não está comprovadamente conforme com o BoilerPlateAdvance em
+   <diferenças principais>. Queres adaptar o projeto atual? Se sim, indica o
+   objetivo concreto da adaptação; também podes manter a divergência ou adiar.`
+
+   Mostra em poucas linhas o que será preservado, o lote proposto, riscos e
+   validação. Não assumes consentimento, não transformes `próximo` numa
+   autorização e não alteres código até o programador responder explicitamente.
+10. Se o programador autorizar a adaptação e indicar o objetivo, aplica apenas
+    o menor lote compatível com esse objetivo. Preserva funcionalidades,
+    personalizações, dados, histórico e alterações locais; usa migração
+    incremental e testes em vez de substituição por atacado. Se optar por
+    manter a divergência ou adiar, regista a decisão e não bloqueies a adoção
+    quando a baseline restante for reproduzível.
+11. Compara com o `BoilerPlateAdvance` apenas ao nível de capacidades,
+    contratos e princípios aprovados. Não copies ficheiros, namespaces,
+    identidade ou módulos por atacado e não transformes diferenças em defeitos
+    sem requisito.
+12. Mantém os artefactos do lifecycle na raiz isolada do processo. Só adiciona
    ou atualiza `AGENTS.md`, contratos ou scripts dentro da aplicação quando não
    houver colisão e essa mudança estiver explicitamente incluída no lote.
-9. Atualiza `APP_CONTEXT.md` e `IMPLEMENTATION_STATUS.md` do processo com fontes,
+13. Atualiza `APP_CONTEXT.md` e `IMPLEMENTATION_STATUS.md` do processo com fontes,
    confiança, baseline, bloqueios e o menor próximo lote. Regista o resultado
    pelo orquestrador; não edites `currentPrompt` ou gates diretamente.
-10. Conclui `completed` apenas quando a adoção e baseline forem reproduzíveis.
+14. Conclui `completed` apenas quando a adoção e baseline forem reproduzíveis.
     Usa `partial` para cobertura incompleta e `blocked` quando faltar uma decisão
     material, acesso ou comando indispensável.
 
@@ -125,11 +214,14 @@ salta as secções greenfield.
 1. Executa esta secção apenas quando `[MODO_INICIATIVA]` for `greenfield`.
 2. Confirma os caminhos absolutos reais; não assumas `C:\Work` nem outra localização fixa.
 3. Lê `AGENTS.md`, `README.md`, `MODULES.md`, manifests, soluções, projetos, configuração, CI e pontos de entrada da origem.
-4. Confirma que `[PASTA_DESTINO]` não é a origem, não está dentro da origem e está vazia ou ainda não existe. Não apagues nem substituas um destino com conteúdo.
-5. Inventaria todos os usos ativos de `BoilerPlateAdvance`: caminhos, nomes de projetos, assemblies, namespaces, solution filters, launch profiles, package IDs, recursos MAUI, application IDs, configuração, testes e documentação.
-6. Cria um mapa de transformação antes de editar. Distingue o nome técnico, o nome público e identificadores de publicação; não faças uma substituição cega de texto.
-7. Se o mapa revelar colisões de nomes, destination path inseguro ou identificadores externos não aprovados, para antes da cópia/renomeação afetada e apresenta a decisão mínima necessária.
-8. Antes de qualquer ação GitHub:
+4. Executa a comparação obrigatória com as fontes oficiais e aprova a matriz de
+   decisões antes de criar o destino. Não atualizes a origem local para a fazer
+   coincidir silenciosamente com o online.
+5. Confirma que `[PASTA_DESTINO]` não é a origem, não está dentro da origem e está vazia ou ainda não existe. Não apagues nem substituas um destino com conteúdo.
+6. Inventaria todos os usos ativos de `BoilerPlateAdvance`: caminhos, nomes de projetos, assemblies, namespaces, solution filters, launch profiles, package IDs, recursos MAUI, application IDs, configuração, testes e documentação.
+7. Cria um mapa de transformação antes de editar. Distingue o nome técnico, o nome público e identificadores de publicação; não faças uma substituição cega de texto.
+8. Se o mapa revelar colisões de nomes, destination path inseguro ou identificadores externos não aprovados, para antes da cópia/renomeação afetada e apresenta a decisão mínima necessária.
+9. Antes de qualquer ação GitHub:
    - confirma que `git` e GitHub CLI `gh` existem;
    - executa `gh auth status --hostname github.com` sem mostrar tokens e confirma que a conta ativa pode criar em `[GITHUB_OWNER]`;
    - verifica com `gh repo view` que o repositório não existe;
@@ -142,7 +234,7 @@ salta as secções greenfield.
 2. Renomeia de forma consistente diretórios, ficheiros de solução/projeto, referências, namespaces, assemblies, root namespaces, testes e comandos documentados.
 3. Atualiza o nome público apenas nas superfícies apropriadas; não uses nomes de marketing como namespaces se não forem identificadores válidos e estáveis.
 4. Configura `[IDENTIFICADOR_INVERSO]` e recursos MAUI apenas quando MAUI estiver ativo. Não inventes certificados, perfis de assinatura ou IDs de loja.
-5. Mantém por defeito a fundação indicada em `MODULES.md`: API/OpenAPI/ProblemDetails, SSR público, Web/PWA, EF Core/migrations, Identity, configuração validada, health, rate limiting, headers de segurança, logging e resiliência. Remove uma capacidade apenas quando `[DECISAO_DE_MODULOS]` o determinar.
+5. Mantém por defeito a fundação indicada em `MODULES.md`: API/OpenAPI/ProblemDetails, SSR público, Web/PWA, EF Core/migrations, Identity, configuração validada, health, rate limiting, headers de segurança, logging e resiliência. Integra aqui as decisões `adotar` da matriz oficial sem alterar o `BoilerPlateAdvance` de origem. Remove uma capacidade apenas quando `[DECISAO_DE_MODULOS]` o determinar.
 6. Para cada capacidade removida, elimina o conjunto completo descrito em `MODULES.md`: código, serviços, middleware/endpoints, configuração, recursos, packages e testes. Compila após cada remoção relevante.
 7. Mantém integrações opcionais inativas enquanto não houver configuração real. Usa placeholders, User Secrets, variáveis de ambiente ou cofre de segredos; nunca copies credenciais para `appsettings*.json`.
 8. Copia `EXECUTION_CONTRACT.md`, `PRODUCT_EXCELLENCE.md`, `REQUIREMENTS_ENGINEERING_CONTRACT.md`, `VISUAL_SLICE_CONTRACT.md`, `TEST_STRATEGY_CONTRACT.md`, `HELP_AND_ACADEMY.md`, `PRODUCT_DEFINITION.md`, `PRODUCT_QUALITY_BASELINE.md`, `CHANGE_CONTROL.md`, `CLAUDE.md`, `PILOT_APPROVAL.md`, `LIFECYCLE_GATE_EVIDENCE.json`, `QUALITY_GATES.md`, `PROCESS_MANIFEST.json` e `PROMPT_EVALUATION.md` para a raiz do destino, bem como `DISCOVERY_RESEARCH.md` quando existir e `software-lifecycle.ps1`, `scripts/Test-ProductDefinitionGate.ps1`, `scripts/Test-ImplementationReadinessGate.ps1`, `scripts/Test-ProductQualityGate.ps1`, `scripts/Test-LifecycleGateEvidence.ps1`, `scripts/Test-PromptReferences.ps1` e a skill `.agents/skills/advance-app-continue`. Cria ou atualiza o `AGENTS.md` para exigir as leituras aplicáveis. Mantém no `AGENTS.md` apenas regras duradouras, comandos comprovados e links para documentação detalhada; não dupliques ali os protocolos integrais.
@@ -185,10 +277,26 @@ dotnet test --project src/Tests/<Projeto>.Tests.csproj --no-build --no-restore -
 
 ## Entrega
 
-Apresenta o mapa de transformação, plataformas/módulos mantidos e removidos, ficheiros principais alterados, ocorrências intencionais do nome antigo, estado Git, commit-base, URL/visibilidade/branch do GitHub quando criado, comparação dos SHAs local/remoto, comandos e resultados, smoke tests, validação de `AGENTS.md` e dos protocolos, valores de configuração ainda necessários e bloqueios. Não declares o projeto concluído apenas porque os ficheiros foram copiados ou o push terminou sem verificação.
+Começa por um resumo curto: `Resultado: completed|partial|blocked`, se a base
+local está `atual|desatualizada|divergente|não verificável`, se a aplicação está
+`conforme|parcialmente conforme|divergência intencional|não conforme|não
+verificável` quando aplicável, novidades adotadas e trabalho em falta. Depois
+apresenta os links para as duas matrizes, mapa de transformação,
+plataformas/módulos mantidos e removidos, ficheiros principais alterados,
+ocorrências intencionais do nome antigo, estado Git, commit-base,
+URL/visibilidade/branch do GitHub quando criado, comparação dos SHAs
+local/remoto, comandos e resultados, smoke tests, validação de `AGENTS.md` e dos
+protocolos, valores de configuração ainda necessários e bloqueios. Não declares
+o projeto concluído apenas porque os ficheiros foram copiados ou o push terminou
+sem verificação.
 
 ## Referências oficiais
 
+- https://bitplatform.dev/templates
+- https://bitplatform.dev/templates/create-project
+- https://bitplatform.dev/templates/project-structure
+- https://bitplatform.dev/templates/wiki
+- https://github.com/bitfoundation/bitplatform
 - https://learn.microsoft.com/dotnet/core/tools/dotnet-sln
 - https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-10.0
 - https://learn.microsoft.com/dotnet/core/tools/dotnet-restore

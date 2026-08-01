@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-01.7 |
+| Catalog version | 2026-08-01.12 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -290,3 +290,43 @@ as identidades executáveis são atualizadas; uma instância anterior deve recus
 o upgrade quando o mesmo ID representar outro prompt. EVAL-05, EVAL-11,
 EVAL-12 e depois os 15 casos devem ser repetidos na mesma versão, com avaliação
 humana e revisão separada. O estado permanece `pending` e o canal `candidate`.
+A versão 2026-08-01.8 torna obrigatória a atualização da tool Advance depois de
+qualquer `commit e sync` autorizado neste catálogo. O cachebuster entra no
+mesmo commit; o push é seguido pela reinstalação via `promptsadvance` e pela
+confirmação da versão `installed, enabled`, sem force push nem commit vazio
+adicional. EVAL-02-SYNC, EVAL-03, EVAL-04, EVAL-12 e a suite completa devem ser
+repetidos. O piloto permanece `pending` e o canal `candidate`.
+
+A versão 2026-08-01.9 torna o prompt 13 um reset visual real. Antes de propor o
+novo layout, elimina layouts, CSS/SCSS, temas, tokens, componentes próprios e
+componentes UI do BitPlatform, mantendo negócio, contratos, rotas, permissões e
+infraestrutura não visual. O novo `INITIAL_LAYOUT_RESET.md` e pesquisas
+reproduzíveis demonstram que a proposta foi criada do zero sem reutilização
+residual. EVAL-05, EVAL-07, EVAL-12 e a suite completa devem ser repetidos. O
+piloto permanece `pending` e o canal `candidate`.
+
+A versão 2026-08-01.10 torna obrigatório o levantamento exaustivo para todas as
+aplicações, páginas/ecrãs, endpoints, operações e funcionalidades em âmbito. O
+formato por projeto e funcionalidade usa sempre
+`ID | Quem | Onde | Quando | O quê`; IDs são únicos e cada ramo/efeito tem linha
+atómica. Amostragem, resumos e lacunas ocultadas por
+`approved_for_refinement` deixam de ser aceites. EVAL-11, EVAL-12, EVAL-15 e a
+suite completa devem ser repetidos. O piloto permanece `pending` e o canal
+`candidate`.
+
+A versão 2026-08-01.11 exige um teste Playwright primário por `RF-P`, com ID
+rastreável e execução mobile, tablet e desktop para Web/SSR. API usa request
+context e requisitos exclusivamente MAUI usam teste UI nativo equivalente. A
+matriz `PLAYWRIGHT_REQUIREMENTS_COVERAGE.md` rejeita omissões, duplicados,
+`skip`/`fixme` e projetos em falta. EVAL-06, EVAL-07, EVAL-10, EVAL-12 e a
+suite completa devem ser repetidos. O piloto permanece `pending` e o canal
+`candidate`.
+
+A versão 2026-08-01.12 torna a atualização do boilerplate uma comparação
+oficial, rastreável e orientada a requisitos, não uma cópia cega do conteúdo
+mais recente. O prompt 07 regista proveniência e deltas, preserva a origem e,
+quando a base já existe numa aplicação, audita conformidade e personalizações.
+Uma adaptação material só começa depois de o programador escolher explicitamente
+adaptar e indicar o objetivo; manter uma divergência consciente continua a ser
+válido. EVAL-02, EVAL-03, EVAL-11, EVAL-12 e a suite completa devem ser
+repetidos. O piloto permanece `pending` e o canal `candidate`.

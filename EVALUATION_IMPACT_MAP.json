@@ -9,7 +9,7 @@
     {
       "name": "lifecycle-and-common-contract",
       "pathRegex": "^(software-lifecycle\\.ps1|PROCESS_MANIFEST\\.json|AGENTS\\.md|EXECUTION_CONTRACT\\.md|scripts/Test-PromptReferences\\.ps1|\\.agents/skills/)",
-      "cases": ["EVAL-03", "EVAL-04", "EVAL-11", "EVAL-12", "EVAL-13"]
+      "cases": ["EVAL-02", "EVAL-03", "EVAL-04", "EVAL-11", "EVAL-12", "EVAL-13"]
     },
     {
       "name": "discovery",
@@ -25,6 +25,11 @@
       "name": "requirements-and-gate-a",
       "pathRegex": "(^|/)(03-levantar-requisitos-funcionais|04-identificar-requisitos-em-falta|09-completar-requisitos-apos-fundacao-tecnica|20-completar-requisitos-apos-refinamento-visual)\\.md$|^(PRODUCT_DEFINITION\\.md|HELP_AND_ACADEMY\\.md|REQUIREMENTS_ENGINEERING_CONTRACT\\.md)$",
       "cases": ["EVAL-11", "EVAL-15"]
+    },
+    {
+      "name": "foundation-and-boilerplate-adoption",
+      "pathRegex": "^prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate\\.md$",
+      "cases": ["EVAL-02", "EVAL-03", "EVAL-11", "EVAL-12"]
     },
     {
       "name": "visual-experience",

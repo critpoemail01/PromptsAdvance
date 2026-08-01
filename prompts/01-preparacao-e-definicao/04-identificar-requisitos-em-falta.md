@@ -92,8 +92,8 @@ ao prompt 04 para nova auditoria.
    Uma exceção exige risco, owner, prazo, aprovador e plano de validação.
 5. Audita a especificação:
    - todos os `Must` da release têm ID, fonte, resultado, aceitação, prioridade,
-     owner e slice; a primeira slice/alto risco estão detalhados e os restantes
-     estão explicitamente `approved_for_refinement`;
+     owner e slice; todas as funcionalidades conhecidas estão detalhadas ao
+     máximo e `approved_for_refinement` não oculta detalhe ou lacunas;
    - jornadas críticas incluem happy path, alternativas, erros, recuperação e autorização;
    - NFR materiais são mensuráveis ou originam uma decisão bloqueante;
    - regras condicionais/estados materiais têm tabelas de decisão/transição,
@@ -109,7 +109,7 @@ ao prompt 04 para nova auditoria.
      âmbito tem cobertura, sem páginas/requisitos fictícios em superfícies
      ausentes, bibliotecas, testes ou projetos de suporte;
    - `ALL_FUNCTIONALITIES.md` segue exatamente
-     `Projeto/APP -> PAGE -> FUNCIONALIDADE -> ID | Quem | Onde | Quando | O quê`;
+     `Projeto - PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL -> Projeto - unidade - FUNCIONALIDADE -> ID | Quem | Onde | Quando | O quê`;
    - existe uma tabela por funcionalidade, cada `RF-P` é único e liga a
      `FNC`, requisito canónico, `AC` e prova;
    - confirmação, validação, condição, ramo, leitura, mutação, operação
@@ -126,6 +126,9 @@ ao prompt 04 para nova auditoria.
 9. Produz uma reconciliação mecânica com contagens e listas de IDs para
    `APP`, `PAGE`, `FNC`, `RF-P`, requisitos canónicos e `AC`; amostragem não
    prova paridade.
+   Compara também o censo de rotas, páginas/ecrãs, endpoints, handlers,
+   componentes, contratos e testes com o ficheiro único; exige zero omissões
+   sem justificação e lista nominalmente cada lacuna.
 10. Atualiza em `PRODUCT_DEFINITION.md` DOR-01 a DOR-12 como `passou`, `falhou` ou `não verificável`, sempre com evidência e ação concreta.
 
 ## Regras bloqueantes
@@ -137,9 +140,10 @@ O Gate A não pode receber `GO` se ocorrer qualquer uma destas condições:
 - investigação direta do problema/solução ausente ou exceção sem aprovação,
   risco, owner, prazo e plano;
 - nome de trabalho ainda não aprovado pelo responsável de produto;
-- algum `Must` sem fonte, resultado, aceitação, owner ou slice; primeira
-  slice/alto risco incompletos; ou item posterior falsamente marcado pronto em
-  vez de `approved_for_refinement`;
+- algum `Must` sem fonte, resultado, aceitação, owner ou slice; qualquer
+  aplicação, página/ecrã, endpoint, operação, funcionalidade, ramo ou efeito
+  conhecido omitido ou resumido; ou `approved_for_refinement` usado para
+  esconder detalhe/lacunas;
 - `ALL_FUNCTIONALITIES.md` ausente, vazio ou fora do formato obrigatório;
 - qualquer `APP/PAGE/FNC/RF-P` já aprovado ausente, duplicado, órfão ou
   divergente entre fonte canónica, contratos, checklist, ficheiro único e

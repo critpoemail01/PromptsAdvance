@@ -51,6 +51,10 @@ Este passo ocorre depois dos prompts 07 e 08. Usa também a evidência dos promp
    e página, checklist do programador, `ALL_FUNCTIONALITIES.md`, catálogos e
    matrizes de cobertura, incluindo `REQUIREMENTS_QUALITY_MATRIX.md` e
    `quality/TEST_MATRIX.md` quando já existir.
+   Repete exatamente o formato obrigatório
+   `Projeto - PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL - FUNCIONALIDADE -> ID | Quem | Onde | Quando | O quê`
+   e percorre todas as superfícies e funcionalidades afetadas pelo delta, sem
+   amostragem, resumos ou IDs repetidos.
 6. Revê o delta adversarialmente: procura requisitos inventados a partir do
    código, IDs duplicados, páginas omitidas, contratos contraditórios e trabalho
    técnico apresentado como decisão de produto.
@@ -62,6 +66,8 @@ Conclui apenas quando:
 - o delta entre requisitos e fundação técnica está classificado e rastreável;
 - todas as alterações canónicas preservam IDs ou justificam novos IDs;
 - as vistas derivadas estão em paridade com a fonte detalhada;
+- o censo completo da fundação não contém página/ecrã, endpoint, operação,
+  funcionalidade, ramo ou estado afetado sem cobertura ou lacuna explícita;
 - decisões ainda materiais têm owner, evidência esperada e prompt proprietário;
 - `IMPLEMENTATION_STATUS.md` regista resultado, evidência e trabalho restante.
 

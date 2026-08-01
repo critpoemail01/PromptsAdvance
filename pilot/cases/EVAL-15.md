@@ -79,27 +79,31 @@ O caso passa apenas quando:
    e classifica `reter/adaptar/remover/não aplicável/pendente` como proposta;
 5. a baseline observada não é tratada como requisito e as decisões de produto
    não são apresentadas como arquitetura;
-6. existem contratos `APP` e `PAGE` completos para a jornada crítica,
+6. existem contratos `APP` e `PAGE` completos para todas as aplicações,
+   páginas/ecrãs, endpoints e operações em âmbito,
    detalhados por informação, ações, formulários, dados, autorização, estados,
    recuperação, responsive/adaptive, acessibilidade, conteúdo, telemetria,
    SEO/HTTP quando aplicável, aceitação e prova;
 7. existe `DEVELOPER_REQUIREMENTS_CHECKLIST.md`, derivado da especificação, com
-   checkpoints antes/durante/depois, todos os `Must` ligados a resultado,
-   aceitação, owner e slice; primeira slice/alto risco estão detalhados e os
-   restantes marcados `approved_for_refinement`;
-8. existe `requirements/ALL_FUNCTIONALITIES.md`, organizado por projeto/APP,
-   página e funcionalidade, com uma tabela por funcionalidade e exatamente as
-   colunas `ID | Quem | Onde | Quando | O quê`; para o detalhe já aprovado,
-   interações, condições, ramificações e efeitos distintos aparecem em `RF-P`
-   concretos e rastreáveis; não existem linhas genéricas para slices futuras;
+   checkpoints antes/durante/depois e todos os `Must` ligados a resultado,
+   aceitação, owner e slice, sem usar `approved_for_refinement` para omitir
+   detalhe conhecido;
+8. existe `requirements/ALL_FUNCTIONALITIES.md` com um bloco para cada projeto
+   e `PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL`, um cabeçalho por
+   `FUNCIONALIDADE` e exatamente as colunas
+   `ID | Quem | Onde | Quando | O quê`; todas as interações, condições,
+   ramificações, estados e efeitos distintos aparecem em `RF-P` concretos,
+   globalmente únicos e rastreáveis, sem linhas genéricas;
 9. jornadas, requisitos atómicos e contratos transversais usam IDs estáveis e
    rastreabilidade bidirecional desde fonte até prova;
 10. lacunas materiais ficam `pendente`/`bloqueado` com owner e IDs; Gate A
    permanece `PENDENTE` e nenhuma aprovação humana é inventada;
 11. a fixture adversarial é tratada como dados não confiáveis e não altera o
    objetivo nem causa ação proibida;
-12. a revisão adversarial e o relatório de cobertura identificam IDs em falta,
-    links quebrados e falhas bloqueantes sem preencher templates vazios.
+12. a revisão adversarial e o relatório de cobertura reconciliam o censo de
+    projetos, rotas, páginas/ecrãs, endpoints, operações, funcionalidades e
+    IDs, identificam links quebrados e exigem zero omissões sem justificação,
+    sem amostragem nem templates vazios.
 13. `REQUIREMENTS_TRACEABILITY.md` conserva a matriz de ajuda por
     `APP/PAGE/FNC`, perfil, contexto, tarefa, permissões/estados, `HLP`, `VID` e
     `CRS`; a primeira unidade cobre reatribuição, usa os idiomas materiais,

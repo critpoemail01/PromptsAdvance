@@ -6,13 +6,58 @@ objetivo é tornar requisitos funcionais e não funcionais suficientemente
 precisos para implementação, revisão e teste, sem transformar a especificação
 num desenho técnico prematuro.
 
+## Exaustividade e formato invariantes
+
+Este contrato aplica-se a qualquer levantamento, auditoria, correção ou
+reconciliação de requisitos, incluindo os prompts 03, 04, 09, 20, 27 e 29.
+O executor produz o levantamento mais completo que as fontes e o produto real
+permitem, sem amostragem, quota máxima, resumo por módulo ou adiamento por a
+lista ser extensa.
+
+- Enumera todos os projetos/superfícies ativos, páginas/ecrãs/rotas, endpoints,
+  operações não visuais e funcionalidades em âmbito antes de escrever o
+  detalhe. Código, rotas, menus, componentes, handlers, contratos, testes,
+  documentação e decisões aprovadas são fontes de descoberta, não autorização
+  automática para inventar requisitos.
+- Para cada funcionalidade, percorre integralmente atores, permissões,
+  pré-condições, trigger, happy path, confirmações, validações, leituras,
+  mutações ordenadas, condições e ramos, operações múltiplas, sucesso parcial,
+  estados, erros, recuperação, concorrência, repetição/idempotência,
+  notificações, auditoria e pós-condições aplicáveis.
+- Não usa “principais funcionalidades”, “exemplos”, “etc.”, “e semelhantes” ou
+  uma amostra representativa como substituto do inventário completo. Um item
+  desconhecido recebe ID, estado, lacuna, owner e evidência necessária; não é
+  omitido nem preenchido por inferência.
+- A exaustividade é demonstrada por um censo reconciliado
+  `projeto → página/ecrã/endpoint/operação → funcionalidade → RF-P → requisito
+  canónico → AC → prova`, com contagens, IDs e zero omissões sem justificação.
+- Cada `RF-P` é globalmente único e estável. Os IDs repetidos do exemplo de
+  formato são ilustrativos e nunca podem ser copiados para funcionalidades
+  diferentes.
+
+Em `requirements/ALL_FUNCTIONALITIES.md`, repete exatamente esta estrutura,
+usando o nome técnico real do projeto e `PÁGINA`, `ECRÃ`, `ENDPOINT` ou
+`OPERAÇÃO-NÃO-VISUAL` conforme a superfície:
+
+```text
+# <Projeto real> - <PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL> <ID/nome>
+## <Projeto real> - <PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL> <ID/nome> - FUNCIONALIDADE NN (<FNC-ID>) - <nome>
+| ID | Quem | Onde | Quando | O quê |
+|---|---|---|---|---|
+| RF-P... | <ator ou sistema concreto> | <local/fronteira concreta> | <trigger, condição ou momento exato> | <obrigação atómica e efeito observável> |
+```
+
+Não acrescenta colunas, não funde funcionalidades na mesma tabela e não cria
+uma `PÁGINA` fictícia para a API. Em `Server.Api`, cada unidade usa `ENDPOINT`
+com verbo/rota ou `OPERAÇÃO-NÃO-VISUAL` quando não existe endpoint.
+
 ## Saída obrigatória
 
 Mantém `requirements/REQUIREMENTS_QUALITY_MATRIX.md` em paridade com
 `REQUIREMENTS_SPECIFICATION.md`, os contratos `APP/PAGE`, a checklist do
 programador e `ALL_FUNCTIONALITIES.md`.
 
-Cada requisito selecionado para uma slice tem uma linha com:
+Cada requisito em âmbito tem uma linha com:
 
 | Campo | Regra |
 |---|---|
@@ -24,7 +69,7 @@ Cada requisito selecionado para uma slice tem uma linha com:
 | Obrigação atómica | Uma única regra em voz ativa; sem “e/ou”, “etc.” ou adjetivos vagos |
 | Resultado e efeitos | UI, contrato, dados, integrações, auditoria e notificações afetadas |
 | Estados e recuperação | Sucesso, vazio, erro, repetição, concorrência, cancelamento e retoma aplicáveis |
-| Aceitação e oráculo | Como distinguir inequivocamente passou/falhou |
+| Aceitação e oráculo | Como distinguir inequivocamente passou/falhou; `RF-P` liga ao teste Playwright primário e aos projetos mobile/tablet/desktop aplicáveis |
 | Risco e nível de teste | Risco coberto e prova unitária, componente, integração, contrato ou browser |
 | Prioridade e slice | `Must/Should/Could`, slice candidata e estado de refinamento |
 
@@ -93,10 +138,16 @@ Uma slice só fica `ready` quando:
 - dados, permissões, integrações, erros e recuperação estão definidos;
 - NFR materiais têm cenário mensurável ou bloqueio explícito;
 - cada aceitação tem um oráculo e um nível mínimo de teste;
+- cada `RF-P` tem identificador previsto do teste Playwright primário e
+  aplicabilidade mobile/tablet/desktop; MAUI nativo identifica também o teste
+  UI nativo equivalente;
 - as vistas derivadas estão em paridade mecânica com a fonte canónica;
 - não existem `TBD/TBR`, conflitos ou hipóteses que mudem o comportamento da slice.
 
 O prompt 03 cria a baseline; os prompts 09 e 20 reconciliam deltas; os prompts
 27 e 29 executam este gate novamente antes de editar código. Uma reconciliação
-preserva IDs e histórico e nunca promove observação técnica ou visual a
-requisito aprovado sem change control.
+preserva IDs, formato, exaustividade e histórico e nunca promove observação
+técnica ou visual a requisito aprovado sem change control. O estado
+`approved_for_refinement` não autoriza omitir detalhe já descoberto nem marcar
+o levantamento como completo; uma lacuna material continua `pending` ou
+`blocked` com owner e prova necessária.

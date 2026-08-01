@@ -2,10 +2,13 @@
 
 ## Objetivo
 
-Transforma a definição dos prompts 01 e 02 numa especificação versionada. Define
-todos os `Must` da release por resultado/aceitação/slice e detalha integralmente
-a primeira slice e contratos transversais de alto risco por jornada, aplicação,
-página/ecrã e funcionalidade. Deriva vistas do detalhe já aprovado.
+Transforma a definição dos prompts 01 e 02 numa especificação versionada.
+Levanta com o máximo detalhe possível toda a aplicação em âmbito: todos os
+projetos/superfícies ativos, páginas/ecrãs, endpoints, operações não visuais,
+funcionalidades e requisitos observáveis. Define todos os `Must` da release por
+resultado/aceitação/slice e detalha integralmente cada funcionalidade conhecida,
+não apenas a primeira slice ou os contratos de alto risco. Deriva vistas do
+detalhe já aprovado sem omitir lacunas.
 Usa fontes de produto,
 o comportamento observado no `BoilerPlateAdvance` e pesquisa online atual de
 produtos comparáveis, padrões maduros e layouts premium para descobrir lacunas e
@@ -207,22 +210,26 @@ outras páginas consumidoras. O programador marca `não iniciado`, `bloqueado`,
 aprovação de produto. Divergência entre a checklist e a fonte canónica bloqueia
 a implementação e é corrigida primeiro nos artefactos detalhados.
 
-`ALL_FUNCTIONALITIES.md` é o ficheiro único, completo e compacto para navegar
-por todas as funcionalidades. Usa o nome técnico real do projeto/superfície
-observado no inventário `BPP`, associado ao `APP` lógico, e repete exatamente:
+`ALL_FUNCTIONALITIES.md` é o ficheiro único e completo para navegar por todas
+as funcionalidades. Usa o nome técnico real do projeto/superfície observado no
+inventário `BPP`, associado ao `APP` lógico, e repete exatamente, sem um nível
+intermédio adicional nem resumos:
 
 ```text
-# <Projeto visível real> — <APP-ID> <nome lógico>
-## <Projeto visível real> — <PAGE-ID> — <nome da página>
-### <Projeto visível real> — <PAGE-ID> — FUNCIONALIDADE NN (<FNC-ID>) — <nome>
+# <Projeto real> - <PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL> <ID/nome>
+## <Projeto real> - <PÁGINA|ECRÃ|ENDPOINT|OPERAÇÃO-NÃO-VISUAL> <ID/nome> - FUNCIONALIDADE NN (<FNC-ID>) - <nome>
 | ID | Quem | Onde | Quando | O quê |
 |---|---|---|---|---|
-| RF-P... | <ator/papel> | <superfície/fronteira> | <evento/condição> | <obrigação observável atómica> |
+| RF-P... | <ator ou sistema concreto> | <local/fronteira concreta> | <trigger, condição ou momento exato> | <obrigação observável atómica e efeito observável> |
 ```
 
 Aplica estas regras sem exceção:
 
 - uma tabela por funcionalidade e apenas as cinco colunas indicadas;
+- repete o bloco para todas as aplicações reais, incluindo `*.Client.Maui`,
+  `*.Client.Ssr`, `*.Client.Web`/`*.Cliente.Web` e `*.Server.Api` quando
+  existirem; clientes usam `PÁGINA`/`ECRÃ` e a API usa `ENDPOINT` com verbo/rota
+  ou `OPERAÇÃO-NÃO-VISUAL`, nunca uma página fictícia;
 - uma linha por obrigação, interação, passo ou ramo observável; não existe
   número fixo de linhas por funcionalidade;
 - separa confirmação, validação, cada condição `se`, leitura, mutação ordenada,
@@ -235,6 +242,7 @@ Aplica estas regras sem exceção:
   ou equivalentes só são suficientes quando o contexto e o evento exatos ficam
   inequívocos na própria linha;
 - cada `RF-P` é único, estável e liga ao `FNC`, requisito canónico, `AC` e prova;
+- IDs apresentados em exemplos nunca são reutilizados entre funcionalidades;
 - uma aplicação técnica sem página usa uma secção
   `OPERAÇÃO-NÃO-VISUAL`, não uma `PAGE` fictícia;
 - projetos ausentes, bibliotecas, testes e superfícies excluídas aparecem numa
@@ -275,6 +283,10 @@ esgota primeiro as fontes e agrupa as perguntas por owner e impacto.
   `facto aprovado`, `observação`, `inferência`, `hipótese` e `desconhecido`.
 - Define cobertura esperada por objetivo, jornada, aplicação e página; não uses
   uma quota arbitrária de requisitos como medida de completude.
+- Cria primeiro um censo fechado de projetos, páginas/ecrãs, endpoints,
+  operações e funcionalidades. Continua a decomposição até cada item ter
+  cobertura ou uma lacuna explícita com owner e evidência necessária; não uses
+  amostragem nem “principais funcionalidades”.
 
 ### 2. Inventariar o BoilerPlateAdvance
 
@@ -356,6 +368,9 @@ owner e prazo.
   `RF-P`, incluindo todas as ações do utilizador, respostas do sistema, ramos e
   efeitos observáveis; não uses uma decomposição fixa ou linhas de categoria
   sem comportamento específico.
+- Repete esta decomposição para todas as funcionalidades conhecidas de todas as
+  superfícies em âmbito. Volume, duração ou prioridade futura não justificam
+  omissão, agregação ou uma linha genérica.
 - Modela variantes como estados da mesma página quando partilham objetivo,
   rota e contrato; cria páginas distintas quando mudam objetivo, navegação,
   autorização ou responsabilidade.
@@ -369,8 +384,10 @@ owner e prazo.
   com uma única obrigação observável, fonte, ator, prioridade, aprovação,
   `APP/PAGE` ou justificação não visual e dependências.
 - Aplica `REQUIREMENTS_ENGINEERING_CONTRACT.md`: usa decisões, transições, exemplos, contraexemplos e classes de equivalência nas regras materiais.
-- Para slices posteriores, conserva resultado/aceitação e marca lacunas
-  `approved_for_refinement`; primeira slice/alto risco não usam esse estado.
+- Para qualquer slice, escreve já todo o detalhe sustentado pelas fontes. O
+  estado `approved_for_refinement` não autoriza omitir detalhe conhecido nem
+  permite declarar o levantamento completo; informação material ainda
+  desconhecida fica `pending`/`blocked`, com IDs, owner e prova necessária.
 - Escreve o que o produto deve fazer, sem prescrever implementação. Substitui
   “rápido”, “seguro”, “intuitivo”, “robusto”, “escalável” ou “em tempo real”
   por condição, medida, unidade, limiar e método de verificação; quando a meta
@@ -411,9 +428,11 @@ owner e prazo.
 ## Critério de conclusão e entrega
 
 Usa `concluído` apenas quando todos os `Must` têm fonte, resultado, aceitação,
-owner e slice; primeira slice/alto risco estão completos; itens posteriores
-estão explicitamente `approved_for_refinement`; e as vistas do detalhe aprovado
-têm paridade com a fonte canónica sem falhas bloqueantes.
+owner e slice; todas as aplicações, páginas/ecrãs, endpoints, operações e
+funcionalidades em âmbito foram enumeradas e decompostas ao máximo detalhe
+sustentado pelas fontes; todas as lacunas estão explicitamente identificadas;
+e as vistas têm paridade com a fonte canónica sem falhas bloqueantes ou omissões
+injustificadas.
 Usa `parcial` para trabalho útil com lacunas não bloqueantes e `bloqueado` quando uma decisão/fonte material impede aprovar um `Must`.
 
 Começa a resposta pela conclusão. Indica versões e caminhos dos artefactos

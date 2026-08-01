@@ -304,11 +304,11 @@ foreach ($pageId in $catalogPageIds) {
     }
 }
 
-Require-Pattern -Content $allFunctionalities -Pattern '(?im)^#\s+[^\r\n|]+Client\.(?:Ssr|Web|Maui)[^\r\n]*APP-\d{3}' `
-    -Message 'The single functionality file does not group requirements by a real visible project and logical APP.'
-Require-Pattern -Content $allFunctionalities -Pattern '(?im)^##\s+[^\r\n]+PAGE-\d{3}\s+—\s+[^\r\n]+' `
-    -Message 'The single functionality file does not group requirements by PAGE.'
-Require-Pattern -Content $allFunctionalities -Pattern '(?im)^###\s+[^\r\n]+PAGE-\d{3}\s+—\s+FUNCIONALIDADE\s+\d{2}\s+\(FNC-[^)]+\)' `
+Require-Pattern -Content $allFunctionalities -Pattern '(?im)^#\s+[^\r\n|]+Client\.(?:Ssr|Web|Maui)\s+-\s+(?:P.GINA|ECR.)[^\r\n]*PAGE-\d{3}' `
+    -Message 'The single functionality file does not group client requirements by real project and PAGE/ECRA.'
+Require-Pattern -Content $allFunctionalities -Pattern '(?im)^#\s+[^\r\n|]+Server\.Api\s+-\s+(?:ENDPOINT|OPERA..O-N.O-VISUAL)[^\r\n]+' `
+    -Message 'The single functionality file does not group API requirements by ENDPOINT or non-visual operation.'
+Require-Pattern -Content $allFunctionalities -Pattern '(?im)^##\s+[^\r\n]+\s+-\s+FUNCIONALIDADE\s+\d{2}\s+\(FNC-[^)]+\)' `
     -Message 'The single functionality file lacks named, numbered functionality sections.'
 Require-Pattern -Content $allFunctionalities -Pattern '(?im)^\|\s*ID\s*\|\s*Quem\s*\|\s*Onde\s*\|\s*Quando\s*\|\s*O qu.\s*\|$' `
     -Message 'The single functionality file does not use the exact five-column table.'
@@ -320,7 +320,7 @@ if ($allFunctionalities -match '(?im)^\|\s*RF-P[^|\r\n]*\|(?:[^|\r\n]*\|){3}\s*(
 
 $functionalityHeadingCount = [regex]::Matches(
     $allFunctionalities,
-    '(?im)^###\s+[^\r\n]+PAGE-\d{3}\s+—\s+FUNCIONALIDADE\s+\d{2}\s+\(FNC-[^)]+\)'
+    '(?im)^##\s+[^\r\n]+\s+-\s+FUNCIONALIDADE\s+\d{2}\s+\(FNC-[^)]+\)'
 ).Count
 $functionalityTableCount = [regex]::Matches(
     $allFunctionalities,
