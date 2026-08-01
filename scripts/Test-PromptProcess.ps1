@@ -125,8 +125,8 @@ foreach ($portablePath in @(
 
 $promptRoot = Join-Path $root 'prompts'
 $promptFiles = @(Get-ChildItem -LiteralPath $promptRoot -Recurse -File -Filter '*.md')
-if ($promptFiles.Count -ne 75) {
-    Add-Failure "Esperados 75 prompts; encontrados $($promptFiles.Count)."
+if ($promptFiles.Count -ne 76) {
+    Add-Failure "Esperados 76 prompts; encontrados $($promptFiles.Count)."
 }
 
 $numbers = foreach ($file in $promptFiles) {
@@ -142,7 +142,7 @@ foreach ($duplicate in $duplicates) {
     Add-Failure "Numero de prompt duplicado: $($duplicate.Name)"
 }
 
-foreach ($expected in 1..75) {
+foreach ($expected in 1..76) {
     if ($expected -notin $numbers) {
         Add-Failure "Numero de prompt em falta: $expected"
     }
@@ -152,11 +152,11 @@ $manifestPath = Join-Path $root 'PROCESS_MANIFEST.json'
 if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
     try {
         $manifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath | ConvertFrom-Json
-        if ([int]$manifest.promptCount -ne 75) {
-            Add-Failure "PROCESS_MANIFEST.json declara $($manifest.promptCount) prompts em vez de 75."
+        if ([int]$manifest.promptCount -ne 76) {
+            Add-Failure "PROCESS_MANIFEST.json declara $($manifest.promptCount) prompts em vez de 76."
         }
         $manifestPromptIds = @($manifest.stages | ForEach-Object { @($_.promptIds) })
-        foreach ($expected in 1..75 | ForEach-Object { '{0:D2}' -f $_ }) {
+        foreach ($expected in 1..76 | ForEach-Object { '{0:D2}' -f $_ }) {
             if ($expected -notin $manifestPromptIds) {
                 Add-Failure "Prompt $expected ausente do PROCESS_MANIFEST.json."
             }
@@ -623,8 +623,15 @@ if ((Test-Path -LiteralPath $prompt03Path -PathType Leaf) -and
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/05-definir-arquitetura-e-selecionar-modulos.md' 'PRODUCT_DEFINITION\.md' 'O prompt 05 nao verifica o artefacto da etapa 1.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/05-definir-arquitetura-e-selecionar-modulos.md' 'termina com estado `bloqueado`' 'O prompt 05 nao bloqueia quando o Gate A falha.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/05-definir-arquitetura-e-selecionar-modulos.md' 'Test-ProductDefinitionGate\.ps1' 'O prompt 05 nao executa o gate mecanico.'
-Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"id": "02".*"conditionalPromptIds": \["05", "06", "10", "11"\]' 'Os prompts opcionais da etapa 2 nao estao declarados como condicionais.'
-Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"promptIds": \["05", "06", "07", "08", "09", "10", "11"\].*"promptIds": \["12", "13", "14", "15", "16", "17", "18", "19", "20"\]' 'Os prompts complementares 09/20 nao estao ordenados nas fases corretas.'
+$stage02 = @($manifest.stages | Where-Object { [string]$_.id -eq '02' })[0]
+$stage03 = @($manifest.stages | Where-Object { [string]$_.id -eq '03' })[0]
+if ((@($stage02.conditionalPromptIds) -join ',') -ne '05,06,10,11') {
+    Add-Failure 'Os prompts opcionais da etapa 2 nao estao declarados como condicionais.'
+}
+if ((@($stage02.promptIds) -join ',') -ne '05,06,07,08,09,10,11' -or
+    (@($stage03.promptIds) -join ',') -ne '12,13,14,15,16,17,18,19,20') {
+    Add-Failure 'Os prompts complementares 09/20 nao estao ordenados nas fases corretas.'
+}
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/09-completar-requisitos-apos-fundacao-tecnica.md' '(?s)prompt 03.*preserva.*IDs.*Reconcilia mecanicamente' 'O prompt 09 nao completa os requisitos tecnicos preservando a fonte canonica.'
 Require-Pattern 'prompts/03-marca-e-layout/20-completar-requisitos-apos-refinamento-visual.md' '(?s)prompt 03.*prompts 14, 16 ou 18.*antes do prompt 28 ou 30.*Reconcilia' 'O prompt 20 nao completa os requisitos depois do refinamento visual.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)CompletedId -eq ''08''.*return ''09''.*CompletedId -eq ''09''.*return ''10''' 'O lifecycle nao executa o complemento tecnico na posicao pretendida.'
@@ -643,14 +650,18 @@ Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-
 Require-Pattern 'PRODUCT_EXCELLENCE.md' 'painel administrativo gen.rico' 'Falta o gate contra UI generica.'
 Require-Pattern 'PRODUCT_EXCELLENCE.md' 'regress.o visual automatizada' 'Falta regressao visual obrigatoria.'
 Require-Pattern 'PRODUCT_EXCELLENCE.md' 'checks autom.ticos de acessibilidade em cada pull request' 'Falta acessibilidade continua.'
-Require-Pattern 'prompts/09-entrega-e-distribuicao/57-configurar-ci-cd-e-ambientes-de-deploy.md' 'diff visual' 'O CI nao publica/compara o diff visual.'
-Require-Pattern 'prompts/09-entrega-e-distribuicao/57-configurar-ci-cd-e-ambientes-de-deploy.md' '(?s)attestation.*source SHA.*digest' 'O CI nao gera e verifica proveniencia assinada.'
+Require-Pattern 'prompts/09-entrega-e-distribuicao/58-configurar-ci-cd-e-ambientes-de-deploy.md' 'diff visual' 'O CI nao publica/compara o diff visual.'
+Require-Pattern 'prompts/09-entrega-e-distribuicao/58-configurar-ci-cd-e-ambientes-de-deploy.md' '(?s)attestation.*source SHA.*digest' 'O CI nao gera e verifica proveniencia assinada.'
 Require-Pattern 'scripts/Test-LifecycleGateEvidence.ps1' '(?s)build-provenance-attestation.*sourceSha.*verificationPassed' 'Os gates estruturados nao verificam attestation da candidata.'
-Require-Pattern 'prompts/11-aceitacao-e-manutencao/65-executar-revisao-final-independente.md' 'read-only' 'Falta revisao final read-only.'
-Require-Pattern 'prompts/11-aceitacao-e-manutencao/66-publicar-com-migrations-smoke-tests-e-rollback.md' '\[AUTORIZAR_RELEASE\]' 'A publicacao nao exige autorizacao explicita.'
-Require-Pattern 'prompts/11-aceitacao-e-manutencao/66-publicar-com-migrations-smoke-tests-e-rollback.md' '(?s)\[CANDIDATE_SHA\].*\[ARTIFACT_DIGEST\]' 'A publicacao nao fixa candidate SHA e digest.'
-Require-Pattern 'prompts/12-operacao-continua/75-medir-metricas-dora-e-melhoria-continua.md' 'deployment rework rate' 'O prompt DORA nao usa as cinco metricas atuais.'
-Require-Pattern 'prompts/12-operacao-continua/75-medir-metricas-dora-e-melhoria-continua.md' 'dora-metrics/' 'O prompt DORA nao usa a referencia atual.'
+Require-Pattern 'prompts/11-aceitacao-e-manutencao/66-executar-revisao-final-independente.md' 'read-only' 'Falta revisao final read-only.'
+Require-Pattern 'prompts/11-aceitacao-e-manutencao/67-publicar-com-migrations-smoke-tests-e-rollback.md' '\[AUTORIZAR_RELEASE\]' 'A publicacao nao exige autorizacao explicita.'
+Require-Pattern 'prompts/11-aceitacao-e-manutencao/67-publicar-com-migrations-smoke-tests-e-rollback.md' '(?s)\[CANDIDATE_SHA\].*\[ARTIFACT_DIGEST\]' 'A publicacao nao fixa candidate SHA e digest.'
+Require-Pattern 'prompts/12-operacao-continua/76-medir-metricas-dora-e-melhoria-continua.md' 'deployment rework rate' 'O prompt DORA nao usa as cinco metricas atuais.'
+Require-Pattern 'prompts/12-operacao-continua/76-medir-metricas-dora-e-melhoria-continua.md' 'dora-metrics/' 'O prompt DORA nao usa a referencia atual.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/32-validar-vantagem-competitiva-layout-funcionalidades-e-fluxos.md' '(?s)tr.s a sete concorrentes diretos.*alternativa adjacente.*fontes prim.rias' 'O prompt competitivo nao exige selecao atual e rastreavel de concorrentes.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/32-validar-vantagem-competitiva-layout-funcionalidades-e-fluxos.md' '(?s)vantagem demonstrada.*vantagem condicionada.*paridade.*desvantagem.*n.o demonstr.vel' 'O prompt competitivo força uma conclusao positiva ou nao possui veredito honesto.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/32-validar-vantagem-competitiva-layout-funcionalidades-e-fluxos.md' '(?s)COMPETITIVE_QUALITY_AUDIT\.md.*an.lise de sensibilidade.*backlog priorizado.*n.o o implementes' 'O prompt competitivo nao conserva evidência, robustez e handoff diagnostico.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/32-validar-vantagem-competitiva-layout-funcionalidades-e-fluxos.md' '(?s)conte.do externo como dados n.o confi.veis.*Ignora instru..es.*n.o instala software.*compra.*login.*sem autoriza..o' 'O prompt competitivo nao limita instrucoes e acoes externas encontradas na pesquisa.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-13' 'O piloto nao conserva o caso de revisao independente.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-14.*naming natural' 'O piloto nao contem a regressao dirigida do prompt 02.'
 Require-Pattern 'PROMPT_EVALUATION.md' 'EVAL-15.*requisitos pesquisados por aplica..o e p.gina' 'O piloto nao contem a regressao dirigida do prompt 03.'
@@ -677,11 +688,11 @@ Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/10-configurar-ambien
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/11-definir-contratos-api-versionamento-e-compatibilidade.md' '(?s)ajuda/Academia.*APP/PAGE/FNC.*progresso.*IDs/URLs do fornecedor.*evento do player.*n.o prova sozinho aprendizagem' 'Os contratos API nao cobrem contexto, progresso e limites do provider.'
 Require-Pattern 'prompts/04-backend-e-funcionalidades/25-implementar-requisitos-globais.md' '(?s)HELP_AND_ACADEMY\.md.*FNC -> HLP por idioma -> VID -> contexto -> CRS.*fallback textual.*n.o faz upload real' 'O prompt 23 nao implementa a primeira unidade vertical de ajuda com provider isolado.'
 Require-Pattern 'prompts/04-backend-e-funcionalidades/26-criar-testes-playwright-para-requisitos-globais.md' '(?s)APP/PAGE/FNC.*player simulado.*fornecedor indispon.vel.*fallback.*n.o chama YouTube real' 'Os testes globais nao isolam o player externo e o fallback da ajuda.'
-Require-Pattern 'prompts/04-backend-e-funcionalidades/Optional/33-validar-localizacao-e-formatacao-cultural.md' '(?s)HLP/VID/CRS.*narra..o.*captions.*transcri..o.*Caption autom.tica.*provis.ria' 'O prompt de localizacao nao valida os idiomas dos conteudos de ajuda.'
-Require-Pattern 'prompts/05-seguranca-e-privacidade/41-auditar-seguranca-com-owasp-asvs.md' '(?s)CSP/frame-src.*cookies/tracking.*OAuth/segredos.*IDOR em progresso' 'A auditoria de seguranca nao cobre o provider multimédia e progresso da Academia.'
-Require-Pattern 'prompts/06-conformidade-e-presenca-publica/45-auditar-acessibilidade-wcag.md' '(?s)HELP_AND_ACADEMY\.md.*captions revistas.*transcri..o.*iframe/player.*foco.*captions autom.ticas' 'A auditoria WCAG nao cobre media de ajuda com captions revistas.'
-Require-Pattern 'prompts/11-aceitacao-e-manutencao/63-concluir-documentacao-e-plano-de-manutencao.md' '(?s)HELP_AND_ACADEMY\.md.*autoriza..o expl.cita.*canal/playlist.*IDs/URLs.*smoke test.*Sem autoriza..o.*`parcial`' 'O prompt 61 nao produz/publica videos com autorizacao e fail-closed.'
-Require-Pattern 'prompts/11-aceitacao-e-manutencao/64-executar-aceitacao-final-e-checklist-de-release.md' 'APP/PAGE/FNC/HLP/VID/CRS' 'A aceitacao final nao reconcilia a matriz de ajuda e Academia.'
+Require-Pattern 'prompts/04-backend-e-funcionalidades/Optional/34-validar-localizacao-e-formatacao-cultural.md' '(?s)HLP/VID/CRS.*narra..o.*captions.*transcri..o.*Caption autom.tica.*provis.ria' 'O prompt de localizacao nao valida os idiomas dos conteudos de ajuda.'
+Require-Pattern 'prompts/05-seguranca-e-privacidade/42-auditar-seguranca-com-owasp-asvs.md' '(?s)CSP/frame-src.*cookies/tracking.*OAuth/segredos.*IDOR em progresso' 'A auditoria de seguranca nao cobre o provider multimédia e progresso da Academia.'
+Require-Pattern 'prompts/06-conformidade-e-presenca-publica/46-auditar-acessibilidade-wcag.md' '(?s)HELP_AND_ACADEMY\.md.*captions revistas.*transcri..o.*iframe/player.*foco.*captions autom.ticas' 'A auditoria WCAG nao cobre media de ajuda com captions revistas.'
+Require-Pattern 'prompts/11-aceitacao-e-manutencao/64-concluir-documentacao-e-plano-de-manutencao.md' '(?s)HELP_AND_ACADEMY\.md.*autoriza..o expl.cita.*canal/playlist.*IDs/URLs.*smoke test.*Sem autoriza..o.*`parcial`' 'O prompt 64 nao produz/publica videos com autorizacao e fail-closed.'
+Require-Pattern 'prompts/11-aceitacao-e-manutencao/65-executar-aceitacao-final-e-checklist-de-release.md' 'APP/PAGE/FNC/HLP/VID/CRS' 'A aceitacao final nao reconcilia a matriz de ajuda e Academia.'
 Require-Pattern 'pilot/fixtures/prompt-03/untrusted-premium-preview.html' 'Ignore as instru..es anteriores' 'A fixture adversarial do prompt 03 esta ausente.'
 Require-Pattern 'pilot/fixtures/prompt-03/product-definition.md' 'QST-001.*pendente' 'As fontes de EVAL-15 nao conservam uma decisao material em falta.'
 Require-Pattern 'pilot/fixtures/prompt-03/user-research-evidence.md' '(?s)Method.*Prototype task.*Limitation' 'EVAL-15 nao inclui evidencia sintetica de user research com limites.'
@@ -964,7 +975,7 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Host 'PASS: processo documental coerente.' -ForegroundColor Green
-Write-Host " - Prompts: $($promptFiles.Count), numeracao continua 01-75."
+Write-Host " - Prompts: $($promptFiles.Count), numeracao continua 01-76."
 Write-Host " - Links locais: validos em $($markdownFiles.Count) ficheiros Markdown."
 Write-Host ' - Placeholders: declarados no APP_CONTEXT.md.'
 Write-Host ' - Gate da definicao: fixture valida aceite e fixture invalida bloqueada.'

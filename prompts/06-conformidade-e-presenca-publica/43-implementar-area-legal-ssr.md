@@ -9,7 +9,7 @@ Implementa em `Client.Ssr` as páginas legais públicas e os controlos de consen
 - Conteúdo legal factual revisto, ainda que marcado como rascunho: entidade, contactos, finalidades, bases propostas, fornecedores, transferências e retenção.
 - Inventário técnico de cookies/storage, analytics, ads, push, email, pagamentos e integrações ativas.
 - Decisões de consentimento por finalidade e mercados.
-- Para acesso, exportação, retificação, eliminação ou restrição de dados, usa primeiro o prompt 40 e fornece aqui apenas as rotas/explicações aprovadas.
+- Para acesso, exportação, retificação, eliminação ou restrição de dados, usa primeiro o prompt 41 e fornece aqui apenas as rotas/explicações aprovadas.
 
 Se faltar informação factual material ou `[RESPONSAVEL_REVISAO_JURIDICA]`, cria apenas estrutura não indexável com o texto visível `REVISÃO JURÍDICA PENDENTE`; não publiques, não inventes texto e não simules fluxos de direitos. Este marcador não é um novo placeholder e deve desaparecer apenas após aprovação registada do responsável.
 
@@ -19,7 +19,7 @@ Se faltar informação factual material ou `[RESPONSAVEL_REVISAO_JURIDICA]`, cri
 - Scripts/cookies não essenciais respeitam a decisão antes de carregar.
 - Aceitar, rejeitar, personalizar e retirar são equivalentes em clareza e esforço.
 - Páginas e controlos são static SSR, acessíveis, localizáveis e testados sem JavaScript essencial.
-- Placeholders, lacunas jurídicas e dependências do prompt 40 permanecem visíveis.
+- Placeholders, lacunas jurídicas e dependências do prompt 41 permanecem visíveis.
 
 ## Descoberta obrigatória
 
@@ -35,7 +35,7 @@ Se faltar informação factual material ou `[RESPONSAVEL_REVISAO_JURIDICA]`, cri
 - Avisos just-in-time nos formulários e preferências acessíveis.
 - Consentimento separado por finalidade quando essa for a base; recusar deve ser tão simples como aceitar e retirar tão simples como dar.
 - Bloqueia scripts/cookies não essenciais antes da escolha. Regista versão, finalidade, escolha e timestamp sem recolher mais dados do que o necessário.
-- Apresenta links e explicações aprovadas para pedidos de direitos; a implementação autenticada pertence ao prompt 40.
+- Apresenta links e explicações aprovadas para pedidos de direitos; a implementação autenticada pertence ao prompt 41.
 - Mostra a lista aprovada de processadores/transferências e prazos sem a transformar numa decisão técnica nova.
 
 ## Limites
@@ -48,7 +48,7 @@ Testa HTML bruto, primeira visita, aceitar/rejeitar/personalizar/retirar, ausên
 
 ## Entrega
 
-Apresenta artefactos de entrada, páginas/controlos, placeholders, testes, divergências encontradas, dependências do prompt 40 e questões para revisão jurídica.
+Apresenta artefactos de entrada, páginas/controlos, placeholders, testes, divergências encontradas, dependências do prompt 41 e questões para revisão jurídica.
 
 ## Referências oficiais
 

@@ -28,7 +28,7 @@
     },
     {
       "name": "visual-experience",
-      "pathRegex": "^(PRODUCT_EXCELLENCE\\.md|PRODUCT_QUALITY_BASELINE\\.md|VISUAL_SLICE_CONTRACT\\.md)$|^prompts/03-marca-e-layout/",
+      "pathRegex": "^(PRODUCT_EXCELLENCE\\.md|PRODUCT_QUALITY_BASELINE\\.md|VISUAL_SLICE_CONTRACT\\.md)$|^prompts/03-marca-e-layout/|^prompts/04-backend-e-funcionalidades/32-validar-vantagem-competitiva-",
       "cases": ["EVAL-05", "EVAL-07"]
     },
     {
@@ -38,7 +38,7 @@
     },
     {
       "name": "test-strategy-and-robustness",
-      "pathRegex": "^TEST_STRATEGY_CONTRACT\\.md$|^prompts/(08-qualidade-e-hardening/(51|53|54)-|09-entrega-e-distribuicao/57-)",
+      "pathRegex": "^TEST_STRATEGY_CONTRACT\\.md$|^prompts/(08-qualidade-e-hardening/(52|54|55)-|09-entrega-e-distribuicao/58-)",
       "cases": ["EVAL-06", "EVAL-09", "EVAL-10", "EVAL-12"]
     },
     {

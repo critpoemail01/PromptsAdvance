@@ -29,7 +29,7 @@ executável, decide `NO-GO`.
 
 ## Critérios de sucesso
 
-- A candidata e o artefacto são imutáveis e correspondem à aceitação do prompt 64.
+- A candidata e o artefacto são imutáveis e correspondem à aceitação do prompt 65.
 - O diff integral e os gates bloqueantes são revistos com evidência atual.
 - Findings incluem severidade, localização, reprodução, impacto e critério violado.
 - Falhas críticas/altas ou evidência material ausente produzem `NO-GO`.

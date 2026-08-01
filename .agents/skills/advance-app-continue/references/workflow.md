@@ -41,11 +41,11 @@ not enough.
 | Product definition | 01–04 | G01 product clarity and requirements |
 | Architecture/foundation | 05–11, including reconciliation at 09 | G02 architecture and repository foundation |
 | Design/surfaces | 12–20, including repeatable reconciliation at 20 | G03/G04 implementation and experience quality |
-| Backend/functions | 21–39 | G05 complete user journeys |
-| Security/public/hardening | 40–56 | G06 security and quality |
-| Delivery/operations | 57–62 | G07 operational readiness |
-| Acceptance/release | 63–66 | G08/G09 candidate, review, and authorization |
-| Continuous operations | 67–75 | G10 measured operation and improvement |
+| Backend/functions | 21–40 | G05 complete user journeys |
+| Security/public/hardening | 41–57 | G06 security and quality |
+| Delivery/operations | 58–63 | G07 operational readiness |
+| Acceptance/release | 64–67 | G08/G09 candidate, review, and authorization |
+| Continuous operations | 68–76 | G10 measured operation and improvement |
 
 During normal local development, G01–G08 and G10 are advisory: report missing
 evidence and let the programmer decide whether to correct, repeat, or advance.

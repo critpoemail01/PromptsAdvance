@@ -197,7 +197,7 @@ Critérios:
 Regista estes campos em `LIFECYCLE_GATE_EVIDENCE.json` com identidades e
 artefactos locais acompanhados por SHA-256. Executa
 `scripts/Test-LifecycleGateEvidence.ps1`. G09 autoriza a release antes do
-prompt 66; no fim desse prompt, o mesmo validador compara deploy, ambiente,
+prompt 67; no fim desse prompt, o mesmo validador compara deploy, ambiente,
 SHA e digest autorizados e exige smoke tests, rollback e critérios de aborto.
 
 ## G10 — Operação e melhoria contínua

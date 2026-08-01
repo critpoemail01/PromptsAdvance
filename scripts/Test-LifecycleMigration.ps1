@@ -52,12 +52,12 @@ try {
     $legacyVersion = '2026-07-31.11'
 
     foreach ($stage in @($manifest.stages)) {
-        $stage.promptIds = @($stage.promptIds | Where-Object { $_ -notin @('74', '75') })
+        $stage.promptIds = @($stage.promptIds | Where-Object { $_ -notin @('74', '75', '76') })
         if ($stage.PSObject.Properties.Name -contains 'conditionalPromptIds') {
-            $stage.conditionalPromptIds = @($stage.conditionalPromptIds | Where-Object { $_ -notin @('74', '75') })
+            $stage.conditionalPromptIds = @($stage.conditionalPromptIds | Where-Object { $_ -notin @('74', '75', '76') })
         }
         if ($stage.PSObject.Properties.Name -contains 'repeatablePromptIds') {
-            $stage.repeatablePromptIds = @($stage.repeatablePromptIds | Where-Object { $_ -notin @('74', '75') })
+            $stage.repeatablePromptIds = @($stage.repeatablePromptIds | Where-Object { $_ -notin @('74', '75', '76') })
         }
     }
     $manifest.catalogVersion = $legacyVersion
@@ -70,6 +70,7 @@ try {
     $state.catalogVersion = $legacyVersion
     $state.prompts.PSObject.Properties.Remove('74')
     $state.prompts.PSObject.Properties.Remove('75')
+    $state.prompts.PSObject.Properties.Remove('76')
     foreach ($id in @('01', '02', '03')) {
         $state.prompts.$id.status = 'completed'
         $state.prompts.$id.evidence = "fixture://prompt-$id"
@@ -97,7 +98,7 @@ try {
     Write-Json -Path $manifestPath -Value $manifest
     Write-Json -Path $statePath -Value $state
     Write-Json -Path $gateEvidencePath -Value $gateEvidence
-    foreach ($id in @('74', '75')) {
+    foreach ($id in @('74', '75', '76')) {
         $promptFile = Get-ChildItem -LiteralPath (Join-Path $process 'prompts') -Recurse -File -Filter "$id-*.md"
         Remove-Item -LiteralPath $promptFile.FullName -Force
     }
@@ -142,13 +143,14 @@ try {
 
     $migrated = Get-Content -Raw -Encoding UTF8 -LiteralPath $statePath | ConvertFrom-Json
     $migratedManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath | ConvertFrom-Json
-    if ($migratedManifest.promptCount -ne 75 -or
+    if ($migratedManifest.promptCount -ne 76 -or
         $null -eq $migrated.prompts.PSObject.Properties['74'] -or
-        $null -eq $migrated.prompts.PSObject.Properties['75']) {
-        throw 'Controlled migration did not add prompts 74 and 75.'
+        $null -eq $migrated.prompts.PSObject.Properties['75'] -or
+        $null -eq $migrated.prompts.PSObject.Properties['76']) {
+        throw 'Controlled migration did not add prompts 74, 75 and 76.'
     }
     $migratedPromptFiles = @(Get-ChildItem -LiteralPath (Join-Path $process 'prompts') -Recurse -File -Filter '*.md')
-    if ($migratedPromptFiles.Count -ne 75 -or
+    if ($migratedPromptFiles.Count -ne 76 -or
         @($migratedPromptFiles | Where-Object {
             $_.Name -match '^(05|06|10|11)-' -and $_.Directory.Name -ne 'Optional'
         }).Count -ne 0) {

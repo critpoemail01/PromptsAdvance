@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-01.6 |
+| Catalog version | 2026-08-01.7 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -280,3 +280,13 @@ do routing. A alteração afeta definição, layout, implementação, hardening 
 EVAL-05, EVAL-06, EVAL-09, EVAL-10, EVAL-11, EVAL-12, EVAL-15 e depois os 15
 casos devem ser repetidos na mesma versão, com avaliação humana e revisão
 separada. O estado permanece `pending` e o canal `candidate`.
+
+A versão 2026-08-01.7 acrescenta o prompt 32 para validar, sem pressupor, a
+vantagem competitiva da aplicação através de pesquisa online, jornadas
+comparáveis, pontuação com confiança e análise de sensibilidade. A auditoria
+termina com um veredito honesto e um backlog para o programador, sem implementar
+melhorias nem publicar claims. Os antigos prompts 32–75 passam a 33–76 e todas
+as identidades executáveis são atualizadas; uma instância anterior deve recusar
+o upgrade quando o mesmo ID representar outro prompt. EVAL-05, EVAL-11,
+EVAL-12 e depois os 15 casos devem ser repetidos na mesma versão, com avaliação
+humana e revisão separada. O estado permanece `pending` e o canal `candidate`.

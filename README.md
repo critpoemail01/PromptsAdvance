@@ -7,7 +7,7 @@ prompt depois de `próximo`, `repetir`, `corrigir` ou `ignorar e avançar`.
 
 Iniciativas `greenfield` partem do `BoilerPlateAdvance`; iniciativas
 `brownfield` ligam um processo isolado à aplicação existente sem copiar a base
-por cima dela. Os 75 prompts ficam disponíveis como catálogo detalhado, mas não
+por cima dela. Os 76 prompts ficam disponíveis como catálogo detalhado, mas não
 formam uma cadeia automática nem obrigam a executar trabalho que não se aplica.
 
 Este catálogo é deliberadamente opinativo para Advance/.NET, Bit, Blazor,
@@ -168,17 +168,17 @@ O primeiro padrão visual só pode propagar depois de
 
 Permite 57–65 quando CI/CD, SLI/SLO, observabilidade, backup/restore, rollback,
 runbooks, documentação e owners estão comprovados. A candidata deve ter base
-SHA, candidate SHA, digest e attestation de proveniência imutáveis. O prompt 64
+SHA, candidate SHA, digest e attestation de proveniência imutáveis. O prompt 65
 executa aceitação e o 65 executa revisão separada, read-only, verificando issuer,
 builder, source SHA e subject digest.
 
 ### Gate E — operação contínua
 
-Permite o prompt 66 apenas quando os prompts 64 e 65 produziram `GO` para os mesmos identificadores e existe `[AUTORIZAR_RELEASE]`. Depois da publicação, permite 67–75 apenas sobre o ambiente exato, com acessos read-only e owners. Correções externas continuam a exigir `[AUTORIZAR_ACOES_CORRETIVAS_OPERACIONAIS]` ou outra autorização específica.
+Permite o prompt 67 apenas quando os prompts 65 e 66 produziram `GO` para os mesmos identificadores e existe `[AUTORIZAR_RELEASE]`. Depois da publicação, permite 68–76 apenas sobre o ambiente exato, com acessos read-only e owners. Correções externas continuam a exigir `[AUTORIZAR_ACOES_CORRETIVAS_OPERACIONAIS]` ou outra autorização específica.
 
 G08–G10 são validados por `scripts/Test-LifecycleGateEvidence.ps1`.
-G09 passa **antes** de selecionar o prompt 66 e fixa ambiente, SHA, digest, attestation,
-janela e identidade autorizadora. A conclusão do prompt 66 volta a validar no
+G09 passa **antes** de selecionar o prompt 67 e fixa ambiente, SHA, digest, attestation,
+janela e identidade autorizadora. A conclusão do prompt 67 volta a validar no
 mesmo ficheiro o ambiente/artefacto implantado, smoke tests, rollback e
 critérios de aborto.
 
@@ -291,7 +291,7 @@ Os prompts 25/26 tratam requisitos globais quando já existe base funcional sufi
   para contratos públicos.
 - Trata flakiness como defeito com owner/prazo; não usa retries ilimitados,
   `skip`, sleeps ou thresholds relaxados para tornar a CI verde.
-- Não declara “sem bugs”, conformidade total ou sucesso sem evidência. A revisão adversarial do próprio executor é obrigatória, mas só a tarefa/revisor separado do prompt 65 é independente.
+- Não declara “sem bugs”, conformidade total ou sucesso sem evidência. A revisão adversarial do próprio executor é obrigatória, mas só a tarefa/revisor separado do prompt 66 é independente.
 
 ## Ordem global dos prompts
 
@@ -337,68 +337,69 @@ Os prompts 25/26 tratam requisitos globais quando já existe base funcional sufi
 29. [Implementar funcionalidade específica](prompts/04-backend-e-funcionalidades/29-implementar-funcionalidades-especificas.md)
 30. [Testar a funcionalidade com Playwright](prompts/04-backend-e-funcionalidades/30-criar-testes-playwright-para-funcionalidade-especifica.md)
 31. [Criar emails transacionais](prompts/04-backend-e-funcionalidades/31-criar-emails-transacionais.md)
+32. [Validar vantagem competitiva, layout, funcionalidades e fluxos](prompts/04-backend-e-funcionalidades/32-validar-vantagem-competitiva-layout-funcionalidades-e-fluxos.md)
 
-Opcionais desta etapa: [32 faturação](prompts/04-backend-e-funcionalidades/Optional/32-implementar-faturacao.md), [33 localização](prompts/04-backend-e-funcionalidades/Optional/33-validar-localizacao-e-formatacao-cultural.md), [34 login externo](prompts/04-backend-e-funcionalidades/Optional/34-validar-login-com-fornecedores-externos.md), [35 passkeys](prompts/04-backend-e-funcionalidades/Optional/35-validar-webauthn-e-passkeys.md), [36 Hangfire](prompts/04-backend-e-funcionalidades/Optional/36-validar-jobs-hangfire.md), [37 SignalR](prompts/04-backend-e-funcionalidades/Optional/37-validar-signalr-e-tempo-real.md), [38 push/deep links](prompts/04-backend-e-funcionalidades/Optional/38-validar-push-notifications-e-deep-links.md) e [39 uploads](prompts/04-backend-e-funcionalidades/Optional/39-validar-uploads-imagens-e-armazenamento.md).
+Opcionais desta etapa: [33 faturação](prompts/04-backend-e-funcionalidades/Optional/33-implementar-faturacao.md), [34 localização](prompts/04-backend-e-funcionalidades/Optional/34-validar-localizacao-e-formatacao-cultural.md), [35 login externo](prompts/04-backend-e-funcionalidades/Optional/35-validar-login-com-fornecedores-externos.md), [36 passkeys](prompts/04-backend-e-funcionalidades/Optional/36-validar-webauthn-e-passkeys.md), [37 Hangfire](prompts/04-backend-e-funcionalidades/Optional/37-validar-jobs-hangfire.md), [38 SignalR](prompts/04-backend-e-funcionalidades/Optional/38-validar-signalr-e-tempo-real.md), [39 push/deep links](prompts/04-backend-e-funcionalidades/Optional/39-validar-push-notifications-e-deep-links.md) e [40 uploads](prompts/04-backend-e-funcionalidades/Optional/40-validar-uploads-imagens-e-armazenamento.md).
 
 ### 5 — Segurança e privacidade
 
-40. [Privacidade operacional e direitos de dados — opcional](prompts/05-seguranca-e-privacidade/Optional/40-implementar-privacidade-operacional-e-direitos-de-dados.md)
-41. [Auditar segurança com OWASP ASVS](prompts/05-seguranca-e-privacidade/41-auditar-seguranca-com-owasp-asvs.md)
+41. [Privacidade operacional e direitos de dados — opcional](prompts/05-seguranca-e-privacidade/Optional/41-implementar-privacidade-operacional-e-direitos-de-dados.md)
+42. [Auditar segurança com OWASP ASVS](prompts/05-seguranca-e-privacidade/42-auditar-seguranca-com-owasp-asvs.md)
 
 ### 6 — Conformidade e presença pública
 
-42. [Implementar área legal](prompts/06-conformidade-e-presenca-publica/42-implementar-area-legal-ssr.md)
-43. [Atualizar footer institucional](prompts/06-conformidade-e-presenca-publica/43-atualizar-footer-institucional-ssr.md)
-44. [Implementar SEO SSR](prompts/06-conformidade-e-presenca-publica/44-implementar-seo-area-publica-ssr.md)
-45. [Auditar acessibilidade WCAG](prompts/06-conformidade-e-presenca-publica/45-auditar-acessibilidade-wcag.md)
-46. [Validar static SSR](prompts/06-conformidade-e-presenca-publica/46-validar-ssr.md)
+43. [Implementar área legal](prompts/06-conformidade-e-presenca-publica/43-implementar-area-legal-ssr.md)
+44. [Atualizar footer institucional](prompts/06-conformidade-e-presenca-publica/44-atualizar-footer-institucional-ssr.md)
+45. [Implementar SEO SSR](prompts/06-conformidade-e-presenca-publica/45-implementar-seo-area-publica-ssr.md)
+46. [Auditar acessibilidade WCAG](prompts/06-conformidade-e-presenca-publica/46-auditar-acessibilidade-wcag.md)
+47. [Validar static SSR](prompts/06-conformidade-e-presenca-publica/47-validar-ssr.md)
 
 ### 7 — Monetização e crescimento — opcionais
 
-47. [Publicidade](prompts/07-monetizacao-e-crescimento/Optional/47-implementar-publicidade.md)
-48. [Retenção](prompts/07-monetizacao-e-crescimento/Optional/48-implementar-retencao-de-utilizadores.md)
-49. [Fidelização](prompts/07-monetizacao-e-crescimento/Optional/49-fidelizar-utilizadores.md)
+48. [Publicidade](prompts/07-monetizacao-e-crescimento/Optional/48-implementar-publicidade.md)
+49. [Retenção](prompts/07-monetizacao-e-crescimento/Optional/49-implementar-retencao-de-utilizadores.md)
+50. [Fidelização](prompts/07-monetizacao-e-crescimento/Optional/50-fidelizar-utilizadores.md)
 
 ### 8 — Qualidade e hardening
 
-50. [Observabilidade e alertas](prompts/08-qualidade-e-hardening/50-implementar-observabilidade-e-alertas.md)
-51. [Performance, carga e estabilidade](prompts/08-qualidade-e-hardening/51-testar-performance-e-carga.md)
-52. [PWA, instalação, offline e atualização](prompts/08-qualidade-e-hardening/52-validar-pwa-instalacao-offline-e-atualizacao.md)
-53. [Resiliência e recuperação de falhas](prompts/08-qualidade-e-hardening/53-testar-resiliencia-e-recuperacao-de-falhas.md)
-54. [Auditoria geral baseada em risco](prompts/08-qualidade-e-hardening/54-testar-aplicacao-geral.md)
-55. [Dependências, licenças e supply chain](prompts/08-qualidade-e-hardening/55-auditar-dependencias-licencas-e-supply-chain.md)
-56. [Preparar estratégia de cache](prompts/08-qualidade-e-hardening/56-evitar-cache-apos-publicacao.md)
+51. [Observabilidade e alertas](prompts/08-qualidade-e-hardening/51-implementar-observabilidade-e-alertas.md)
+52. [Performance, carga e estabilidade](prompts/08-qualidade-e-hardening/52-testar-performance-e-carga.md)
+53. [PWA, instalação, offline e atualização](prompts/08-qualidade-e-hardening/53-validar-pwa-instalacao-offline-e-atualizacao.md)
+54. [Resiliência e recuperação de falhas](prompts/08-qualidade-e-hardening/54-testar-resiliencia-e-recuperacao-de-falhas.md)
+55. [Auditoria geral baseada em risco](prompts/08-qualidade-e-hardening/55-testar-aplicacao-geral.md)
+56. [Dependências, licenças e supply chain](prompts/08-qualidade-e-hardening/56-auditar-dependencias-licencas-e-supply-chain.md)
+57. [Preparar estratégia de cache](prompts/08-qualidade-e-hardening/57-evitar-cache-apos-publicacao.md)
 
 ### 9 — Entrega e distribuição
 
-57. [Configurar CI/CD e ambientes](prompts/09-entrega-e-distribuicao/57-configurar-ci-cd-e-ambientes-de-deploy.md)
-58. [Infraestrutura como código — opcional](prompts/09-entrega-e-distribuicao/Optional/58-provisionar-infraestrutura-como-codigo.md)
-59. [Preparar MAUI para lojas — opcional](prompts/09-entrega-e-distribuicao/Optional/59-preparar-maui-para-distribuicao-nas-stores.md)
+58. [Configurar CI/CD e ambientes](prompts/09-entrega-e-distribuicao/58-configurar-ci-cd-e-ambientes-de-deploy.md)
+59. [Infraestrutura como código — opcional](prompts/09-entrega-e-distribuicao/Optional/59-provisionar-infraestrutura-como-codigo.md)
+60. [Preparar MAUI para lojas — opcional](prompts/09-entrega-e-distribuicao/Optional/60-preparar-maui-para-distribuicao-nas-stores.md)
 
 ### 10 — Operação e recuperação
 
-60. [Definir SLI, SLO e error budget](prompts/10-operacao-e-recuperacao/60-definir-sli-slo-e-error-budget.md)
-61. [Implementar backup, restore e disaster recovery](prompts/10-operacao-e-recuperacao/61-implementar-backup-restore-e-disaster-recovery.md)
-62. [Criar runbook de incidentes e operação](prompts/10-operacao-e-recuperacao/62-criar-runbook-de-incidentes-e-operacao.md)
+61. [Definir SLI, SLO e error budget](prompts/10-operacao-e-recuperacao/61-definir-sli-slo-e-error-budget.md)
+62. [Implementar backup, restore e disaster recovery](prompts/10-operacao-e-recuperacao/62-implementar-backup-restore-e-disaster-recovery.md)
+63. [Criar runbook de incidentes e operação](prompts/10-operacao-e-recuperacao/63-criar-runbook-de-incidentes-e-operacao.md)
 
 ### 11 — Aceitação, revisão e release
 
-63. [Concluir documentação e manutenção](prompts/11-aceitacao-e-manutencao/63-concluir-documentacao-e-plano-de-manutencao.md)
-64. [Executar aceitação final](prompts/11-aceitacao-e-manutencao/64-executar-aceitacao-final-e-checklist-de-release.md)
-65. [Executar revisão final independente](prompts/11-aceitacao-e-manutencao/65-executar-revisao-final-independente.md)
-66. [Publicar com migrations, smoke tests e rollback](prompts/11-aceitacao-e-manutencao/66-publicar-com-migrations-smoke-tests-e-rollback.md)
+64. [Concluir documentação e manutenção](prompts/11-aceitacao-e-manutencao/64-concluir-documentacao-e-plano-de-manutencao.md)
+65. [Executar aceitação final](prompts/11-aceitacao-e-manutencao/65-executar-aceitacao-final-e-checklist-de-release.md)
+66. [Executar revisão final independente](prompts/11-aceitacao-e-manutencao/66-executar-revisao-final-independente.md)
+67. [Publicar com migrations, smoke tests e rollback](prompts/11-aceitacao-e-manutencao/67-publicar-com-migrations-smoke-tests-e-rollback.md)
 
 ### 12 — Operação contínua
 
-67. [Validar cache da versão publicada](prompts/12-operacao-continua/67-validar-cache-da-versao-publicada.md)
-68. [Validar SEO online](prompts/12-operacao-continua/68-validar-seo-online.md)
-69. [Verificar pós-release a 30m, 24h e 7d](prompts/12-operacao-continua/69-verificar-pos-release-30m-24h-7d.md)
-70. [Executar triagem operacional diária](prompts/12-operacao-continua/70-executar-triagem-operacional-diaria.md)
-71. [Monitorizar Core Web Vitals com RUM](prompts/12-operacao-continua/71-monitorizar-core-web-vitals-rum.md)
-72. [Triar bugs e feedback de suporte](prompts/12-operacao-continua/72-triar-bugs-e-feedback-de-suporte.md)
-73. [Monitorizar custos e anomalias](prompts/12-operacao-continua/73-monitorizar-custos-e-anomalias.md)
-74. [Auditar vulnerabilidades continuamente](prompts/12-operacao-continua/74-auditar-vulnerabilidades-continuas.md)
-75. [Medir DORA e melhoria contínua](prompts/12-operacao-continua/75-medir-metricas-dora-e-melhoria-continua.md)
+68. [Validar cache da versão publicada](prompts/12-operacao-continua/68-validar-cache-da-versao-publicada.md)
+69. [Validar SEO online](prompts/12-operacao-continua/69-validar-seo-online.md)
+70. [Verificar pós-release a 30m, 24h e 7d](prompts/12-operacao-continua/70-verificar-pos-release-30m-24h-7d.md)
+71. [Executar triagem operacional diária](prompts/12-operacao-continua/71-executar-triagem-operacional-diaria.md)
+72. [Monitorizar Core Web Vitals com RUM](prompts/12-operacao-continua/72-monitorizar-core-web-vitals-rum.md)
+73. [Triar bugs e feedback de suporte](prompts/12-operacao-continua/73-triar-bugs-e-feedback-de-suporte.md)
+74. [Monitorizar custos e anomalias](prompts/12-operacao-continua/74-monitorizar-custos-e-anomalias.md)
+75. [Auditar vulnerabilidades continuamente](prompts/12-operacao-continua/75-auditar-vulnerabilidades-continuas.md)
+76. [Medir DORA e melhoria contínua](prompts/12-operacao-continua/76-medir-metricas-dora-e-melhoria-continua.md)
 
 ## Módulos não previstos
 

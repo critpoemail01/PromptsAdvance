@@ -159,12 +159,12 @@ Uma linha da matriz só fica `concluída` quando:
 | Prompts 05/06/10/11 | arquitetura, ameaças, configuração, contratos e dependência externa |
 | Prompt 25 | shell/registo/pesquisa/Ajuda/Academia transversal |
 | Prompts 26–30 | implementação e testes por requisito, página e funcionalidade |
-| Prompt 33 | recursos, fallback e revisão nos idiomas aprovados |
-| Prompts 40/41 | dados, tracking, acesso, CSP, OAuth, segredos e abuso |
-| Prompt 45 | player, captions, transcrição, teclado e tecnologias de apoio |
-| Prompt 54 | cobertura integrada, fornecedor indisponível, idiomas e regressões |
-| Prompt 63 | conteúdo final sobre UI estável, upload autorizado e manutenção |
-| Prompt 64 | reconciliação da matriz e aceitação da candidata exata |
+| Prompt 34 | recursos, fallback e revisão nos idiomas aprovados |
+| Prompts 41/42 | dados, tracking, acesso, CSP, OAuth, segredos e abuso |
+| Prompt 46 | player, captions, transcrição, teclado e tecnologias de apoio |
+| Prompt 55 | cobertura integrada, fornecedor indisponível, idiomas e regressões |
+| Prompt 64 | conteúdo final sobre UI estável, upload autorizado e manutenção |
+| Prompt 65 | reconciliação da matriz e aceitação da candidata exata |
 
 ## Referências e exemplo fornecido
 
