@@ -124,6 +124,13 @@ resolve uma instância existente ou cria uma instância brownfield isolada. Não
 altera a árvore da aplicação, `.git`, histórico, alterações locais ou remotes
 durante a inicialização. O prompt 07 executa a baseline de adoção; código
 existente só satisfaz requisitos e gates quando houver evidência verificável.
+
+Todos os prompts herdam o protocolo comum sem duplicação: tarefas triviais
+mostram apenas uma intenção/validação de uma linha; trabalho não trivial
+apresenta e atualiza um plano verificável. O executor avança autonomamente nas
+decisões técnicas reversíveis dentro do âmbito e completa todas as etapas do
+prompt atual, incluindo a autorrevisão adversarial. Depois regista o resultado
+e espera pelo programador antes de preparar o prompt seguinte.
 Antes de criar ou adaptar, compara a origem local com o template, documentação
 e repositório oficiais atuais do BitPlatform. Se a aplicação já tiver recebido
 o boilerplate, audita a conformidade sem recopiar a base; quando a adaptação for
@@ -143,8 +150,52 @@ de cada processo. Este pedido não avança prompts nem autoriza deploy/produçã
 4. Para e aguarda a decisão do programador.
 5. `próximo` avança; `repetir/corrigir` exige um objetivo; `ignorar e avançar`
    conserva as lacunas e a razão.
-6. Numa aplicação existente, mostra histórico ou sobreposição antes de repetir.
-7. Mantém autorizações externas, Git e produção como limites bloqueantes.
+6. Antes de um prompt não crítico, `decide` pode registá-lo como não aplicável,
+   dispensado ou adiado, sempre com uma razão curta.
+7. Numa aplicação existente, mostra histórico ou sobreposição antes de repetir.
+8. Mantém autorizações externas, Git e produção como limites bloqueantes.
+
+Os 76 prompts têm quatro classes: `hard_required`, `recommended`, `conditional`
+e `optional`. Só os sete invariantes críticos (`07`, `42`, `55`, `56`, `65`,
+`66`, `67`) não aceitam dispensa. Os restantes podem ser ajustados pelo
+programador sem falsificar o histórico:
+
+```powershell
+.\software-lifecycle.ps1 decide -ProcessRoot . -PromptId 03 `
+  -Result deferred -Evidence "Workshop de requisitos fica para a próxima iteração"
+.\software-lifecycle.ps1 decide -ProcessRoot . -PromptId 33 `
+  -Result not_applicable -Evidence "Esta aplicação não tem faturação"
+.\software-lifecycle.ps1 decide -ProcessRoot . -PromptId 48 `
+  -Result waived -Evidence "Publicidade excluída deste produto"
+```
+
+`advance` ignora estas decisões. Um prompt adiado ou dispensado pode ser
+reaberto mais tarde com `request`/`repeat` e um objetivo concreto.
+
+O AdvanceAppFlow assume sempre que a aplicação final será colocada em produção.
+Não existe um perfil MVP com critérios reduzidos. `fast`, `standard` e `deep`
+descrevem apenas o esforço proporcional de cada tarefa; todos convergem para a
+mesma qualidade final.
+
+O programador continua livre para parar, alterar a ordem e adiar prompts. Porém,
+o lifecycle só declara `production_ready` quando os sete prompts críticos estão
+concluídos, todos os restantes têm resultado ou decisão explícita, não existem
+resultados parciais/bloqueados e o Gate G10 passou. Chegar ao prompt 76 sem isso
+produz `not_production_ready` e uma lista objetiva das lacunas. Esta regra não
+autoriza automaticamente deploy, lojas, custos ou qualquer ação de produção.
+
+Para permitir várias aplicações na mesma máquina, cada raiz recebe um bloco
+local exclusivo de dez portas através de
+`scripts/Manage-AdvanceLocalPorts.ps1`. O registo global usa lock e verifica os
+listeners TCP; `APP_LOCAL_PORTS.json` conserva os URLs próprios de API, SSR e
+Web no lifecycle e nunca deve ser commitado. `corre a app` reutiliza a reserva,
+realoca o bloco completo perante uma colisão externa comprovada e mantém a
+reserva quando os processos param.
+
+```powershell
+.\scripts\Manage-AdvanceLocalPorts.ps1 reserve `
+  -ApplicationRoot "C:\Apps\MinhaApp" -ProcessRoot "C:\Processos\MinhaApp"
+```
 
 Para trabalho complexo ou ambíguo, usa Plan mode para refinar resultado, restrições, etapas e verificação; depois executa o plano. Para trabalho longo suportado pela interface, Goal mode pode manter a execução persistente. Nenhum modo amplia autorização para GitHub, produção, operações destrutivas ou custos.
 

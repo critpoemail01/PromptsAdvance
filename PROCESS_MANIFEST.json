@@ -1,19 +1,32 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-08-02.8",
+  "catalogVersion": "2026-08-02.12",
   "releaseChannel": "candidate",
   "name": "AdvanceAppFlow — Professional Advance .NET Software Lifecycle",
   "promptCount": 76,
   "executionPolicy": {
     "workflowMode": "programmer_controlled",
+    "applicationDeliveryTarget": "production",
+    "applicationMaturityProfilesEnabled": false,
+    "productionReadinessRequiredForLifecycleCompletion": true,
+    "concurrentLocalApplicationsRequireExclusivePorts": true,
+    "localPortReservationBlockSize": 10,
+    "machineLocalPortAssignmentsMustNotBeCommitted": true,
     "onePromptPerTask": true,
     "manualPromptAdvance": true,
     "safeSequentialContinuation": false,
     "maxSequentialPromptsPerTask": 1,
     "planRequiredForComplexWork": true,
+    "proportionalVisiblePlanningRequired": true,
+    "autonomousExecutionWithinCurrentPromptRequired": true,
+    "reversibleTechnicalDecisionsDoNotRequireApproval": true,
+    "stopAtPromptBoundaryRequired": true,
     "decisionFirstResponsesRequired": true,
     "promptCompletionSummaryRequired": true,
     "remainingWorkRequiredForIncompleteResult": true,
+    "promptClassModelRequired": true,
+    "preExecutionDispositionSupported": true,
+    "hardRequiredPromptCannotBeWaived": true,
     "rerunObjectiveRequired": true,
     "brownfieldOverlapConfirmationRequired": true,
     "officialBoilerplateComparisonRequired": true,
@@ -63,6 +76,12 @@
     "deep": ["01", "03", "04", "05", "06", "07", "09", "12", "13", "20", "32", "41", "42", "51", "52", "54", "55", "56", "57", "58", "61", "62", "63", "64", "65", "66", "67"],
     "fast": ["08", "68", "69", "70", "71", "72", "73", "74", "75", "76"],
     "standard": "all remaining prompts"
+  },
+  "promptClasses": {
+    "hard_required": ["07", "42", "55", "56", "65", "66", "67"],
+    "recommended": ["01", "02", "03", "04", "08", "09", "12", "13", "25", "26", "32", "43", "44", "45", "46", "47", "51", "52", "54", "57", "58", "61", "62", "63", "64", "70", "71", "73", "75", "76"],
+    "conditional": ["05", "06", "10", "11", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "27", "28", "29", "30", "31", "33", "34", "35", "36", "37", "38", "39", "40", "41", "53", "59", "60", "68", "69", "72", "74"],
+    "optional": ["48", "49", "50"]
   },
   "contextRouting": {
     "always": ["AGENTS.md", "EXECUTION_CONTRACT.md", "APP_CONTEXT.md", "IMPLEMENTATION_STATUS.md"],
@@ -117,7 +136,9 @@
     "partial",
     "blocked",
     "not_selected",
-    "not_applicable"
+    "not_applicable",
+    "waived",
+    "deferred"
   ],
   "stages": [
     {

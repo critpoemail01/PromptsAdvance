@@ -11,6 +11,9 @@ Implementa uma estratégia coerente de configuração para `[AMBIENTES]` no proj
 - Segredos entram por User Secrets, variáveis de ambiente, OIDC/cofre ou mecanismo aprovado.
 - Data Protection, domínios, CORS, providers, telemetria e feature flags respeitam o ambiente.
 - A aplicação arranca localmente com integrações opcionais desativadas.
+- API, SSR e Web usam a reserva exclusiva de `APP_LOCAL_PORTS.json`; MAUI usa o
+  URL da API correspondente e várias aplicações arrancam em simultâneo sem
+  colisões.
 
 ## Preparação
 
@@ -24,6 +27,10 @@ Implementa uma estratégia coerente de configuração para `[AMBIENTES]` no proj
 
 Usa primeiro scanners já existentes. Se não houver scanner, faz pesquisa dirigida por padrões e histórico apenas quando autorizado, redigindo valores; não instales tooling nem imprimas correspondências sensíveis só para completar a auditoria.
 
+5. Executa `scripts/Manage-AdvanceLocalPorts.ps1 status` com as raízes reais. Se
+   ainda não existir reserva, executa `reserve`. Trata `APP_LOCAL_PORTS.json`
+   como fonte local da máquina, nunca como configuração versionada.
+
 ## Implementação
 
 - Reutiliza Options pattern e validação no arranque.
@@ -35,12 +42,30 @@ Usa primeiro scanners já existentes. Se não houver scanner, faz pesquisa dirig
   flags por ambiente, e mantém a aplicação/artigo funcionais sem o fornecedor.
 - Configura persistência/proteção de Data Protection em produção segundo a topologia, sem inventar certificados.
 - Restringe CORS, origins, redirect URIs e hosts por ambiente.
+- Liga os comandos/perfis locais de `App.Server.Api`, `App.Client.Ssr` e
+  `App.Client.Web`/`App.Cliente.Web` aos URLs reservados através do mecanismo de
+  override local já suportado pelo repositório (`ASPNETCORE_URLS`, argumentos
+  `--urls`, variáveis ou ficheiro local ignorado). Não fixes no Git as portas da
+  máquina e não alteres staging/production com estes valores.
+- Configura os clientes SSR, Web e MAUI para receberem o URL reservado da API
+  através da chave tipada existente. Se essa chave não existir, acrescenta um
+  contrato local explícito, valida-o no arranque e documenta-o sem inventar
+  segredos.
+- Preserva o bloco completo por aplicação. Quando uma colisão externa exigir
+  realocação, muda API, SSR, Web, CORS, redirects e URLs de cliente no mesmo
+  lote e volta a executar os testes de arranque.
 - Atualiza documentação e templates de variáveis sem valores secretos.
 - Roda credenciais expostas apenas com autorização e fora deste prompt; reporta o incidente de forma redigida.
 
 ## Validação
 
-Testa arranque com configuração mínima válida, opção obrigatória ausente, valor malformado e integração opcional desativada. Executa build/test e scanners de segredos já disponíveis. Confirma que mensagens de erro são acionáveis sem divulgar valores.
+Testa arranque com configuração mínima válida, opção obrigatória ausente, valor
+malformado e integração opcional desativada. Arranca pelo menos duas fixtures de
+aplicação com reservas distintas e confirma API, SSR e Web acessíveis nos URLs
+corretos, comunicação dos clientes com a API, ausência de listeners cruzados e
+MAUI configurado para a API da sua aplicação. Executa build/test e scanners de
+segredos já disponíveis. Confirma que mensagens de erro são acionáveis sem
+divulgar valores.
 
 ## Entrega
 

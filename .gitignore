@@ -4,6 +4,7 @@
 # Disposable lifecycle and evaluation output
 pilot/temp/
 artifacts/
+APP_LOCAL_PORTS.json
 
 # Local editor and transient files
 *.log

@@ -12,6 +12,21 @@ prompt until the programmer explicitly says `next` or names another prompt.
 Use `$advance-app-start` only for a brand-new initiative without an existing
 application or lifecycle.
 
+## Assume a production-bound application
+
+Treat every Advance application as a final product intended for production.
+Never offer prototype/MVP/pilot versus production maturity profiles. The
+manifest's `fast`, `standard`, and `deep` execution profiles control only the
+proportional effort for an individual prompt; they do not lower final quality.
+
+The programmer may stop, reorder, waive, or defer non-critical work, but do not
+call the lifecycle complete or the application production-ready until every
+hard-required prompt is completed, every other prompt has an explicit result or
+disposition, no partial/blocked work remains, and G10 has passed. Reaching the
+last numeric prompt is not completion. Report `not_production_ready` and the
+exact gaps instead. This assumption never authorizes deployment, stores,
+production resources, costs, or another external action.
+
 ## Locate and inspect
 
 1. Find the nearest `PROCESS_MANIFEST.json` and `software-lifecycle.ps1`.
@@ -60,8 +75,37 @@ repository. Never substitute `Server.Web`, `Client.Core`, `Client.Maui`,
 or ambiguous, report the exact matches and stop without starting a partial app,
 unless the programmer explicitly asks for a partial run.
 
+Before starting new processes, resolve the lifecycle root and run its canonical
+allocator:
+
+```powershell
+.\scripts\Manage-AdvanceLocalPorts.ps1 status `
+  -ApplicationRoot "<exact application root>" -ProcessRoot "<lifecycle root>" -Json
+.\scripts\Manage-AdvanceLocalPorts.ps1 reserve `
+  -ApplicationRoot "<exact application root>" -ProcessRoot "<lifecycle root>" -Json
+```
+
+The machine-local registry assigns a locked ten-port block per application:
+API HTTP/HTTPS at base/base+1, SSR at base+2/base+3, and Web at
+base+4/base+5. MAUI uses the reserved API URL and does not receive a listener.
+Never fall back to boilerplate/default fixed ports when a reservation exists.
+Never commit `APP_LOCAL_PORTS.json` or copy it to shared/remote configuration.
+
+If reserved ports are listening, first inspect the owning commands/processes.
+Reuse them only when all roles match this exact application and are healthy. If
+a listener belongs elsewhere, call `reserve -ReallocateIfOccupied`, then apply
+the returned API/SSR/Web URLs consistently to local client configuration, CORS,
+redirects and launch commands. Do not reallocate a healthy running instance.
+Immediately before each launch, verify the assigned listener is still free; if
+binding loses a race, stop only the processes started in this attempt,
+reallocate once and retry with the complete new block.
+
 Start the API first and wait until its listener or health endpoint is ready;
 then start SSR and Web concurrently in separate persistent terminal sessions.
+Pass each reserved pair through the repository's supported local mechanism,
+preferably `ASPNETCORE_URLS` or the real `--urls` option, and pass the reserved
+API URL through the application's typed local API-base setting. Do not edit
+committed `launchSettings.json` merely to change machine ports.
 Reuse an already healthy matching process instead of launching a duplicate.
 Keep all three processes alive after replying and report, for each role, the
 project, session/process identifier, URL, and readiness or error. Do not claim
@@ -71,7 +115,14 @@ Default to the local development environment. This request does not authorize
 deployment, production, external services, data resets, migrations with side
 effects, or secrets. When asked to stop the app, terminate only the exact
 sessions/processes started or identified for these three roles; never kill all
-`dotnet` processes broadly.
+`dotnet` processes broadly. Keep its reservation after stopping so the URLs are
+stable. Release it only when the programmer explicitly asks to remove/liberate
+that application's local port reservation:
+
+```powershell
+.\scripts\Manage-AdvanceLocalPorts.ps1 release `
+  -ApplicationRoot "<exact application root>" -ProcessRoot "<lifecycle root>"
+```
 
 ## Before executing a requested prompt
 
@@ -93,6 +144,33 @@ The supported inspection/confirmation flow is:
 .\software-lifecycle.ps1 repeat -ProcessRoot . -PromptId 03 `
   -Objective "Revalidate requirements after the billing change" -ConfirmRepeat
 ```
+
+## Decide without executing a prompt
+
+Read `PROCESS_MANIFEST.json` before deciding. Every prompt has one stable class:
+
+- `hard_required`: critical invariant; it cannot be skipped or dispositioned;
+- `recommended`: normal path, but the programmer may waive or defer it;
+- `conditional`: execute when its capability/surface/risk applies;
+- `optional`: execute only when it adds value to this product.
+
+At a prompt boundary, the programmer may decide any non-critical prompt before
+execution with one short reason:
+
+```powershell
+.\software-lifecycle.ps1 decide -ProcessRoot . -PromptId 03 `
+  -Result deferred -Evidence "Requirements workshop moves to the next iteration"
+.\software-lifecycle.ps1 decide -ProcessRoot . -PromptId 33 `
+  -Result not_applicable -Evidence "This application has no billing"
+.\software-lifecycle.ps1 decide -ProcessRoot . -PromptId 48 `
+  -Result waived -Evidence "Advertising is excluded from this product"
+```
+
+Use `not_applicable` when the scope does not apply, `waived` when it applies but
+the programmer accepts omitting it, and `deferred` when it should be revisited.
+Do not translate these into `partial` or `blocked`: those are execution results.
+`advance` skips recorded dispositions. A later `request`/`repeat` may reopen the
+prompt after showing its history and receiving a concrete objective.
 
 ## Execute one prompt
 
@@ -146,7 +224,7 @@ Use:
 - `completed` only when the prompt objective and criteria are satisfied;
 - `partial` when useful implementation exists but work remains;
 - `blocked` when a material dependency prevents safe progress;
-- `not_applicable` only with evidence.
+- `not_applicable` only with evidence and never for a `hard_required` prompt.
 
 ## Wait for the programmer
 
@@ -155,6 +233,7 @@ After `record`, do not continue automatically. Present these choices:
 - `next` — prepare the following numeric prompt;
 - `repeat` or `correct` — rerun the same prompt with a stated objective;
 - `skip and advance` — accept listed gaps and continue with a stated reason;
+- `decide` — disposition a future non-critical prompt with a short reason;
 - request a specific prompt — inspect its history before preparing it.
 
 Commands:
@@ -210,7 +289,8 @@ Start with:
 2. `Achieved` — what was implemented or validated;
 3. `Missing to finish` — specific implementation still required, or `none`;
 4. `Evidence` — essential files and checks;
-5. `Decision` — `next`, `repeat`, `correct`, or `skip and advance`.
+5. `Decision` — `next`, `repeat`, `correct`, `skip and advance`, or disposition
+   a future non-critical prompt.
 
 Never hide missing work inside a long report and never prepare the next prompt
 in the same task.

@@ -452,6 +452,7 @@ try {
     Require-ExitCode -Execution $start -Expected 0 -Label 'start'
 
     foreach ($required in @(
+        '.gitignore',
         'LIFECYCLE_STATE.json',
         'LIFECYCLE_GATE_EVIDENCE.json',
         'NEXT_TASK.md',
@@ -464,6 +465,7 @@ try {
         'VISUAL_SLICE_CONTRACT.md',
         'CHANGE_CONTROL.md',
         'CLAUDE.md',
+        'scripts\Manage-AdvanceLocalPorts.ps1',
         '.agents\skills\advance-app-continue\SKILL.md'
     )) {
         if (-not (Test-Path -LiteralPath (Join-Path $fixtureRoot $required))) {
@@ -542,6 +544,7 @@ try {
         Copy-Item -LiteralPath (Join-Path $CatalogRoot $directory) -Destination $stableCatalogRoot -Recurse
     }
     foreach ($file in @(
+        '.gitignore',
         'AGENTS.md', 'CHANGE_CONTROL.md', 'CLAUDE.md', 'EXECUTION_CONTRACT.md',
         'EVALUATION_IMPACT_MAP.json', 'HELP_AND_ACADEMY.md', 'UPSTREAM_LEARNING.md', 'PILOT_APPROVAL.md',
         'PRODUCT_EXCELLENCE.md', 'REQUIREMENTS_ENGINEERING_CONTRACT.md',

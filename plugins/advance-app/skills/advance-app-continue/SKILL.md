@@ -31,7 +31,10 @@ current working directory. Do not search the entire filesystem.
    `software-lifecycle.ps1` for application-path discovery or adoption.
    For `run/start/corre a app`, follow its local-run procedure and start the
    exact `Server.Api`, `Client.Ssr`, and real `Client.Web`/`Cliente.Web`
-   projects without advancing lifecycle state.
+   projects without advancing lifecycle state. Use the canonical
+   `scripts/Manage-AdvanceLocalPorts.ps1` reservation before launch so every
+   application receives a distinct API/SSR/Web block; never commit the
+   machine-local assignment.
 5. When an existing lifecycle uses an older compatible catalog, use the
    canonical `software-lifecycle.ps1` as the migration entry point. Automatic
    upgrades still require a `stable` source and exact approved pilot. If the
@@ -55,9 +58,16 @@ current working directory. Do not search the entire filesystem.
    never infer authorization for commit, push, PR, publication, or production.
 
 The canonical skill reports every prompt result and remaining implementation,
-then waits for `next`, `repeat`, `correct`, or `skip and advance`. It inspects
-history or brownfield overlap and obtains a concrete objective before repeating
-a prompt.
+then waits for `next`, `repeat`, `correct`, `skip and advance`, or a recorded
+pre-execution disposition (`not_applicable`, `waived`, or `deferred`) for a
+non-critical prompt. It inspects history or brownfield overlap and obtains a
+concrete objective before repeating or reopening a prompt.
+
+The canonical process has one maturity target: a final production-bound
+application. Task execution profiles change effort, never the final quality bar.
+Do not claim production readiness merely because the last numeric prompt ran;
+the canonical production-completion invariant and G10 must pass. This target
+does not authorize deployment or any external production action.
 
 If neither a lifecycle root nor a valid catalog can be resolved, stop before
 changing files and ask for the exact lifecycle, application, or catalog path.

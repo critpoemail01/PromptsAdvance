@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "catalogVersion": "2026-08-02.8",
+  "catalogVersion": "2026-08-02.12",
   "gates": {
     "G06": {
       "status": "pending",

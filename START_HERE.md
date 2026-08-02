@@ -114,6 +114,40 @@ Pedir ou repetir um prompt:
 `request` não repete silenciosamente trabalho anterior. Primeiro informa; o
 segundo comando confirma e fixa a razão da nova execução.
 
+Dispensar, adiar ou marcar um prompt não crítico como não aplicável antes de o
+executar:
+
+```powershell
+.\software-lifecycle.ps1 decide -ProcessRoot C:\Caminho\Processo `
+  -PromptId 03 -Result deferred -Evidence "Requisitos detalhados na próxima iteração"
+.\software-lifecycle.ps1 decide -ProcessRoot C:\Caminho\Processo `
+  -PromptId 33 -Result not_applicable -Evidence "A aplicação não tem faturação"
+.\software-lifecycle.ps1 decide -ProcessRoot C:\Caminho\Processo `
+  -PromptId 48 -Result waived -Evidence "Publicidade excluída por decisão de produto"
+```
+
+As classes são `hard_required`, `recommended`, `conditional` e `optional`.
+Prompts `hard_required` não aceitam estas decisões; o processo não os força a
+correr, mas não pode declarar conclusão integral sem os executar.
+
+## Meta de entrega
+
+Assume sempre uma aplicação final destinada a produção; não escolhas entre MVP
+e produção. Os perfis `fast`, `standard` e `deep` só ajustam a profundidade da
+tarefa atual. O lifecycle pode continuar com decisões e lacunas registadas, mas
+só termina como `production_ready` depois de concluir os prompts críticos,
+resolver ou decidir os restantes e passar o Gate G10. Isto não constitui
+autorização para executar o deploy.
+
+## Várias aplicações na mesma máquina
+
+Cada aplicação recebe automaticamente um bloco local exclusivo de dez portas.
+Os prompts 07/10 e `corre a app` usam
+`scripts/Manage-AdvanceLocalPorts.ps1`; API, SSR e Web recebem URLs próprios e
+MAUI usa a API da mesma reserva. A atribuição `APP_LOCAL_PORTS.json` é local e
+não deve ser commitada. Parar a aplicação mantém a reserva; só um pedido
+explícito `release` a liberta.
+
 ## Qualidade e autorizações
 
 Os gates de produto, arquitetura, layout, implementação e qualidade são

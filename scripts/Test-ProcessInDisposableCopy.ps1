@@ -79,6 +79,12 @@ try {
         throw 'Disposable static process validation failed.'
     }
 
+    & $powerShellExe -NoProfile -ExecutionPolicy Bypass `
+        -File (Join-Path $catalogCopy 'scripts\Test-LocalPortAllocation.ps1')
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Disposable concurrent local port allocation test failed.'
+    }
+
     $lifecycleArguments = @(
         '-NoProfile',
         '-ExecutionPolicy', 'Bypass',

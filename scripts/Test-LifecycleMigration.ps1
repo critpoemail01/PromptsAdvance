@@ -159,7 +159,7 @@ try {
     if ($migrated.status -ne 'awaiting_programmer' -or
         $null -ne $migrated.currentPrompt -or
         $migrated.lastPrompt -ne '04' -or
-        $migrated.nextAction -ne 'next | repeat | correct | skip_and_advance') {
+        $migrated.nextAction -ne 'next | repeat | correct | skip_and_advance | decide') {
         throw 'Legacy partial result was not converted to programmer-controlled waiting state.'
     }
     if ($migrated.prompts.'04'.status -ne 'partial' -or

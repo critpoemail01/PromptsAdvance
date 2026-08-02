@@ -15,7 +15,7 @@ param(
     [string]$ProjectPath,
 
     [string]$PromptId,
-    [ValidateSet('completed', 'partial', 'blocked', 'not_applicable')]
+    [ValidateSet('completed', 'partial', 'blocked', 'not_applicable', 'waived', 'deferred')]
     [string]$Result,
     [string]$Evidence,
     [string]$NextPrompt,
@@ -553,17 +553,91 @@ function Get-CatalogPromptMetadata {
 
     $file = Get-PromptFile -Root $Root -Id $Id
     $stage = Get-PromptStage -Manifest $Manifest -Id $Id
-    $isConditional = $file.FullName -match '[\\/]Optional[\\/]'
-    if ($stage.PSObject.Properties.Name -contains 'conditionalPromptIds') {
-        $isConditional = $isConditional -or (@($stage.conditionalPromptIds) -contains $Id)
-    }
+    $promptClass = Get-PromptClass -Manifest $Manifest -Id $Id
     $title = (Get-Content -Encoding UTF8 -LiteralPath $file.FullName -TotalCount 1) -replace '^#\s*', ''
     return [pscustomobject][ordered]@{
         title = $title
         path = $file.FullName.Substring($Root.Length + 1).Replace('\', '/')
         stage = [string]$stage.id
-        applicability = $(if ($isConditional) { 'conditional' } else { 'required' })
-        initialStatus = $(if ($isConditional) { 'not_selected' } else { 'pending' })
+        applicability = $promptClass
+        initialStatus = $(if ($promptClass -in @('conditional', 'optional')) { 'not_selected' } else { 'pending' })
+    }
+}
+
+function Get-PromptClass {
+    param(
+        [Parameter(Mandatory)]$Manifest,
+        [Parameter(Mandatory)][string]$Id
+    )
+
+    if ($null -eq $Manifest.PSObject.Properties['promptClasses']) {
+        throw 'PROCESS_MANIFEST.json is missing promptClasses.'
+    }
+    $allowedClasses = @('hard_required', 'recommended', 'conditional', 'optional')
+    $matches = @(
+        foreach ($className in $allowedClasses) {
+            if ($null -ne $Manifest.promptClasses.PSObject.Properties[$className] -and
+                $Id -in @($Manifest.promptClasses.$className)) {
+                $className
+            }
+        }
+    )
+    if ($matches.Count -ne 1) {
+        throw "Prompt $Id must belong to exactly one prompt class; found $($matches.Count)."
+    }
+    return [string]$matches[0]
+}
+
+function Test-PromptDispositionStatus {
+    param([AllowNull()][string]$Status)
+    return $Status -in @('not_applicable', 'waived', 'deferred')
+}
+
+function Get-ProductionCompletionGaps {
+    param([Parameter(Mandatory)]$State)
+
+    $promptProperties = @($State.prompts.PSObject.Properties)
+    return [pscustomobject][ordered]@{
+        hardRequired = @(
+            $promptProperties |
+                Where-Object {
+                    $_.Value.applicability -eq 'hard_required' -and
+                    $_.Value.status -ne 'completed'
+                } |
+                ForEach-Object { [string]$_.Name }
+        )
+        undecided = @(
+            $promptProperties |
+                Where-Object { $_.Value.status -eq 'not_selected' } |
+                ForEach-Object { [string]$_.Name }
+        )
+        incompleteNonCritical = @(
+            $promptProperties |
+                Where-Object {
+                    $_.Value.applicability -ne 'hard_required' -and
+                    $_.Value.status -in @('pending', 'ready', 'in_progress', 'partial', 'blocked')
+                } |
+                ForEach-Object { [string]$_.Name }
+        )
+    }
+}
+
+function Assert-ProductionCompletionReady {
+    param([Parameter(Mandatory)]$State)
+
+    $gaps = Get-ProductionCompletionGaps -State $State
+    $messages = [System.Collections.Generic.List[string]]::new()
+    if (@($gaps.hardRequired).Count -gt 0) {
+        $messages.Add("hard-required prompts incomplete: $($gaps.hardRequired -join ', ')")
+    }
+    if (@($gaps.undecided).Count -gt 0) {
+        $messages.Add("prompts without an execution/disposition decision: $($gaps.undecided -join ', ')")
+    }
+    if (@($gaps.incompleteNonCritical).Count -gt 0) {
+        $messages.Add("non-critical prompts still incomplete: $($gaps.incompleteNonCritical -join ', ')")
+    }
+    if ($messages.Count -gt 0) {
+        throw "Production completion is not ready — $($messages -join '; ')."
     }
 }
 
@@ -596,12 +670,12 @@ function Merge-CatalogPromptsIntoState {
         $prompt | Add-Member -NotePropertyName 'title' -NotePropertyValue $metadata.title -Force
         $prompt | Add-Member -NotePropertyName 'path' -NotePropertyValue $metadata.path -Force
         $prompt | Add-Member -NotePropertyName 'stage' -NotePropertyValue $metadata.stage -Force
+        $prompt.applicability = $metadata.applicability
         $hasHistory = @(Get-PromptResultHistory -State $State -Id $id).Count -gt 0
         $hasEvidence = -not [string]::IsNullOrWhiteSpace([string]$prompt.evidence)
         $hasAttempts = @($prompt.attempts).Count -gt 0
         if (-not $hasHistory -and -not $hasEvidence -and -not $hasAttempts -and
             [string]$prompt.status -in @('pending', 'not_selected')) {
-            $prompt.applicability = $metadata.applicability
             $prompt.status = $metadata.initialStatus
         }
     }
@@ -684,7 +758,7 @@ function Convert-LegacyStateToProgrammerControlled {
         $State | Add-Member -NotePropertyName 'lastPrompt' -NotePropertyValue $lastId -Force
         $State.currentPrompt = $null
         $State.status = 'awaiting_programmer'
-        $State.nextAction = 'next | repeat | correct | skip_and_advance'
+        $State.nextAction = 'next | repeat | correct | skip_and_advance | decide'
         $State.blockers = @()
         return $true
     }
@@ -974,11 +1048,10 @@ function Set-CurrentPrompt {
     }
 
     $promptState = Get-PromptState -State $State -Id $Id
-    if ($promptState.status -eq 'not_selected') {
-        $promptState.status = 'ready'
-        $promptState.applicability = 'selected'
-    }
-    elseif ($promptState.status -in @('pending', 'partial', 'blocked', 'completed', 'not_applicable')) {
+    if ($promptState.status -in @(
+        'pending', 'not_selected', 'partial', 'blocked', 'completed',
+        'not_applicable', 'waived', 'deferred'
+    )) {
         $promptState.status = 'ready'
     }
 
@@ -1107,9 +1180,10 @@ function Test-GatePrerequisites {
         foreach ($requiredPromptId in @($GateDefinition.requiredPromptIds)) {
             $requiredPrompt = Get-PromptState -State $State -Id ([string]$requiredPromptId)
             $acceptable = $requiredPrompt.status -eq 'completed' -or
-                ($requiredPrompt.applicability -ne 'required' -and $requiredPrompt.status -eq 'not_applicable')
+                ($requiredPrompt.applicability -ne 'hard_required' -and
+                    (Test-PromptDispositionStatus -Status ([string]$requiredPrompt.status)))
             if (-not $acceptable) {
-                throw "Gate $($GateDefinition.id) requires prompt $requiredPromptId to be completed or explicitly not applicable; found '$($requiredPrompt.status)'."
+                throw "Gate $($GateDefinition.id) requires prompt $requiredPromptId to be completed or explicitly dispositioned when non-critical; found '$($requiredPrompt.status)'."
             }
         }
     }
@@ -1842,14 +1916,19 @@ function Test-Lifecycle {
         if ($promptState.status -notin @($manifest.statuses)) {
             $issues.Add("Prompt $($property.Name) has invalid status '$($promptState.status)'.")
         }
-        if ($promptState.applicability -notin @('required', 'conditional', 'selected')) {
+        if ($promptState.applicability -notin @('hard_required', 'recommended', 'conditional', 'optional')) {
             $issues.Add("Prompt $($property.Name) has invalid applicability '$($promptState.applicability)'.")
         }
         if ($promptState.status -eq 'completed' -and [string]::IsNullOrWhiteSpace([string]$promptState.evidence)) {
             $issues.Add("Completed prompt $($property.Name) has no evidence.")
         }
-        if ($promptState.status -eq 'not_applicable' -and $promptState.applicability -eq 'required') {
-            $issues.Add("Required prompt $($property.Name) is marked not_applicable.")
+        if ((Test-PromptDispositionStatus -Status ([string]$promptState.status)) -and
+            $promptState.applicability -eq 'hard_required') {
+            $issues.Add("Hard-required prompt $($property.Name) is marked $($promptState.status).")
+        }
+        if ((Test-PromptDispositionStatus -Status ([string]$promptState.status)) -and
+            [string]::IsNullOrWhiteSpace([string]$promptState.evidence)) {
+            $issues.Add("Dispositioned prompt $($property.Name) has no reason/evidence.")
         }
 
         $structuredAttempts = @(
@@ -1869,7 +1948,10 @@ function Test-Lifecycle {
             if ([string]$attempt.promptId -ne [string]$property.Name) {
                 $issues.Add("Work attempt $($attempt.id) belongs to prompt '$($attempt.promptId)', not '$($property.Name)'.")
             }
-            if ([string]$attempt.result -notin @('in_progress', 'completed', 'partial', 'blocked', 'not_applicable')) {
+            if ([string]$attempt.result -notin @(
+                'in_progress', 'completed', 'partial', 'blocked',
+                'not_applicable', 'waived', 'deferred'
+            )) {
                 $issues.Add("Work attempt $($attempt.id) has invalid result '$($attempt.result)'.")
             }
             $goalIds = @(@($attempt.goals) | ForEach-Object { [string]$_.id })
@@ -1998,7 +2080,10 @@ function Test-Lifecycle {
         if ($hasCurrentPrompt) {
             $issues.Add('awaiting_programmer lifecycle cannot have a currentPrompt.')
         }
-        if ([string]$state.nextAction -ne 'next | repeat | correct | skip_and_advance') {
+        if ([string]$state.nextAction -notin @(
+            'next | repeat | correct | skip_and_advance',
+            'next | repeat | correct | skip_and_advance | decide'
+        )) {
             $issues.Add("awaiting_programmer nextAction is invalid: '$($state.nextAction)'.")
         }
         if ($null -eq (Get-LastRecordedPromptId -State $state)) {
@@ -2041,33 +2126,23 @@ function Test-Lifecycle {
         if (@($state.blockers).Count -gt 0) {
             $issues.Add('Completed lifecycle cannot retain blockers.')
         }
+        $g10CompletionState = Get-GateState -State $state -Id 'G10'
+        if ($g10CompletionState.status -ne 'passed') {
+            $issues.Add("Production-complete lifecycle requires G10 passed; found '$($g10CompletionState.status)'.")
+        }
+        $productionGaps = Get-ProductionCompletionGaps -State $state
+        if (@($productionGaps.hardRequired).Count -gt 0) {
+            $issues.Add("Completed lifecycle has unfinished hard-required prompts: $($productionGaps.hardRequired -join ', ').")
+        }
+        if (@($productionGaps.undecided).Count -gt 0) {
+            $issues.Add("Completed lifecycle has prompts without an explicit execution/disposition decision: $($productionGaps.undecided -join ', ').")
+        }
+        if (@($productionGaps.incompleteNonCritical).Count -gt 0) {
+            $issues.Add("Completed lifecycle has unfinished non-critical prompts: $($productionGaps.incompleteNonCritical -join ', ').")
+        }
         if (-not $programmerControlled) {
-            $g10CompletionState = Get-GateState -State $state -Id 'G10'
-            if ($g10CompletionState.status -ne 'passed') {
-                $issues.Add("Completed lifecycle requires G10 passed; found '$($g10CompletionState.status)'.")
-            }
             if ((Get-PromptState -State $state -Id '76').status -ne 'completed') {
                 $issues.Add('Completed lifecycle requires prompt 76 completed.')
-            }
-            $unfinishedRequired = @(
-                $state.prompts.PSObject.Properties |
-                    Where-Object {
-                        $_.Value.applicability -eq 'required' -and
-                        $_.Value.status -ne 'completed'
-                    }
-            )
-            if ($unfinishedRequired.Count -gt 0) {
-                $issues.Add("Completed lifecycle has unfinished required prompts: $($unfinishedRequired.Name -join ', ').")
-            }
-            $unresolvedSelected = @(
-                $state.prompts.PSObject.Properties |
-                    Where-Object {
-                        $_.Value.applicability -eq 'selected' -and
-                        $_.Value.status -notin @('completed', 'not_applicable')
-                    }
-            )
-            if ($unresolvedSelected.Count -gt 0) {
-                $issues.Add("Completed lifecycle has unresolved selected prompts: $($unresolvedSelected.Name -join ', ').")
             }
         }
     }
@@ -2377,6 +2452,7 @@ function New-LifecycleInstance {
         Copy-Item -LiteralPath (Join-Path $catalogRoot $directory) -Destination $DestinationRoot -Recurse
     }
     foreach ($file in @(
+        '.gitignore',
         'AGENTS.md',
         'APP_CONTEXT.md',
         'CHANGE_CONTROL.md',
@@ -2449,17 +2525,14 @@ function New-LifecycleInstance {
         }
         $id = $Matches[1]
         $stage = Get-PromptStage -Manifest $manifest -Id $id
-        $isConditional = $file.FullName -match '[\\/]Optional[\\/]'
-        if ($stage.PSObject.Properties.Name -contains 'conditionalPromptIds') {
-            $isConditional = $isConditional -or (@($stage.conditionalPromptIds) -contains $id)
-        }
+        $metadata = Get-CatalogPromptMetadata -Root $DestinationRoot -Manifest $manifest -Id $id
         $title = (Get-Content -Encoding UTF8 -LiteralPath $file.FullName -TotalCount 1) -replace '^#\s*', ''
         $promptMap[$id] = [ordered]@{
             title = $title
             path = $file.FullName.Substring($DestinationRoot.Length + 1).Replace('\', '/')
             stage = $stage.id
-            applicability = $(if ($isConditional) { 'conditional' } else { 'required' })
-            status = $(if ($id -eq '01') { 'ready' } elseif ($isConditional) { 'not_selected' } else { 'pending' })
+            applicability = $metadata.applicability
+            status = $(if ($id -eq '01') { 'ready' } else { $metadata.initialStatus })
             evidence = $null
             attempts = @()
         }
@@ -2805,6 +2878,7 @@ if ($Command -eq 'upgrade') {
             -Destination $ProcessRoot -Recurse -Force
     }
     foreach ($file in @(
+        '.gitignore',
         'AGENTS.md',
         'CHANGE_CONTROL.md',
         'CLAUDE.md',
@@ -3035,24 +3109,15 @@ if ($Command -eq 'cycle-start') {
         $utf8NoBom
     )
 
-    $conditionalIds = @(
-        $manifest.stages |
-            ForEach-Object {
-                if ($_.PSObject.Properties.Name -contains 'conditionalPromptIds') {
-                    @($_.conditionalPromptIds)
-                }
-            }
-    )
     foreach ($promptProperty in @($state.prompts.PSObject.Properties)) {
         $promptId = [string]$promptProperty.Name
         $promptState = $promptProperty.Value
-        $promptState.applicability = $(if ($promptId -in $conditionalIds) { 'conditional' } else { 'required' })
+        $metadata = Get-CatalogPromptMetadata -Root $ProcessRoot -Manifest $manifest -Id $promptId
+        $promptState.applicability = $metadata.applicability
         $promptState.status = $(if ($promptId -eq '01') {
             'ready'
-        } elseif ($promptId -in $conditionalIds) {
-            'not_selected'
         } else {
-            'pending'
+            $metadata.initialStatus
         })
         $promptState.evidence = $null
     }
@@ -3304,14 +3369,25 @@ if ($Command -eq 'closeout') {
 
 if ($Command -eq 'status') {
     $allPrompts = @($state.prompts.PSObject.Properties)
-    $required = @($allPrompts | Where-Object { $_.Value.applicability -eq 'required' })
-    $requiredDone = @($required | Where-Object { $_.Value.status -eq 'completed' }).Count
-    $selectedOptionalPrompts = @($allPrompts | Where-Object { $_.Value.applicability -eq 'selected' })
-    $selectedOptionalDone = @(
-        $selectedOptionalPrompts |
-            Where-Object { $_.Value.status -in @('completed', 'not_applicable') }
+    $hardRequired = @($allPrompts | Where-Object { $_.Value.applicability -eq 'hard_required' })
+    $hardRequiredDone = @($hardRequired | Where-Object { $_.Value.status -eq 'completed' }).Count
+    $recommended = @($allPrompts | Where-Object { $_.Value.applicability -eq 'recommended' })
+    $conditional = @($allPrompts | Where-Object { $_.Value.applicability -eq 'conditional' })
+    $optional = @($allPrompts | Where-Object { $_.Value.applicability -eq 'optional' })
+    $decidedStatuses = @('completed', 'not_applicable', 'waived', 'deferred')
+    $recommendedDone = @($recommended | Where-Object { $_.Value.status -in $decidedStatuses }).Count
+    $conditionalDone = @($conditional | Where-Object { $_.Value.status -in $decidedStatuses }).Count
+    $optionalDone = @($optional | Where-Object { $_.Value.status -in $decidedStatuses }).Count
+    $undecidedSelectable = @(
+        $allPrompts |
+            Where-Object {
+                $_.Value.applicability -in @('conditional', 'optional') -and
+                $_.Value.status -eq 'not_selected'
+            }
     ).Count
-    $optionalUndecided = @($allPrompts | Where-Object { $_.Value.status -eq 'not_selected' }).Count
+    $notApplicable = @($allPrompts | Where-Object { $_.Value.status -eq 'not_applicable' }).Count
+    $waived = @($allPrompts | Where-Object { $_.Value.status -eq 'waived' }).Count
+    $deferred = @($allPrompts | Where-Object { $_.Value.status -eq 'deferred' }).Count
     $blocked = @($allPrompts | Where-Object { $_.Value.status -eq 'blocked' }).Count
     $currentStageDefinition = @($manifest.stages | Where-Object { $_.id -eq $state.currentStage })[0]
     $stagePromptIds = @($currentStageDefinition.promptIds)
@@ -3324,7 +3400,7 @@ if ($Command -eq 'status') {
     )
     $stageDone = @(
         $stageApplicable |
-            Where-Object { $_.Value.status -in @('completed', 'not_applicable') }
+            Where-Object { $_.Value.status -in $decidedStatuses }
     ).Count
     Write-Host "Process: $($state.processName)"
     Write-Host "Root: $ProcessRoot"
@@ -3334,9 +3410,12 @@ if ($Command -eq 'status') {
     }
     Write-Host "Status: $($state.status)"
     Write-Host "Current stage/prompt: $($state.currentStage)/$($state.currentPrompt)"
-    Write-Host "Required progress: $requiredDone/$($required.Count) completed"
-    Write-Host "Selected optional progress: $selectedOptionalDone/$($selectedOptionalPrompts.Count) decided"
-    Write-Host "Optional decisions remaining: $optionalUndecided"
+    Write-Host "Hard-required progress: $hardRequiredDone/$($hardRequired.Count) completed"
+    Write-Host "Recommended progress: $recommendedDone/$($recommended.Count) completed or dispositioned"
+    Write-Host "Conditional progress: $conditionalDone/$($conditional.Count) completed or dispositioned"
+    Write-Host "Optional progress: $optionalDone/$($optional.Count) completed or dispositioned"
+    Write-Host "Undecided conditional/optional prompts: $undecidedSelectable"
+    Write-Host "Dispositions: not applicable=$notApplicable, waived=$waived, deferred=$deferred"
     Write-Host "Current-stage applicable progress: $stageDone/$($stageApplicable.Count)"
     Write-Host "Blocked prompts: $blocked"
     Write-Host "Vertical slices recorded: $(@($state.slices).Count)"
@@ -3385,8 +3464,9 @@ if ($Command -eq 'status') {
         Write-Host "Next command: .\software-lifecycle.ps1 next -ProcessRoot `"$ProcessRoot`""
     }
     elseif ($state.status -eq 'awaiting_programmer') {
-        Write-Host "Programmer choices: next | repeat | correct | skip and advance"
+        Write-Host "Programmer choices: next | repeat | correct | skip and advance | decide a non-critical prompt"
         Write-Host "Next command: .\software-lifecycle.ps1 advance -ProcessRoot `"$ProcessRoot`""
+        Write-Host "Disposition command: .\software-lifecycle.ps1 decide -ProcessRoot `"$ProcessRoot`" -PromptId <ID> -Result <not_applicable|waived|deferred> -Evidence `"<short reason>`""
     }
     elseif ($state.status -eq 'waiting_decision') {
         Write-Host "Decision required: $($state.nextAction)"
@@ -3433,8 +3513,8 @@ if ($Command -eq 'status') {
             Write-Host "Gate command first: .\software-lifecycle.ps1 gate -ProcessRoot `"$ProcessRoot`" -GateId G10 -GateDecision passed -GateEvidence `"LIFECYCLE_GATE_EVIDENCE.json#G10`""
         }
         if ($allowedDecisions.Count -gt 0) {
-            Write-Host "Optional applicability decisions: $($allowedDecisions -join ', ')"
-            Write-Host "Not-applicable command: .\software-lifecycle.ps1 decide -ProcessRoot `"$ProcessRoot`" -PromptId <ID> -Result not_applicable -Evidence `"<approved decision>`""
+            Write-Host "Suggested applicability decisions: $($allowedDecisions -join ', ')"
+            Write-Host "Disposition command: .\software-lifecycle.ps1 decide -ProcessRoot `"$ProcessRoot`" -PromptId <ID> -Result <not_applicable|waived|deferred> -Evidence `"<short reason>`""
         }
         if ($state.nextAction -match '^select_vertical_slice') {
             Write-Host 'Vertical-slice fields: -SliceId <ID> -SliceKind <page|feature> -Surface <ssr|web|maui> -Requirements "<IDs>" -AcceptanceCriteria "<observable criteria>" -OutOfScope "<explicit exclusions>"'
@@ -3486,25 +3566,50 @@ if ($Command -eq 'advance') {
     for ($index = $lastIndex + 1; $index -lt $orderedPromptIds.Count; $index++) {
         $candidateId = [string]$orderedPromptIds[$index]
         $candidateState = Get-PromptState -State $state -Id $candidateId
-        if ($candidateState.status -ne 'not_selected') {
+        if ($candidateState.status -notin @('not_selected', 'completed', 'not_applicable', 'waived', 'deferred')) {
             $nextId = $candidateId
             break
         }
     }
     if ($null -eq $nextId) {
-        $state.status = 'completed'
-        $state.nextAction = 'none'
+        $productionGaps = Get-ProductionCompletionGaps -State $state
+        $g10 = Get-GateState -State $state -Id 'G10'
+        $productionReady = @($productionGaps.hardRequired).Count -eq 0 -and
+            @($productionGaps.undecided).Count -eq 0 -and
+            @($productionGaps.incompleteNonCritical).Count -eq 0 -and
+            [string]$g10.status -eq 'passed'
+        if ($productionReady) {
+            $state.status = 'completed'
+            $state.nextAction = 'none'
+            $state | Add-Member -NotePropertyName 'completion' `
+                -NotePropertyValue 'production_ready' -Force
+        }
+        else {
+            $state.status = 'awaiting_programmer'
+            $state.nextAction = 'next | repeat | correct | skip_and_advance | decide'
+            $state | Add-Member -NotePropertyName 'completion' `
+                -NotePropertyValue 'not_production_ready' -Force
+        }
         $state.blockers = @()
-        $incomplete = @(
-            $state.prompts.PSObject.Properties |
-                Where-Object { $_.Value.status -in @('partial', 'blocked', 'pending', 'ready') }
-        )
-        $state | Add-Member -NotePropertyName 'completion' `
-            -NotePropertyValue $(if ($incomplete.Count -eq 0) { 'complete' } else { 'with_gaps' }) -Force
+        Add-LifecycleHistoryAction -State $state -Action 'production-completion-check' `
+            -Evidence $(if ($productionReady) {
+                'All production completion invariants and G10 passed'
+            } else {
+                'Production readiness remains incomplete; no completion claimed'
+            })
         Save-State -State $state -Root $ProcessRoot
-        Write-Host 'PROCESS FINISHED.' -ForegroundColor Green
-        Write-Host " - Completion: $($state.completion)"
-        Write-Host " - Prompts with pending or incomplete work: $($incomplete.Count)"
+        if ($productionReady) {
+            Write-Host 'PROCESS FINISHED: PRODUCTION READY.' -ForegroundColor Green
+            Write-Host " - Completion: $($state.completion)"
+        }
+        else {
+            Write-Host 'PROCESS NOT FINISHED: PRODUCTION READINESS IS INCOMPLETE.' -ForegroundColor Yellow
+            Write-Host " - Hard-required prompts incomplete: $(@($productionGaps.hardRequired) -join ', ')"
+            Write-Host " - Prompts without decision: $(@($productionGaps.undecided) -join ', ')"
+            Write-Host " - Non-critical prompts incomplete: $(@($productionGaps.incompleteNonCritical) -join ', ')"
+            Write-Host " - Production gate G10: $($g10.status)"
+            Write-Host ' - Use request/repeat to finish work, decide for non-critical prompts, and pass the production gates with exact evidence.'
+        }
         exit 0
     }
 
@@ -3767,46 +3872,53 @@ if ($Command -eq 'decide') {
     if ($null -eq $decidedId) {
         throw 'PromptId is required for decide.'
     }
-    if ($Result -ne 'not_applicable') {
-        throw 'The decide command currently accepts only Result not_applicable; use select to execute applicable work.'
+    if ($Result -notin @('not_applicable', 'waived', 'deferred')) {
+        throw 'The decide command accepts only not_applicable, waived, or deferred.'
     }
-    if ($null -ne $state.currentPrompt -and -not [string]::IsNullOrWhiteSpace([string]$state.currentPrompt)) {
+    $hasCurrentPrompt = $null -ne $state.currentPrompt -and
+        -not [string]::IsNullOrWhiteSpace([string]$state.currentPrompt)
+    $isPreparedTarget = $hasCurrentPrompt -and
+        [string]$state.currentPrompt -eq $decidedId -and
+        [string]$state.status -eq 'ready' -and
+        (Test-ProgrammerControlledWorkflow -Manifest $manifest)
+    if ($hasCurrentPrompt -and -not $isPreparedTarget) {
         throw "Cannot decide prompt $decidedId while prompt $($state.currentPrompt) is active."
     }
-    if ($state.status -ne 'waiting_decision') {
-        throw "Applicability decisions require lifecycle status waiting_decision; found '$($state.status)'."
+    if ($state.status -notin @('ready', 'awaiting_programmer', 'waiting_decision')) {
+        throw "Prompt dispositions require a prompt boundary; lifecycle status is '$($state.status)'."
     }
     Require-SafeText -Value $Evidence -Label 'Evidence'
-    $allowedDecisions = @(Get-AllowedDecisionPromptIds -State $state)
-    if ($decidedId -notin $allowedDecisions) {
-        $allowedText = $(if ($allowedDecisions.Count -eq 0) { 'none' } else { $allowedDecisions -join ', ' })
-        throw "Prompt $decidedId cannot be decided for '$($state.nextAction)'. Allowed: $allowedText."
-    }
     $decidedPrompt = Get-PromptState -State $state -Id $decidedId
-    if ($decidedPrompt.applicability -eq 'required') {
-        throw "Required prompt $decidedId cannot be marked not_applicable."
+    if ($decidedPrompt.applicability -eq 'hard_required') {
+        throw "Hard-required prompt $decidedId cannot be marked $Result. Execute it and record an honest result."
     }
-    if ($decidedPrompt.status -eq 'completed') {
-        throw "Completed prompt $decidedId cannot be changed to not_applicable."
+    if ($decidedPrompt.status -notin @('pending', 'not_selected', 'ready')) {
+        throw "Prompt $decidedId cannot be dispositioned from status '$($decidedPrompt.status)'; request or repeat it when a prior decision must change."
     }
-    $decidedPrompt.applicability = 'selected'
-    $decidedPrompt.status = 'not_applicable'
+    $decidedPrompt.status = $Result
     $decidedPrompt.evidence = $Evidence
     $decidedPrompt.attempts = @($decidedPrompt.attempts) + @([ordered]@{
         at = [DateTimeOffset]::Now.ToString('o')
-        result = 'not_applicable'
+        result = $Result
         evidence = $Evidence
     })
     $state.history = @($state.history) + @([ordered]@{
         at = [DateTimeOffset]::Now.ToString('o')
-        action = 'applicability_decision'
+        action = 'prompt_disposition'
         promptId = $decidedId
-        result = 'not_applicable'
+        result = $Result
         evidence = $Evidence
     })
+    if ($isPreparedTarget) {
+        $state | Add-Member -NotePropertyName 'lastPrompt' -NotePropertyValue $decidedId -Force
+        $state.currentPrompt = $null
+        $state.status = 'awaiting_programmer'
+        $state.nextAction = 'next | repeat | correct | skip_and_advance | decide'
+        $state.blockers = @()
+    }
     Save-State -State $state -Root $ProcessRoot
-    Write-Host "DECIDED: optional prompt $decidedId is not applicable." -ForegroundColor Green
-    Write-Host " - Evidence: $Evidence"
+    Write-Host "DECIDED: $($decidedPrompt.applicability) prompt $decidedId -> $Result." -ForegroundColor Green
+    Write-Host " - Reason: $Evidence"
     Write-Host " - Next action remains: $($state.nextAction)"
     exit 0
 }
@@ -3815,8 +3927,11 @@ if ($Command -eq 'gate') {
     if ($null -ne $state.currentPrompt -and -not [string]::IsNullOrWhiteSpace([string]$state.currentPrompt)) {
         throw "Cannot decide a standalone gate while prompt $($state.currentPrompt) is active."
     }
-    if ($state.status -ne 'waiting_decision') {
-        throw "Standalone gate decisions require lifecycle status waiting_decision; found '$($state.status)'."
+    $allowedGateBoundary = $state.status -eq 'waiting_decision' -or
+        ((Test-ProgrammerControlledWorkflow -Manifest $manifest) -and
+            $state.status -eq 'awaiting_programmer')
+    if (-not $allowedGateBoundary) {
+        throw "Standalone gate decisions require a prompt boundary; lifecycle status is '$($state.status)'."
     }
     if ([string]::IsNullOrWhiteSpace($GateId) -or $GateId -notmatch '^G\d{2}$') {
         throw 'A valid GateId is required for gate.'
@@ -3851,6 +3966,9 @@ if ($Command -eq 'gate') {
     }
     if ($GateDecision -eq 'passed') {
         Test-GatePrerequisites -State $state -GateDefinition $standaloneGate
+        if ($GateId -eq 'G10') {
+            Assert-ProductionCompletionReady -State $state
+        }
         Invoke-ManifestGateValidator -Root $ProcessRoot -GateDefinition $standaloneGate -RecordedApprover $ApprovedBy
         if ($standaloneGate.PSObject.Properties.Name -contains 'validator' -and
             [string]$standaloneGate.validator -eq 'scripts/Test-LifecycleGateEvidence.ps1') {
@@ -3879,6 +3997,8 @@ if ($Command -eq 'gate') {
     if ($GateId -eq 'G10' -and $GateDecision -eq 'passed') {
         $state.status = 'completed'
         $state.nextAction = 'none'
+        $state | Add-Member -NotePropertyName 'completion' `
+            -NotePropertyValue 'production_ready' -Force
         if ($null -ne $state.PSObject.Properties['activeChange'] -and $null -ne $state.activeChange) {
             $state.activeChange.status = 'completed'
             $state.activeChange | Add-Member -NotePropertyName 'completedAt' `
@@ -3898,6 +4018,9 @@ if ($Command -eq 'record') {
     }
     if ([string]::IsNullOrWhiteSpace($Result)) {
         throw 'Result is required for record.'
+    }
+    if ($Result -in @('waived', 'deferred')) {
+        throw "Result '$Result' is a pre-execution disposition. Use decide before executing the prompt."
     }
     Require-SafeText -Value $Evidence -Label 'Evidence'
     $programmerControlled = Test-ProgrammerControlledWorkflow -Manifest $manifest
@@ -3924,8 +4047,8 @@ if ($Command -eq 'record') {
     }
 
     $promptState = Get-PromptState -State $state -Id $PromptId
-    if ($Result -eq 'not_applicable' -and $promptState.applicability -eq 'required') {
-        throw "Required prompt $PromptId cannot be marked not_applicable."
+    if ($Result -eq 'not_applicable' -and $promptState.applicability -eq 'hard_required') {
+        throw "Hard-required prompt $PromptId cannot be marked not_applicable."
     }
 
     if (Test-TaskLedgerRequired -Manifest $manifest) {
@@ -4075,7 +4198,7 @@ if ($Command -eq 'record') {
         $state | Add-Member -NotePropertyName 'lastPrompt' -NotePropertyValue $PromptId -Force
         $state.currentPrompt = $null
         $state.status = 'awaiting_programmer'
-        $state.nextAction = 'next | repeat | correct | skip_and_advance'
+        $state.nextAction = 'next | repeat | correct | skip_and_advance | decide'
         $state.blockers = @()
         Save-State -State $state -Root $ProcessRoot
 
@@ -4090,7 +4213,7 @@ if ($Command -eq 'record') {
             Write-Host ' - Remaining implementation:'
             $normalizedRemainingWork | ForEach-Object { Write-Host "   - $_" }
         }
-        Write-Host ' - Waiting for programmer: next | repeat | correct | skip and advance'
+        Write-Host ' - Waiting for programmer: next | repeat | correct | skip and advance | decide a non-critical prompt'
         exit 0
     }
 

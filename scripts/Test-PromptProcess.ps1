@@ -93,6 +93,8 @@ $requiredScripts = @(
     'scripts/Test-ProductQualityGate.ps1',
     'scripts/Test-SoftwareLifecycle.ps1',
     'scripts/Test-LifecycleMigration.ps1',
+    'scripts/Manage-AdvanceLocalPorts.ps1',
+    'scripts/Test-LocalPortAllocation.ps1',
     'scripts/Test-ProcessInDisposableCopy.ps1',
     'scripts/Get-PromptEvaluationScope.ps1',
     'software-lifecycle.ps1'
@@ -165,6 +167,31 @@ if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
         $manifestDuplicates = @($manifestPromptIds | Group-Object | Where-Object Count -gt 1)
         foreach ($duplicate in $manifestDuplicates) {
             Add-Failure "Prompt duplicado no PROCESS_MANIFEST.json: $($duplicate.Name)"
+        }
+        $promptClassNames = @('hard_required', 'recommended', 'conditional', 'optional')
+        $classifiedPromptIds = @()
+        foreach ($promptClassName in $promptClassNames) {
+            if ($null -eq $manifest.promptClasses.PSObject.Properties[$promptClassName]) {
+                Add-Failure "Classe de prompt ausente no PROCESS_MANIFEST.json: $promptClassName"
+                continue
+            }
+            $classifiedPromptIds += @($manifest.promptClasses.$promptClassName)
+        }
+        foreach ($manifestPromptId in $manifestPromptIds) {
+            $classCount = @($classifiedPromptIds | Where-Object { [string]$_ -eq [string]$manifestPromptId }).Count
+            if ($classCount -ne 1) {
+                Add-Failure "Prompt $manifestPromptId deve pertencer exatamente a uma classe; encontrado em $classCount."
+            }
+        }
+        foreach ($classifiedPromptId in $classifiedPromptIds) {
+            if ([string]$classifiedPromptId -notin $manifestPromptIds) {
+                Add-Failure "Classe de prompt referencia ID inexistente: $classifiedPromptId"
+            }
+        }
+        foreach ($requiredStatus in @('not_applicable', 'waived', 'deferred')) {
+            if ($requiredStatus -notin @($manifest.statuses)) {
+                Add-Failure "Estado de flexibilidade ausente no manifesto: $requiredStatus"
+            }
         }
         if ([string]$manifest.releaseChannel -notin @('candidate', 'stable')) {
             Add-Failure "PROCESS_MANIFEST.json tem releaseChannel invalido: $($manifest.releaseChannel)."
@@ -437,6 +464,23 @@ Require-Pattern 'software-lifecycle.ps1' '(?s)ConfirmMigration.*AcceptCandidateC
 Require-Pattern 'scripts/Test-LifecycleMigration.ps1' '(?s)legacyVersion.*prompt-04-partial.*controlled legacy migration.*preservedHistory.*skip-incomplete-and-advance:04->07' 'O teste de migracao nao prova preservacao de evidencia e avancar com gaps aceites.'
 Require-Pattern 'PROCESS_MANIFEST.json' '"releaseChannel"\s*:\s*"candidate"' 'O catalogo ainda nao distingue a candidata da versao stable.'
 Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"executionProfiles".*"fast".*"standard".*"deep".*"contextRouting"' 'O manifesto nao define perfis proporcionais e routing progressivo de contexto.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"proportionalVisiblePlanningRequired": true.*"autonomousExecutionWithinCurrentPromptRequired": true.*"reversibleTechnicalDecisionsDoNotRequireApproval": true.*"stopAtPromptBoundaryRequired": true' 'O manifesto nao declara planeamento proporcional, autonomia interna e paragem entre prompts.'
+Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)plano proporcional ao .mbito.*tarefa\s+trivial.*uma frase vis.vel.*n.o cries um artefacto separado.*altera..es n.o triviais.*apresenta um plano curto.*Apresentar ou atualizar o plano n.o . um pedido de aprova..o' 'O contrato comum nao distingue plano trivial de plano detalhado sem gate de aprovacao.'
+Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)decis.es t.cnicas.*sem pedir aprova..o.*revers.veis.*compat.veis.*verific.veis.*N.o pares apenas.*material.*fora do .mbito.*incompat.vel.*irrevers.vel' 'O contrato comum bloqueia indevidamente decisoes tecnicas reversiveis.'
+Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)Dentro do prompt atual.*todas as etapas necess.rias.*sem\s+pedir aprova..o.*n.o . um gate humano.*regista e apresenta o\s+resultado e para.*S. prepares ou executes outro prompt.*`pr.ximo`.*`repetir`.*`corrigir`.*`ignorar e avan.ar`' 'O contrato nao executa autonomamente o prompt atual nem para na fronteira seguinte.'
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11-PROTOCOL(?=.*corre..o local, revers.vel e de um s. passo)(?=.*quatro etapas verific.veis)(?=.*N.o pe.as aprova..o do plano)(?=.*premissa falsa)(?=.*decis.es t.cnicas revers.veis)(?=.*autorrevis.o adversarial)(?=.*awaiting_programmer)(?=.*sem preparar nem executar o seguinte)(?=.*a..o externa)(?=.*altera..o incompat.vel)' 'A avaliacao nao exercita autonomia dentro do prompt e paragem na fronteira.'
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11-FLEX(?=.*hard_required)(?=.*recommended)(?=.*conditional)(?=.*optional)(?=.*waived)(?=.*deferred)(?=.*not_applicable)(?=.*sem raz.o)(?=.*rejei..o sem muta..o)(?=.*reabre)' 'A avaliacao nao exercita classes, disposicoes, invariantes e reabertura.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"promptClasses".*"hard_required".*"recommended".*"conditional".*"optional"' 'O manifesto nao declara as quatro classes de prompt.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"statuses".*"not_applicable".*"waived".*"deferred"' 'O manifesto nao declara os tres estados de flexibilidade.'
+Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)Flexibilidade antes de executar um prompt.*hard_required.*recommended.*conditional.*optional.*not_applicable.*waived.*deferred.*raz.o curta' 'O contrato comum nao explica a flexibilidade antes da execucao.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)The decide command accepts only not_applicable, waived, or deferred.*Hard-required prompt.*cannot be marked.*prompt_disposition' 'O lifecycle nao implementa as disposicoes sem permitir dispensar invariantes criticos.'
+Require-Pattern 'scripts/Test-ProgrammerControlledLifecycle.ps1' '(?s)waive recommended prompt.*defer recommended prompt.*mark conditional prompt not applicable.*defer optional prompt.*Hard-required prompt 07.*advance across dispositions.*reopen deferred prompt' 'A regressao do lifecycle nao prova as quatro classes, as tres decisoes e a reabertura.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)Decide without executing a prompt.*hard_required.*recommended.*conditional.*optional.*not_applicable.*waived.*deferred' 'A skill canonica nao orienta as decisoes antes da execucao.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"applicationDeliveryTarget": "production".*"applicationMaturityProfilesEnabled": false.*"productionReadinessRequiredForLifecycleCompletion": true' 'O manifesto nao fixa producao como unica meta de maturidade.'
+Require-Pattern 'EXECUTION_CONTRACT.md' '(?s)Destino .nico: produ..o.*n.o existem perfis de maturidade.*fast.*standard.*deep.*production_ready.*Gate G10.*n.o.*autoriza' 'O contrato comum nao separa meta de producao, intensidade da tarefa e autorizacao de deploy.'
+Require-Pattern 'software-lifecycle.ps1' '(?s)(?=.*Get-ProductionCompletionGaps)(?=.*Assert-ProductionCompletionReady)(?=.*PROCESS NOT FINISHED: PRODUCTION READINESS IS INCOMPLETE)(?=.*not_production_ready)(?=.*Production-complete lifecycle requires G10 passed)(?=.*production_ready)' 'O lifecycle nao impede conclusao de producao prematura nos dois modos.'
+Require-Pattern 'scripts/Test-ProgrammerControlledLifecycle.ps1' '(?s)production-guard-process.*request final numeric prompt early.*PROCESS NOT FINISHED: PRODUCTION READINESS IS INCOMPLETE.*G10 passed or changed state before its production prerequisites.*forged programmer-controlled production completion' 'A regressao nao prova o guard de conclusao de producao.'
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)(?=.*EVAL-11-PROD)(?=.*prototype.*MVP.*pilot)(?=.*not_production_ready)(?=.*awaiting_programmer)(?=.*G10 prematuramente)(?=.*sem muta..o)(?=.*production_ready)(?=.*autoriza deploy)' 'A avaliacao nao exercita a meta unica e a conclusao real de producao.'
 Require-Pattern 'software-lifecycle.ps1' '(?s)(?=.*Execution profile:)(?=.*## Required context)(?=.*SHA-256)(?=.*execute only this prompt)(?=.*After recording, stop)' 'NEXT_TASK nao gera perfil, contexto auditavel e paragem obrigatoria.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' 'software-lifecycle\.ps1 upgrade.*lifecycle-root' 'A skill canonica nao atualiza instancias compativeis antes de continuar.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)automatic lifecycle upgrade.*stable.*PILOT_APPROVAL\.md.*explicitly asks.*ConfirmMigration' 'A skill nao separa upgrade automatico estavel de migracao candidata explicitamente autorizada.'
@@ -465,10 +509,19 @@ Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)(?=.*n.o listado.*n.o . controlo de\s
 Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)Definition of Done por unidade.*UI e vers.o atuais.*idiomas.*rota/contexto.*player.*build e testes' 'O protocolo nao possui Definition of Done ponta a ponta por unidade de ajuda.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)Execute one prompt.*After `record`, do not continue automatically.*next.*repeat.*skip and advance' 'A skill nao para depois de cada prompt sob controlo do programador.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*Cliente\.Web.*persistent terminal sessions.*Keep all three processes alive.*does not authorize.*production' 'A skill canonica nao inicia e valida as tres superficies locais sem alterar o lifecycle.'
+Require-Pattern 'AGENTS.md' '(?s)(?=.*corre a app)(?=.*Manage-AdvanceLocalPorts\.ps1)(?=.*bloco\s+exclusivo)(?=.*APP_LOCAL_PORTS\.json)(?=.*MAUI)' 'As instrucoes duradouras nao reservam portas exclusivas antes de executar varias apps.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)(?=.*Manage-AdvanceLocalPorts\.ps1 status)(?=.*Manage-AdvanceLocalPorts\.ps1 reserve)(?=.*ten-port block)(?=.*API HTTP/HTTPS)(?=.*ReallocateIfOccupied)(?=.*ASPNETCORE_URLS)(?=.*APP_LOCAL_PORTS\.json)(?=.*Manage-AdvanceLocalPorts\.ps1 release)' 'A skill de execucao local nao reserva, valida, realoca e conserva portas exclusivas.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"concurrentLocalApplicationsRequireExclusivePorts": true.*"localPortReservationBlockSize": 10.*"machineLocalPortAssignmentsMustNotBeCommitted": true' 'O manifesto nao exige blocos locais exclusivos e nao versionados.'
+Require-Pattern 'scripts/Manage-AdvanceLocalPorts.ps1' '(?s)(?=.*FileShare\]::None)(?=.*GetActiveTcpListeners)(?=.*basePort)(?=.*apiHttp)(?=.*apiHttps)(?=.*ssrHttp)(?=.*ssrHttps)(?=.*webHttp)(?=.*webHttps)(?=.*APP_LOCAL_PORTS\.json)(?=.*doNotCommit)(?=.*ReallocateIfOccupied)' 'O alocador nao combina lock, listeners reais, mapa de portas e atribuicao local.'
+Require-Pattern '.gitignore' '(?m)^APP_LOCAL_PORTS\.json$' 'A atribuicao local de portas nao esta protegida contra commit acidental.'
+Require-Pattern 'scripts/Test-LocalPortAllocation.ps1' '(?s)(?=.*concurrent local application port allocation)(?=.*OS-occupied block)(?=.*Repeated reservation)(?=.*Concurrent applications received duplicate)(?=.*Explicit release)' 'A regressao de portas nao cobre ocupacao real, estabilidade, concorrencia e release.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' '(?s)Reserva local obrigat.ria de portas.*Manage-AdvanceLocalPorts\.ps1 reserve.*API HTTP/HTTPS.*SSR HTTP/HTTPS.*Web HTTP/HTTPS.*MAUI.*doNotCommit.*ReallocateIfOccupied' 'O prompt 07 nao reserva o bloco local completo por aplicacao.'
+Require-Pattern 'prompts/02-arquitetura-e-fundacao/Optional/10-configurar-ambientes-segredos-e-configuracao.md' '(?s)(?=.*APP_LOCAL_PORTS\.json)(?=.*ASPNETCORE_URLS)(?=.*App\.Server\.Api)(?=.*App\.Client\.Ssr)(?=.*App\.Client\.Web)(?=.*MAUI)(?=.*duas fixtures)(?=.*aus.ncia de listeners cruzados)' 'O prompt 10 nao aplica nem testa a reserva nas superficies locais.'
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)(?=.*EVAL-02-PORTS)(?=.*oito raízes)(?=.*primeira porta candidata)(?=.*cinco reservas concorrentes)(?=.*machineLocal/doNotCommit)(?=.*release)(?=.*n.o altera Git)' 'A avaliacao nao cobre reservas locais concorrentes, colisao real e isolamento Git.'
 Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*without advancing lifecycle state' 'A skill global nao encaminha o pedido de executar a app completa.'
 Require-Pattern '.agents/skills/advance-app-continue/agents/openai.yaml' '(?s)short_description: "Continue, correct, or run an Advance app".*default_prompt: "Use \$advance-app-continue to continue, correct, or run my Advance application\."' 'A metadata da skill canonica nao apresenta continuacao, correcao e arranque.'
 Require-Pattern 'plugins/advance-app/skills/advance-app-continue/agents/openai.yaml' '(?s)short_description: "Continue, correct, or run an Advance app".*default_prompt: "Use \$advance-app-continue to continue, correct, or run my Advance application\."' 'A metadata global da skill nao apresenta continuacao, correcao e arranque.'
-Require-Pattern 'AGENTS.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*readiness.*n.o avan.a o lifecycle' 'As instrucoes derivadas nao conservam o contrato de executar os tres projetos locais.'
+Require-Pattern 'AGENTS.md' '(?s)(?=.*corre a app)(?=.*Server\.Api)(?=.*Client\.Ssr)(?=.*Client\.Web)(?=.*readiness)(?=.*n.o\s+avan.a\s+o\s+lifecycle)' 'As instrucoes derivadas nao conservam o contrato de executar os tres projetos locais.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-04.*work ledger.*finding-gate.*record completed' 'O piloto nao exercita o findings gate durante a revisao adversarial.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11.*awaiting_programmer.*parcial.*skip and advance.*request/repeat.*brownfield.*objetivo' 'O piloto nao cobre o fluxo controlado, gaps e reruns.'
 Require-Pattern 'pilot/cases/EVAL-04.md' '(?s)work-start.*finding-add.*finding-gate.*finding-resolve.*attempt ID' 'O caso EVAL-04 nao conserva o ciclo completo do task ledger.'

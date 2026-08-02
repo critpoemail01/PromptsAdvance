@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-02.8 |
+| Catalog version | 2026-08-02.12 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -400,3 +400,40 @@ instalado em cache ou com conflito gera um relatório anonimizado pendente, sem
 sobrescrever trabalho. Esta regra não autoriza commit, push ou outra ação
 externa. EVAL-02-UPSTREAM, EVAL-03, EVAL-04, EVAL-12 e a suite completa devem
 ser repetidos. O piloto permanece `pending` e o canal `candidate`.
+
+A versão 2026-08-02.9 torna explícita a autonomia proporcional do protocolo
+comum: tarefas triviais usam um plano visível de uma linha, tarefas não triviais
+apresentam etapas verificáveis, e nenhuma delas pede aprovação apenas por
+mostrar ou atualizar o plano. Decisões técnicas reversíveis e compatíveis com o
+âmbito avançam autonomamente. Todas as etapas do prompt atual são executadas
+sem pausas artificiais, mas a fronteira entre prompts continua sob controlo
+explícito do programador. A autorrevisão adversarial permanece universal e não
+é confundida com revisão independente. EVAL-02, EVAL-04, EVAL-11-PROTOCOL,
+EVAL-12 e a suite completa devem ser repetidos. O piloto permanece `pending` e
+o canal `candidate`.
+
+A versão 2026-08-02.10 classifica os 76 prompts como `hard_required`,
+`recommended`, `conditional` ou `optional`. O programador pode decidir antes da
+execução que um prompt não crítico é `not_applicable`, `waived` ou `deferred`,
+com uma razão curta preservada no histórico; `advance` ignora a decisão e o
+prompt pode ser reaberto com objetivo explícito. Os prompts 07, 42, 55, 56, 65,
+66 e 67 continuam críticos e não aceitam dispensa. EVAL-02, EVAL-04,
+EVAL-11-FLEX, EVAL-12 e a suite completa devem ser repetidos. O piloto permanece
+`pending` e o canal `candidate`.
+
+A versão 2026-08-02.11 assume uma única meta de maturidade: aplicação final
+destinada a produção. `fast`, `standard` e `deep` afetam apenas o esforço da
+tarefa, nunca o nível de qualidade. O fluxo controlado pelo programador já não
+declara conclusão ao chegar ao último prompt se faltarem prompts críticos,
+decisões explícitas, resolução de trabalho incompleto ou G10; nesses casos fica
+`not_production_ready`. EVAL-02, EVAL-04, EVAL-11-PROD, EVAL-12 e a suite
+completa devem ser repetidos. O piloto permanece `pending` e o canal
+`candidate`.
+
+A versão 2026-08-02.12 acrescenta reservas locais exclusivas para executar
+várias aplicações simultaneamente na mesma máquina. Um registo protegido por
+lock atribui blocos de dez portas, verifica listeners reais e conserva URLs
+estáveis de API, SSR e Web; MAUI usa a API da própria reserva. A configuração é
+local, não versionada, e só é libertada por pedido explícito. EVAL-02-PORTS,
+EVAL-03, EVAL-04, EVAL-12 e a suite completa devem ser repetidos. O piloto
+permanece `pending` e o canal `candidate`.

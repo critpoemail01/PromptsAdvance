@@ -44,6 +44,8 @@ origem local permanece imutável.
   greenfield autorizada
 - Autorização externa: `[AUTORIZAR_CRIACAO_GITHUB_E_PUSH_INICIAL]`, apenas
   quando a ação externa é pedida
+- Reserva local de portas: `scripts/Manage-AdvanceLocalPorts.ps1`, usando a
+  raiz real da aplicação e a raiz isolada do processo
 
 Em `greenfield`, usa `private`, `main` e `origin` apenas como defaults
 conservadores quando não colidirem com uma política confirmada. Não inventes
@@ -108,6 +110,34 @@ prompt, antes de alterar a aplicação:
    independentes dessa incerteza, marca o resultado `partial` e lista a
    evidência necessária para terminar.
 
+## Reserva local obrigatória de portas
+
+Depois de existir uma raiz de aplicação válida, reserva um bloco exclusivo de
+portas nesta máquina antes de executar a aplicação:
+
+```powershell
+.\scripts\Manage-AdvanceLocalPorts.ps1 reserve `
+  -ApplicationRoot "<raiz absoluta da aplicação>" `
+  -ProcessRoot "<raiz absoluta do lifecycle>"
+```
+
+O registo global local usa lock exclusivo e confirma listeners TCP reais antes
+de atribuir um bloco. Cada aplicação recebe dez portas reservadas, das quais
+seis têm função estável: API HTTP/HTTPS, SSR HTTP/HTTPS e Web HTTP/HTTPS. A
+aplicação MAUI não abre outro listener; consome o URL reservado da API.
+
+`APP_LOCAL_PORTS.json` fica apenas no processo local, marcado `doNotCommit`, e
+nunca é copiado para configuração partilhada, Git ou ambientes remotos. Uma
+reserva existente para a mesma raiz é reutilizada. Não calcules portas apenas a
+partir do nome da aplicação e não reutilizes uma porta fixa do boilerplate.
+
+Se uma porta do bloco estiver ocupada, identifica primeiro se pertence a uma
+instância saudável da própria aplicação. Reutiliza essa instância quando for o
+caso. Só usa `-ReallocateIfOccupied` depois de provar que o listener é alheio ou
+obsoleto; atualiza então toda a configuração local dependente como uma unidade.
+Parar a aplicação não liberta a reserva, garantindo URLs estáveis no próximo
+arranque. `release` é apenas para remoção explícita da aplicação/reserva.
+
 ## Critérios de sucesso
 
 - `[MODO_INICIATIVA]`, raiz da aplicação, raiz do processo e baseline Git estão
@@ -132,6 +162,10 @@ prompt, antes de alterar a aplicação:
   tem decisão explícita e nenhuma foi adotada apenas por ser mais recente.
 - Quando a aplicação já contém o boilerplate, a sua conformidade e proveniência
   foram verificadas sem recopiar a base nem apagar personalizações.
+- Existe uma reserva local exclusiva e reproduzível em `APP_LOCAL_PORTS.json`;
+  não colide com outra aplicação registada nem com listeners TCP existentes.
+- API, SSR e Web têm URLs HTTP/HTTPS próprios e MAUI referencia a API da mesma
+  reserva, sem portas locais fixas partilhadas provenientes do boilerplate.
 - O destino não conserva caminhos absolutos, imports ou dependências de runtime para a pasta de origem.
 - Os módulos mantidos estão completos; os removidos não deixam packages, configuração, registos, endpoints, recursos ou testes órfãos.
 - Restore, build e testes passam, ou cada impedimento externo fica demonstrado.

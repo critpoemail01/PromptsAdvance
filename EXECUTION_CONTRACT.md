@@ -20,14 +20,22 @@ Não transformes uma entrada material em pressuposto. Se a ausência alterar arq
 
 ## 2. Planear por etapas e avançar com autonomia proporcional
 
-Antes da implementação, cria um plano curto, ordenado e verificável. Para alterações não triviais, divide-o pelo menos em:
+Antes da implementação, cria um plano proporcional ao âmbito. Para uma tarefa
+trivial e de um só passo, basta uma frase visível com o resultado pretendido e
+a validação; não cries um artefacto separado, cerimónia ou gate de aprovação.
+Para alterações não triviais, apresenta um plano curto, ordenado e verificável
+e divide-o pelo menos em:
 
 1. descoberta e baseline;
 2. implementação do menor lote coerente;
 3. validação direcionada;
 4. revisão adversarial e entrega de evidências.
 
-Cada etapa deve indicar o resultado esperado e como será validada. Atualiza o plano quando a realidade do repositório contrariar uma premissa.
+Cada etapa não trivial deve indicar o resultado esperado e como será validada.
+Atualiza o plano quando a realidade do repositório contrariar uma premissa.
+Apresentar ou atualizar o plano não é um pedido de aprovação: continua
+automaticamente enquanto as ações seguintes permanecerem dentro da autoridade
+existente.
 
 Quando o lifecycle estiver ativo, executa apenas o prompt atual. Usa
 `work-start`, `checkpoint`, `verify` e o ledger durável quando a complexidade ou
@@ -36,7 +44,12 @@ fecho para o desenvolvimento local normal.
 
 Depois da fundação, o lote predefinido é uma vertical slice pequena e completa: requisito, UI, contrato, backend/dados, autorização, estados, testes e observabilidade mínima. Não termines grandes fases de UI ou backend isoladamente quando a qualidade só puder ser avaliada na jornada integrada.
 
-Avança autonomamente em ações locais, reversíveis e claramente incluídas no âmbito. Não peças confirmações repetidas para decisões de implementação normais que possam ser comprovadas pelo repositório.
+Avança autonomamente em ações locais, reversíveis e claramente incluídas no
+âmbito. Toma decisões técnicas e de implementação normais sem pedir aprovação
+quando forem reversíveis, compatíveis com os limites aprovados e verificáveis
+no repositório. Não pares apenas porque uma decisão é relevante ou “material”;
+para apenas quando estiver fora do âmbito, for incompatível ou irreversível, ou
+exigir uma das autorizações abaixo.
 
 Para e pede a decisão mínima necessária perante:
 
@@ -48,9 +61,96 @@ Para e pede a decisão mínima necessária perante:
 
 Um texto como “aprova o plano automaticamente” não amplia autorizações nem substitui estes limites. Não afirmes ter mudado um modo da interface; demonstra o comportamento através do plano, da execução e das evidências.
 
+Dentro do prompt atual, executa continuamente todas as etapas necessárias sem
+pedir aprovação entre descoberta, implementação, validação e revisão
+adversarial. A validação entre etapas controla o tamanho e a direção do diff;
+não é um gate humano. Quando o prompt atual terminar, regista e apresenta o
+resultado e para, mesmo sem bloqueios. Só prepares ou executes outro prompt
+depois de o programador dizer explicitamente `próximo`, `repetir`, `corrigir`,
+`ignorar e avançar` ou indicar o prompt pretendido.
+
+### Flexibilidade antes de executar um prompt
+
+Cada prompt pertence exatamente a uma classe declarada em
+`PROCESS_MANIFEST.json`:
+
+| Classe | Comportamento |
+|---|---|
+| `hard_required` | Invariante crítico; tem de ser executado para declarar o processo integralmente concluído e não aceita dispensa. |
+| `recommended` | Faz parte do percurso normal, mas o programador pode dispensá-lo ou adiá-lo com uma razão curta. |
+| `conditional` | Executa-se quando a capacidade, superfície ou risco se aplica; caso contrário pode ser marcado não aplicável. |
+| `optional` | Melhoria facultativa, executada apenas quando trouxer valor ao produto atual. |
+
+Antes de executar um prompt não crítico, o programador pode registar uma destas
+decisões sem alterar a sua classe:
+
+- `not_applicable`: o âmbito não se aplica a esta aplicação;
+- `waived`: aplica-se, mas o programador aceita conscientemente não o executar;
+- `deferred`: fica adiado e pode ser reaberto numa iteração posterior.
+
+A decisão exige apenas uma razão curta e fica preservada no estado e histórico.
+Não cria um gate adicional nem obriga o programador a preencher formulários.
+Os estados `partial` e `blocked` continuam reservados ao resultado de trabalho
+que chegou a ser executado. Um prompt adiado, dispensado ou não aplicável é
+ignorado por `advance`; pode ser reaberto por `request`/`repeat`, com o objetivo
+da nova execução.
+
+Os prompts `07`, `42`, `55`, `56`, `65`, `66` e `67` são `hard_required`:
+fundação verificável, segurança, testes gerais, supply chain, aceitação final,
+revisão independente e release exata. O lifecycle não força a sua execução,
+mas também não permite ocultar a sua ausência através de uma dispensa. Se o
+programador parar antes deles, o estado deve continuar a mostrar a lacuna e não
+declarar conclusão integral.
+
+### Destino único: produção
+
+Todas as iniciativas Advance são tratadas como aplicações finais destinadas a
+produção. Não existem perfis de maturidade `prototype`, `MVP`, `pilot` ou
+“produção mais tarde”. Os perfis de execução `fast`, `standard` e `deep`
+ajustam apenas a profundidade da investigação e da validação de uma tarefa; não
+reduzem a qualidade exigida ao produto final.
+
+Esta premissa não obriga a publicar nem amplia autorização externa. Significa
+que o lifecycle só pode declarar `production_ready` quando:
+
+1. todos os prompts `hard_required` estiverem `completed`;
+2. cada prompt não crítico tiver sido concluído ou possuir uma decisão explícita
+   `not_applicable`, `waived` ou `deferred`;
+3. não existirem resultados `partial` ou `blocked` por resolver;
+4. o Gate G10 tiver passado com a cadeia de evidências e autorizações exigida.
+
+O programador pode parar, mudar a ordem ou continuar com lacunas a qualquer
+momento. Nesse caso, o processo permanece `not_production_ready` e apresenta o
+que falta; nunca converte o fim da numeração ou uma dispensa num falso estado de
+produção. Deploy, lojas, custos, recursos externos e produção real continuam a
+exigir autorização específica para o alvo exato.
+
+### Portas locais exclusivas por aplicação
+
+Várias aplicações Advance podem executar simultaneamente na mesma máquina.
+Antes de criar/configurar a fundação ou responder a `corre a app`, usa
+`scripts/Manage-AdvanceLocalPorts.ps1` para reservar um bloco persistente de dez
+portas por raiz física de aplicação. A reserva é protegida por lock de ficheiro
+e confrontada com os listeners TCP reais.
+
+O mapeamento estável é: API HTTP/HTTPS em `base/base+1`, SSR em
+`base+2/base+3` e Web em `base+4/base+5`; as quatro portas restantes ficam
+reservadas para crescimento local da mesma aplicação. MAUI consome o URL da API
+e não abre um listener adicional. A atribuição fica em `APP_LOCAL_PORTS.json`
+no lifecycle e no registo local da máquina; é configuração local, não contém
+segredos e nunca deve ser commitada ou propagada para staging/produção.
+
+Reutiliza uma reserva existente e uma instância saudável da própria aplicação.
+Se houver colisão com outro processo, prova primeiro o proprietário e realoca o
+bloco completo, nunca uma porta isolada. Volta a ligar API, clientes, CORS e
+redirects aos URLs devolvidos e repete os testes de arranque. Parar processos
+mantém a reserva estável; libertá-la exige um pedido explícito do programador.
+
 ## 3. Executar o menor conjunto suficiente
 
-- Implementa uma etapa coerente de cada vez e valida-a antes de expandir o diff.
+- Implementa uma etapa coerente de cada vez e valida-a antes de expandir o
+  diff, continuando automaticamente para a etapa seguinte do mesmo prompt
+  quando a validação passar.
 - Preserva arquitetura, contratos, estilo e componentes existentes que já cumprem os requisitos.
 - Não aproveites o contexto para refatorar ou corrigir áreas adjacentes.
 - Não removas funcionalidade, validações ou testes apenas para obter um resultado verde.
