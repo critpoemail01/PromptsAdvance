@@ -305,7 +305,10 @@ Os prompts 25/26 tratam requisitos globais quando já existe base funcional sufi
 
 ## Regras de qualidade não negociáveis
 
-- Pesquisa atual de aplicações profissionais comparáveis, design systems maduros, investigação UX e referências premium relevantes; popularidade ou preço são sinais, não prova de qualidade.
+- No prompt 13, cada direção parte de um template, tema ou UI kit premium pago
+  com página de produto/licença e live preview exato. Aplicações rivais podem
+  ser mostradas como inspiração complementar, mas não são a base da decisão ou
+  da recomendação; popularidade ou preço continuam a não provar qualidade.
 - Extrai princípios e critérios próprios do domínio. Não copies marcas, trade dress, texto, código ou assets sem licença.
 - Evita dashboards genéricos: densidade, grelha, hierarquia, navegação, controlos e estados devem responder às tarefas reais.
 - Mantém catálogo `componente → variantes → estados → plataformas → acessibilidade → baseline`.

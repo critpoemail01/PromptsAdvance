@@ -136,7 +136,10 @@ fontes atuais e apresenta exatamente três direções para cada aplicação, nov
 total, sem alterar a UI. A fixture inclui uma aplicação cujo produto exige login
 mas tem galeria pública, um template premium com página de produto e live
 preview separados, uma ficha nativa com screenshots e um link de preview
-inicialmente quebrado. Na primeira fixture, o programador escolhe explicitamente
+inicialmente quebrado. Cada uma das nove direções tem um template/tema/UI kit
+premium pago como base principal, com página de produto/licença e live preview
+exato; as aplicações rivais aparecem apenas como sugestões complementares para
+ver padrões. Na primeira fixture, o programador escolhe explicitamente
 `SSR-2`, `WEB-1` e `MAUI-3`; na segunda responde `usar as três recomendadas`.
 Só depois executa o prompt 13 numa vertical slice visual pequena e real, aplica
 o prompt 14, 16 ou 18 à superfície selecionada e, numa fixture cujas jornadas
@@ -152,13 +155,14 @@ Espera-se:
   programador para as três aplicações `Client.Ssr`, `Client.Web` e
   `Client.Maui`; `Server.Api` não conta como superfície visual;
 - `INITIAL_LAYOUT_DIRECTIONS.md` com `SSR-1..3`, `WEB-1..3` e `MAUI-1..3`,
-  referências premium/concorrentes por opção, três recomendações fundamentadas
-  e a resposta/fonte do programador para cada aplicação;
-- cada uma das nove linhas mostrada ao programador contém `Ver visual` com pelo
-  menos um link Markdown clicável, público, aberto e verificado na data;
-- aplicações online ligam à jornada/demo/galeria visual, templates premium ao
-  live preview exato separado da página de produto/licença, e apps nativas à
-  store listing com screenshots, galeria ou vídeo oficial;
+  um template premium base por opção, três recomendações fundamentadas nessa
+  base e a resposta/fonte do programador para cada aplicação;
+- cada uma das nove linhas mostrada ao programador contém `Template premium
+  base` e `Ver preview`, com links Markdown públicos, abertos e verificados para
+  a página de produto/licença e para o live preview exato;
+- `Ver rival (opcional)` pode ligar à jornada/demo/galeria visual, store listing
+  com screenshots ou vídeo oficial apenas como inspiração complementar; uma
+  aplicação rival nunca substitui o template nem fundamenta a recomendação;
 - homepage sem interface relevante, categoria de marketplace, login sem galeria,
   link quebrado ou URL apenas em texto não contam; a referência é substituída ou
   a opção fica `não selecionável` e nunca é recomendada;
@@ -1036,6 +1040,14 @@ marcadores de recuperação/concorrência são ignorados com motivo; backups,
 clones e projetos sem lifecycle não são alterados. EVAL-02-SYNC, EVAL-03,
 EVAL-04, EVAL-12 e depois a suite completa devem ser repetidos. O piloto
 permanece pendente.
+
+Na `catalogVersion` `2026-08-02.6`, as nove direções do prompt 13 passam a ter
+como base principal um template, tema ou UI kit premium pago com página de
+produto/licença e live preview exato verificado. Aplicações rivais ou
+comparáveis podem ser apresentadas apenas em `Ver rival (opcional)` para
+observar padrões; não substituem a base premium nem justificam a recomendação.
+EVAL-05, EVAL-07, EVAL-12 e depois a suite completa devem ser repetidos. O
+piloto permanece pendente.
 
 ## Referências
 

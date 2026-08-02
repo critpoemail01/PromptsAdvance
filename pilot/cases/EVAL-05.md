@@ -25,16 +25,19 @@ ficheiros; `próximo` não é uma escolha. Regista depois duas execuções isola
 Em ambos preserva rotas, contratos, backend, permissões, negócio e
 infraestrutura não visual. Todas as rotas continuam compiláveis e funcionais;
 apenas a primeira slice recebe acabamento visual completo neste caso.
-Pesquisa fontes atuais de aplicações comparáveis, produto adjacente, design system e
-templates pagos premium para SSR, Web e MAUI, conservando URL oficial, data,
-preço/licença e limites. A proposta identifica as três aplicações individualmente
+Pesquisa primeiro templates, temas ou UI kits pagos premium para SSR, Web e
+MAUI, conservando URL oficial, data, preço/licença e limites. Cada uma das nove
+direções tem uma base premium principal com página de produto/licença e live
+preview exato; aplicações comparáveis, produto adjacente e design systems são
+apenas referências complementares. A proposta identifica as três aplicações individualmente
 e como uma família coerente. Apresenta exatamente `SSR-1..3`, `WEB-1..3` e
 `MAUI-1..3` em três tabelas curtas, com diferenças materiais, referências,
-ganho, custo/risco, coluna `Ver visual` e uma recomendação por aplicação. Cada
-uma das nove linhas contém pelo menos um link Markdown clicável e verificado:
-aplicação/demo/galeria pública para produto online, live preview exato separado
-da página de produto/licença para template premium, e store listing com
-screenshots, galeria ou vídeo oficial para MAUI/nativo. A fixture inclui uma app
+ganho, custo/risco, colunas `Template premium base`, `Ver preview` e `Ver rival
+(opcional)`, e uma recomendação por aplicação fundamentada no template. Cada
+uma das nove linhas contém links Markdown clicáveis e verificados para a página
+do produto/licença e live preview exato. A rival pode ligar a
+aplicação/demo/galeria pública, store listing com screenshots, galeria ou vídeo
+oficial, mas não substitui a base premium. A fixture inclui uma app
 com login mas galeria pública, um template com links de produto/preview distintos
 e um preview inicialmente quebrado; não aceita homepage genérica, categoria de
 marketplace, login sem alternativa visual, URL apenas em texto nem link quebrado.

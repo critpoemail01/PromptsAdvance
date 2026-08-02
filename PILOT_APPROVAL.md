@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-02.5 |
+| Catalog version | 2026-08-02.6 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -376,3 +376,10 @@ fechado. Instâncias concluídas, ativas, inválidas ou com marcadores de
 recuperação são reportadas sem mutação. EVAL-02-SYNC, EVAL-03, EVAL-04,
 EVAL-12 e a suite completa devem ser repetidos. O piloto permanece `pending` e
 o canal `candidate`.
+
+A versão 2026-08-02.6 torna templates, temas ou UI kits premium pagos a base
+principal obrigatória das nove direções do prompt 13. Cada opção apresenta a
+página de produto/licença e o live preview exato; aplicações rivais ficam apenas
+como sugestões visuais complementares e não podem substituir a base ou
+fundamentar a recomendação. EVAL-05, EVAL-07, EVAL-12 e a suite completa devem
+ser repetidos. O piloto permanece `pending` e o canal `candidate`.
