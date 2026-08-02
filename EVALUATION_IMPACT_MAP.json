@@ -8,7 +8,7 @@
   "rules": [
     {
       "name": "lifecycle-and-common-contract",
-      "pathRegex": "^(software-lifecycle\\.ps1|PROCESS_MANIFEST\\.json|AGENTS\\.md|EXECUTION_CONTRACT\\.md|scripts/Test-PromptReferences\\.ps1|\\.agents/skills/)",
+      "pathRegex": "^(software-lifecycle\\.ps1|PROCESS_MANIFEST\\.json|AGENTS\\.md|EXECUTION_CONTRACT\\.md|UPSTREAM_LEARNING\\.md|scripts/Test-PromptReferences\\.ps1|\\.agents/skills/|plugins/advance-app/)",
       "cases": ["EVAL-02", "EVAL-03", "EVAL-04", "EVAL-11", "EVAL-12", "EVAL-13"]
     },
     {

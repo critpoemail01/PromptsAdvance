@@ -1,6 +1,6 @@
 ---
 name: advance-app-continue
-description: Continue, adopt, validate, recover, request, rerun, run, or stop an Advance application and lifecycle from any Codex project. Use under explicit programmer control, including when the user says to run/start/stop the app or "corre a app".
+description: Continue, adopt, validate, recover, correct, request, rerun, run, or stop an Advance application and lifecycle from any Codex project. Use under explicit programmer control, including when the user asks to correct an existing Advance app or says to run/start/stop the app or "corre a app".
 ---
 
 # Advance App Continue
@@ -44,6 +44,15 @@ current working directory. Do not search the entire filesystem.
    as a blocker to local application development. Preserve and report all gaps.
    External, destructive, Git, release, store, financial, and production
    actions retain their specific authorization requirements.
+6. After correcting an application defect, read the resolved catalog's
+   `UPSTREAM_LEARNING.md` completely. For a systemic cause, resolve a safe
+   development clone with
+   `Resolve-AdvanceCatalog.ps1 -PreferDevelopmentClone`, apply the generalized
+   correction plus regression,
+   and update the tool as required by that catalog. If only an installed cache
+   or a conflicting clone is available, create the pending upstream feedback
+   report in the application. Never copy app-specific or private material and
+   never infer authorization for commit, push, PR, publication, or production.
 
 The canonical skill reports every prompt result and remaining implementation,
 then waits for `next`, `repeat`, `correct`, or `skip and advance`. It inspects

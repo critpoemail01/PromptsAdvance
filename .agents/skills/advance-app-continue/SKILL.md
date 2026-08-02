@@ -1,6 +1,6 @@
 ---
 name: advance-app-continue
-description: Continue, adopt, validate, recover, rerun, run, or stop an Advance application and its lifecycle. Use for an existing application, lifecycle, or filesystem project path when the user asks for the next prompt, a specific prompt, a rerun, an honest readiness/result assessment, or says to run/start/stop the app (including "corre a app").
+description: Continue, adopt, validate, recover, correct, rerun, run, or stop an Advance application and its lifecycle. Use for an existing application, lifecycle, or filesystem project path when the user asks for the next prompt, a specific prompt, a correction, a rerun, an honest readiness/result assessment, or says to run/start/stop the app (including "corre a app").
 ---
 
 # Advance App Continue
@@ -23,6 +23,9 @@ application or lifecycle.
    security, release, production, or operations.
    Read `HELP_AND_ACADEMY.md` when contextual help, task videos, or an Academy
    is in scope.
+   After correcting a defect or recurring weakness, read
+   `UPSTREAM_LEARNING.md` completely and apply its recurrence classification,
+   upstream generalization, privacy, regression, and authorization rules.
 4. Inspect the application, Git state, code, tests, and previous prompt history.
    Existing implementation is evidence, not proof of completeness.
 
@@ -100,6 +103,25 @@ The supported inspection/confirmation flow is:
    when the task is complex or their diagnostic value is useful; they are not a
    routine prerequisite for recording a prompt result.
 5. Record one honest result and stop.
+
+## Learn from application corrections
+
+After fixing a defect in an Advance application, do not assume the lesson is
+application-specific. Follow `UPSTREAM_LEARNING.md` before the final response:
+
+1. validate the application fix;
+2. classify the root cause as `advanceappflow_systemic`,
+   `boilerplate_systemic`, `application_specific`, or `unknown`;
+3. for a systemic cause, update a safe canonical AdvanceAppFlow development
+   clone with the smallest generalized correction and a regression oracle;
+4. if safe upstream integration is unavailable, write
+   `reports/ADVANCEAPPFLOW_UPSTREAM_FEEDBACK.md` in the application instead;
+5. report the application result separately from the AdvanceAppFlow learning.
+
+Never copy secrets, customer data, private URLs, app-specific names, or
+proprietary domain logic into the catalog. This local learning rule does not
+authorize commit, push, PR, publication, production, or another external
+action.
 
 Example completed result:
 

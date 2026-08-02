@@ -42,6 +42,9 @@ adicionando-os à aplicação existente apenas num lote explícito e sem colisõ
   risco, níveis, lanes de CI, determinismo, flakiness e failure modes;
 - [HELP_AND_ACADEMY.md](HELP_AND_ACADEMY.md): protocolo opcional para inventário
   funcional, artigos bilingues como PT/EN, vídeos, ajuda contextual, cursos e publicação;
+- [UPSTREAM_LEARNING.md](UPSTREAM_LEARNING.md): revisão de recorrência que
+  transforma correções sistémicas das aplicações em melhorias generalizadas e
+  testes do AdvanceAppFlow, sem copiar lógica ou dados específicos;
 - [APP_CONTEXT.md](APP_CONTEXT.md): valores da aplicação, fontes, confiança e autorizações por execução;
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md): requisitos, candidata, evidências, bloqueios e operação;
 - [LIFECYCLE_GATE_EVIDENCE.json](LIFECYCLE_GATE_EVIDENCE.json): evidência estruturada, identidades, candidata, attestation/proveniência, autorização e artefactos com SHA-256 para G06–G10;
@@ -101,6 +104,14 @@ estado e evidências através do `upgrade` oficial e volta a validar cada uma.
 Lifecycles concluídos, ativos, inválidos ou com marcadores de recuperação são
 ignorados com um motivo claro; projetos sem lifecycle usam diretamente o plugin
 global e não precisam de ficheiros copiados.
+
+Quando uma aplicação Advance é corrigida, a entrega inclui uma revisão de
+recorrência. Uma causa do processo ou boilerplate atualiza o clone canónico
+local do AdvanceAppFlow com uma correção generalizada e uma regressão; uma causa
+específica da aplicação não altera o catálogo. Se a integração upstream não for
+segura ou o clone não estiver disponível, a aplicação conserva
+`reports/ADVANCEAPPFLOW_UPSTREAM_FEEDBACK.md`. Esta aprendizagem local não
+autoriza commit, push ou outra ação externa.
 
 Para continuar ou adotar um projeto existente por caminho:
 

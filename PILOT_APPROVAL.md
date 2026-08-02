@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-02.7 |
+| Catalog version | 2026-08-02.8 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -391,3 +391,12 @@ das skills permanecem estáveis; caminhos `PromptsAdvance` no resolver existem
 apenas como fallback compatível. EVAL-02-SYNC, EVAL-03, EVAL-04, EVAL-12 e a
 suite completa devem ser repetidos. O piloto permanece `pending` e o canal
 `candidate`.
+
+A versão 2026-08-02.8 acrescenta aprendizagem upstream obrigatória depois de
+corrigir uma aplicação Advance. A causa é classificada antes de alterar o
+catálogo: falhas sistémicas produzem uma correção generalizada e regressão no
+AdvanceAppFlow; falhas específicas não o contaminam. Um clone ausente,
+instalado em cache ou com conflito gera um relatório anonimizado pendente, sem
+sobrescrever trabalho. Esta regra não autoriza commit, push ou outra ação
+externa. EVAL-02-UPSTREAM, EVAL-03, EVAL-04, EVAL-12 e a suite completa devem
+ser repetidos. O piloto permanece `pending` e o canal `candidate`.

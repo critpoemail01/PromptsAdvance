@@ -1,7 +1,7 @@
 {
   "name": "advance-app",
-  "version": "0.1.0+codex.20260802082938",
-  "description": "Use AdvanceAppFlow to start, adopt, and continue Advance applications one prompt at a time under programmer control.",
+  "version": "0.1.0+codex.20260802105044",
+  "description": "Use AdvanceAppFlow to start, adopt, continue, and improve Advance applications one prompt at a time under programmer control.",
   "author": {
     "name": "AdvanceAppFlow Maintainers",
     "url": "https://github.com/critpoemail01"
@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "AdvanceAppFlow",
     "shortDescription": "Develop Advance apps one prompt at a time.",
-    "longDescription": "AdvanceAppFlow creates or adopts an application, executes one prompt, reports result and remaining work, and waits for the programmer before advancing or rerunning.",
+    "longDescription": "AdvanceAppFlow creates or adopts an application, executes one prompt, reports result and remaining work, learns from systemic application corrections, and waits for the programmer before advancing or rerunning.",
     "developerName": "AdvanceAppFlow Maintainers",
     "category": "Productivity",
     "capabilities": [
@@ -28,7 +28,7 @@
     "websiteURL": "https://github.com/critpoemail01/AdvanceAppFlow",
     "defaultPrompt": [
       "Use $advance-app-start to create a new Advance application.",
-      "Use $advance-app-continue to continue an Advance project.",
+      "Use $advance-app-continue to continue or correct an Advance project.",
       "Continue the Advance lifecycle from an existing project path."
     ]
   }

@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$CatalogPath,
-    [string]$StartPath
+    [string]$StartPath,
+    [switch]$PreferDevelopmentClone
 )
 
 Set-StrictMode -Version Latest
@@ -15,6 +16,19 @@ function Test-AdvanceCatalog {
         (Test-Path -LiteralPath (Join-Path $Candidate 'software-lifecycle.ps1') -PathType Leaf) -and
         (Test-Path -LiteralPath (Join-Path $Candidate '.agents/skills/advance-app-start/SKILL.md') -PathType Leaf) -and
         (Test-Path -LiteralPath (Join-Path $Candidate '.agents/skills/advance-app-continue/SKILL.md') -PathType Leaf)
+    )
+}
+
+function Test-AdvanceDevelopmentCatalog {
+    param([Parameter(Mandatory)][string]$Candidate)
+
+    $normalized = [System.IO.Path]::GetFullPath($Candidate).Replace('\', '/')
+    return (
+        (Test-AdvanceCatalog -Candidate $Candidate) -and
+        (Test-Path -LiteralPath (Join-Path $Candidate '.git')) -and
+        (Test-Path -LiteralPath (Join-Path $Candidate 'UPSTREAM_LEARNING.md') -PathType Leaf) -and
+        (Test-Path -LiteralPath (Join-Path $Candidate 'plugins/advance-app/.codex-plugin/plugin.json') -PathType Leaf) -and
+        ($normalized -notmatch '/\.codex/\.tmp/marketplaces/')
     )
 }
 
@@ -35,8 +49,14 @@ if (-not [string]::IsNullOrWhiteSpace($CatalogPath)) {
     catch {
         throw "CatalogPath is invalid: $CatalogPath"
     }
-    if (-not (Test-AdvanceCatalog -Candidate $explicitCatalogPath)) {
-        throw "CatalogPath is not a valid AdvanceAppFlow catalog: $explicitCatalogPath"
+    $explicitIsValid = if ($PreferDevelopmentClone) {
+        Test-AdvanceDevelopmentCatalog -Candidate $explicitCatalogPath
+    }
+    else {
+        Test-AdvanceCatalog -Candidate $explicitCatalogPath
+    }
+    if (-not $explicitIsValid) {
+        throw "CatalogPath is not a valid AdvanceAppFlow catalog for the requested use: $explicitCatalogPath"
     }
     Write-Output $explicitCatalogPath
     exit 0
@@ -63,7 +83,9 @@ if (Test-Path -LiteralPath $StartPath -PathType Container) {
 $userProfilePath = [Environment]::GetFolderPath(
     [Environment+SpecialFolder]::UserProfile)
 if (-not [string]::IsNullOrWhiteSpace($userProfilePath)) {
-    Add-Candidate -Candidate (Join-Path $userProfilePath '.codex/.tmp/marketplaces/promptsadvance')
+    if (-not $PreferDevelopmentClone) {
+        Add-Candidate -Candidate (Join-Path $userProfilePath '.codex/.tmp/marketplaces/promptsadvance')
+    }
     Add-Candidate -Candidate (Join-Path $userProfilePath 'Documents/AdvanceAppFlow')
     Add-Candidate -Candidate (Join-Path $userProfilePath 'AdvanceAppFlow')
     Add-Candidate -Candidate (Join-Path $userProfilePath 'Documents/PromptsAdvance')
@@ -86,13 +108,19 @@ foreach ($candidate in $candidatePaths) {
     if (-not $visited.Add($resolvedCandidate)) {
         continue
     }
-    if (Test-AdvanceCatalog -Candidate $resolvedCandidate) {
+    $isValid = if ($PreferDevelopmentClone) {
+        Test-AdvanceDevelopmentCatalog -Candidate $resolvedCandidate
+    }
+    else {
+        Test-AdvanceCatalog -Candidate $resolvedCandidate
+    }
+    if ($isValid) {
         Write-Output $resolvedCandidate
         exit 0
     }
 }
 
 throw @'
-AdvanceAppFlow catalog not found. Pass -CatalogPath with the exact clone path or
-set PROMPTS_ADVANCE_ROOT. No files were changed.
+AdvanceAppFlow catalog not found for the requested use. Pass -CatalogPath with
+the exact clone path or set PROMPTS_ADVANCE_ROOT. No files were changed.
 '@

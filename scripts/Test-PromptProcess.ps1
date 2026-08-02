@@ -65,6 +65,7 @@ $requiredDocuments = @(
     'README.md',
     'AGENTS.md',
     'EXECUTION_CONTRACT.md',
+    'UPSTREAM_LEARNING.md',
     'CHANGE_CONTROL.md',
     'CLAUDE.md',
     'PRODUCT_EXCELLENCE.md',
@@ -286,6 +287,10 @@ Require-Pattern 'AGENTS.md' '(?s)(?=.*sempre que alterares qualquer\s+parte do p
 Require-Pattern 'README.md' '(?s)qualquer altera..o ao processo termina com a atualiza..o da\s+tool Advance.*cachebuster oficial.*plugin e skills.*codex plugin add advance-app@promptsadvance.*installed, enabled.*n.o cria autoriza..o\s+para commit ou push.*`commit e sync`.*nico cachebuster.*depois do push.*n.o existe segundo bump ou commit vazio.*task nova' 'O README nao documenta a atualizacao automatica da tool depois de qualquer alteracao do processo.'
 Require-Pattern 'PROCESS_MANIFEST.json' '"advanceToolUpdateAfterProcessChangeRequired": true' 'O manifesto nao declara a atualizacao obrigatoria da tool apos qualquer alteracao do processo.'
 Require-Pattern 'PROCESS_MANIFEST.json' '"advanceToolUpdateAfterCommitSyncRequired": true' 'O manifesto nao declara a atualizacao obrigatoria da tool apos commit/sync.'
+Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"upstreamLearningAfterApplicationCorrectionRequired": true.*"systemicCorrectionRequiresRegressionTest": true.*"applicationSpecificCorrectionMustNotMutateCatalog": true' 'O manifesto nao declara aprendizagem upstream segura depois de correcoes.'
+Require-Pattern 'AGENTS.md' '(?s)UPSTREAM_LEARNING\.md.*corrige primeiro a\s+aplica..o.*erros\s+sist.micos.*regress.o.*n.o autoriza Git' 'As instrucoes nao obrigam revisao de recorrencia e generalizacao segura.'
+Require-Pattern 'UPSTREAM_LEARNING.md' '(?s)(?=.*advanceappflow_systemic)(?=.*boilerplate_systemic)(?=.*application_specific)(?=.*unknown)(?=.*Corrige primeiro)(?=.*corre..o generalizada)(?=.*regress.o)(?=.*ADVANCEAPPFLOW_UPSTREAM_FEEDBACK\.md)(?=.*Nunca copies)(?=.*n.o autoriza commit, push)' 'O contrato upstream nao cobre classificacao, fallback, privacidade, regressao e autorizacoes.'
+Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-02-UPSTREAM(?=.*duas aplica..es descart.veis)(?=.*advanceappflow_systemic)(?=.*application_specific)(?=.*falha antes e passa depois)(?=.*checkout instalado)(?=.*altera..o concorrente)(?=.*ADVANCEAPPFLOW_UPSTREAM_FEEDBACK\.md)(?=.*n.o edita o cache)(?=.*commit, push, PR)' 'A avaliacao nao prova aprendizagem upstream sem contaminar o catalogo.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-02-SYNC(?=.*sem autorizar commit ou push)(?=.*depois das valida..es)(?=.*valide plugin e skills)(?=.*codex plugin add advance-app@promptsadvance)(?=.*codex plugin list)(?=.*installed, enabled)(?=.*n.o faz commit/push)(?=.*SoftwareProcesses)(?=.*Update-AdvanceLocalProjects\.ps1)(?=.*prompt deslocado)(?=.*tentativa ativa)(?=.*marcador de\s+recupera..o)(?=.*`commit e sync`)(?=.*nico cachebuster antes do commit)(?=.*mesmo SHA)(?=.*sem\s+force push)(?=.*depois do push)(?=.*n.o dispara outro bump)(?=.*segundo commit vazio)(?=.*parcial)(?=.*tarefa nova)' 'A avaliacao nao cobre atualizacao da tool, propagacao local e commit/sync sem recursao.'
 Require-Pattern 'EVALUATION_IMPACT_MAP.json' '(?s)lifecycle-and-common-contract.*"cases": \["EVAL-02", "EVAL-03", "EVAL-04", "EVAL-11", "EVAL-12", "EVAL-13"\]' 'Alteracoes ao contrato comum nao selecionam EVAL-02-SYNC.'
 Require-Pattern 'PROCESS_MANIFEST.json' '(?s)"sliceWorkflows".*"page".*"implementationPrompt": "27".*"requirementsReconciliationPrompt": "20".*"acceptanceTestPrompt": "28".*"feature".*"implementationPrompt": "29".*"acceptanceTestPrompt": "30"' 'O manifesto nao conserva o routing semantico das fatias.'
@@ -318,6 +323,9 @@ Require-Pattern 'plugins/advance-app/skills/advance-app-start/SKILL.md' 'Resolve
 Require-Pattern 'plugins/advance-app/skills/advance-app-start/SKILL.md' '\.agents/skills/advance-app-start/SKILL\.md' 'A skill global de criacao nao delega na fonte canonica.'
 Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '(?s)^---.*name: advance-app-continue.*description:.*---' 'O plugin nao expoe a skill global de continuacao.'
 Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '\.agents/skills/advance-app-continue/SKILL\.md' 'A skill global de continuacao nao delega na fonte canonica.'
+Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)UPSTREAM_LEARNING\.md.*advanceappflow_systemic.*boilerplate_systemic.*application_specific.*unknown.*ADVANCEAPPFLOW_UPSTREAM_FEEDBACK\.md' 'A skill canonica nao aprende com correcoes da aplicacao.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '(?s)UPSTREAM_LEARNING\.md.*PreferDevelopmentClone.*generalized.*regression.*pending upstream feedback' 'A skill global nao encaminha a aprendizagem para um clone seguro.'
+Require-Pattern 'plugins/advance-app/scripts/Resolve-AdvanceCatalog.ps1' '(?s)Test-AdvanceDevelopmentCatalog.*UPSTREAM_LEARNING\.md.*plugins/advance-app/\.codex-plugin/plugin\.json.*marketplaces.*PreferDevelopmentClone.*Documents/AdvanceAppFlow' 'O resolver nao separa um clone de desenvolvimento do cache/instancia quando corrige upstream.'
 Require-Pattern 'plugins/advance-app/scripts/Resolve-AdvanceCatalog.ps1' 'PROMPTS_ADVANCE_ROOT' 'O plugin nao suporta configuracao explicita da raiz do catalogo.'
 Require-Pattern 'plugins/advance-app/scripts/Resolve-AdvanceCatalog.ps1' '\.codex/\.tmp/marketplaces/promptsadvance' 'O plugin nao resolve o checkout instalado do marketplace.'
 Require-Pattern 'plugins/advance-app/scripts/Resolve-AdvanceCatalog.ps1' '(?s)Documents/AdvanceAppFlow.*AdvanceAppFlow.*Documents/PromptsAdvance.*PromptsAdvance' 'O resolver nao prefere AdvanceAppFlow mantendo fallback para o nome anterior.'
@@ -407,6 +415,14 @@ if (Test-Path -LiteralPath $pluginResolverPath -PathType Leaf) {
         [string]@($pluginResolverOutput)[-1] -ne [System.IO.Path]::GetFullPath($root)) {
         Add-Failure 'O resolver do plugin nao devolveu a raiz exata do catalogo.'
     }
+    $developmentResolverOutput = @(
+        & $powerShellExe -NoProfile -File $pluginResolverPath `
+            -CatalogPath $root -PreferDevelopmentClone 2>&1
+    )
+    if ($LASTEXITCODE -ne 0 -or
+        [string]@($developmentResolverOutput)[-1] -ne [System.IO.Path]::GetFullPath($root)) {
+        Add-Failure 'O resolver do plugin nao reconheceu o clone de desenvolvimento canónico.'
+    }
 }
 Require-Pattern 'software-lifecycle.ps1' 'Get-AllowedSelectionPromptIds' 'O seletor nao restringe transicoes ao contexto atual.'
 Require-Pattern 'software-lifecycle.ps1' "Command -eq 'decide'" 'O lifecycle nao permite registar exclusoes opcionais com evidencia.'
@@ -450,8 +466,8 @@ Require-Pattern 'HELP_AND_ACADEMY.md' '(?s)Definition of Done por unidade.*UI e 
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)Execute one prompt.*After `record`, do not continue automatically.*next.*repeat.*skip and advance' 'A skill nao para depois de cada prompt sob controlo do programador.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*Cliente\.Web.*persistent terminal sessions.*Keep all three processes alive.*does not authorize.*production' 'A skill canonica nao inicia e valida as tres superficies locais sem alterar o lifecycle.'
 Require-Pattern 'plugins/advance-app/skills/advance-app-continue/SKILL.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*without advancing lifecycle state' 'A skill global nao encaminha o pedido de executar a app completa.'
-Require-Pattern '.agents/skills/advance-app-continue/agents/openai.yaml' '(?s)short_description: "Continue or run an Advance application".*default_prompt: "Use \$advance-app-continue to continue or run my Advance application\."' 'A metadata da skill canonica nao apresenta o arranque da aplicacao.'
-Require-Pattern 'plugins/advance-app/skills/advance-app-continue/agents/openai.yaml' '(?s)short_description: "Continue or run an Advance application".*default_prompt: "Use \$advance-app-continue to continue or run my Advance application\."' 'A metadata global da skill nao apresenta o arranque da aplicacao.'
+Require-Pattern '.agents/skills/advance-app-continue/agents/openai.yaml' '(?s)short_description: "Continue, correct, or run an Advance app".*default_prompt: "Use \$advance-app-continue to continue, correct, or run my Advance application\."' 'A metadata da skill canonica nao apresenta continuacao, correcao e arranque.'
+Require-Pattern 'plugins/advance-app/skills/advance-app-continue/agents/openai.yaml' '(?s)short_description: "Continue, correct, or run an Advance app".*default_prompt: "Use \$advance-app-continue to continue, correct, or run my Advance application\."' 'A metadata global da skill nao apresenta continuacao, correcao e arranque.'
 Require-Pattern 'AGENTS.md' '(?s)corre a app.*Server\.Api.*Client\.Ssr.*Client\.Web.*readiness.*n.o avan.a o lifecycle' 'As instrucoes derivadas nao conservam o contrato de executar os tres projetos locais.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-04.*work ledger.*finding-gate.*record completed' 'O piloto nao exercita o findings gate durante a revisao adversarial.'
 Require-Pattern 'PROMPT_EVALUATION.md' '(?s)EVAL-11.*awaiting_programmer.*parcial.*skip and advance.*request/repeat.*brownfield.*objetivo' 'O piloto nao cobre o fluxo controlado, gaps e reruns.'
@@ -708,6 +724,8 @@ Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'Copia .*HELP_AND_ACADEMY\.md' 'O prompt 07 nao copia o protocolo de ajuda para a aplicacao derivada.'
 Require-Pattern 'software-lifecycle.ps1' "'HELP_AND_ACADEMY\.md'" 'O inicializador nao copia o protocolo de ajuda para cada instancia.'
 Require-Pattern 'scripts/Test-SoftwareLifecycle.ps1' "'HELP_AND_ACADEMY\.md'" 'O teste end-to-end nao exige o protocolo de ajuda na instancia criada.'
+Require-Pattern 'software-lifecycle.ps1' "'UPSTREAM_LEARNING\.md'" 'O lifecycle nao copia o contrato de aprendizagem upstream para cada instancia.'
+Require-Pattern 'scripts/Test-SoftwareLifecycle.ps1' "'UPSTREAM_LEARNING\.md'" 'O teste end-to-end nao exige o contrato upstream na instancia.'
 Require-Pattern '.agents/skills/advance-app-start/SKILL.md' '(?s)HELP_AND_ACADEMY\.md.*contextual help.*task videos.*Academy' 'A skill de arranque nao le condicionalmente o protocolo de ajuda.'
 Require-Pattern '.agents/skills/advance-app-continue/SKILL.md' '(?s)HELP_AND_ACADEMY\.md.*contextual\s+help.*task videos.*Academy' 'A skill de continuacao nao le condicionalmente o protocolo de ajuda.'
 Require-Pattern 'prompts/02-arquitetura-e-fundacao/07-criar-projeto-a-partir-do-boilerplate.md' 'scripts/Test-ProductDefinitionGate\.ps1' 'O prompt 07 nao copia o gate mecanico para a nova aplicacao.'

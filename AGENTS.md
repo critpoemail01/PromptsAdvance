@@ -32,6 +32,11 @@ Antes de executar qualquer tarefa:
 11. Usa `CHANGE_CONTROL.md` para baselines de release aprovadas e comportamento
     já lançado. Durante o desenvolvimento normal, atualiza a fonte canónica e a
     rastreabilidade sem obrigar um novo ciclo formal.
+12. Depois de corrigir um defeito ou fragilidade numa aplicação derivada, lê e
+    aplica [UPSTREAM_LEARNING.md](UPSTREAM_LEARNING.md): corrige primeiro a
+    aplicação, classifica a causa e generaliza no AdvanceAppFlow apenas erros
+    sistémicos, sempre com regressão. Não copies lógica ou dados específicos da
+    aplicação para o catálogo.
 
 Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações. Aplica o mesmo comportamento a uma tarefa de produto/experiência se `PRODUCT_EXCELLENCE.md` estiver ausente. Para outros documentos em falta, não inventes conteúdo: regista a lacuna no resultado e bloqueia apenas quando ela impedir execução segura/verificável ou uma ação externa/release.
 
@@ -44,6 +49,11 @@ Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações. Aplica o 
   o que foi alcançado, lista tudo o que falta implementar e para. Só prepara
   outro prompt depois de `próximo`, `repetir`, `corrigir` ou `ignorar e avançar`.
 - Preserva alterações locais e distingue falhas introduzidas pela tarefa de falhas preexistentes.
+- Uma correção numa aplicação Advance inclui a revisão de recorrência de
+  `UPSTREAM_LEARNING.md`. Se a causa for sistémica e existir um clone canónico
+  local seguro, corrige também o AdvanceAppFlow e acrescenta um teste/oráculo;
+  se não existir, cria o relatório upstream pendente. Isto não autoriza Git ou
+  ações externas.
 - Não coloques segredos, credenciais, dados pessoais ou configuração privada em prompts, código, logs ou documentação versionada.
 - Não inventes comandos. Descobre e usa os comandos reais do repositório.
 - Quando o programador pedir `corre a app`, `run the app` ou equivalente,

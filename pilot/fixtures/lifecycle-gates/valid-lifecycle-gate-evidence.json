@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "catalogVersion": "2026-08-02.7",
+  "catalogVersion": "2026-08-02.8",
   "gates": {
     "G06": {
       "status": "approved",
