@@ -194,6 +194,85 @@ try {
         throw 'Accepted incomplete prompt did not advance to the next applicable prompt while preserving G01.'
     }
     Assert-ExitCode (Invoke-Lifecycle @('validate', '-ProcessRoot', $process)) 0 'validate advanced lifecycle'
+
+    $identityShiftProcess = Join-Path $temporaryRoot 'identity-shift-process'
+    Assert-ExitCode (Invoke-Lifecycle @(
+        'start', '-Name', 'identity-shift-migration-test', '-Owner', 'Fixture owner',
+        '-ProcessRoot', $identityShiftProcess, '-BoilerplatePath', $boilerplate
+    )) 0 'start identity-shift fixture'
+    $shiftManifestPath = Join-Path $identityShiftProcess 'PROCESS_MANIFEST.json'
+    $shiftStatePath = Join-Path $identityShiftProcess 'LIFECYCLE_STATE.json'
+    $shiftGateEvidencePath = Join-Path $identityShiftProcess 'LIFECYCLE_GATE_EVIDENCE.json'
+    $shiftManifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $shiftManifestPath | ConvertFrom-Json
+    $shiftState = Get-Content -Raw -Encoding UTF8 -LiteralPath $shiftStatePath | ConvertFrom-Json
+    $shiftGateEvidence = Get-Content -Raw -Encoding UTF8 -LiteralPath $shiftGateEvidencePath | ConvertFrom-Json
+    foreach ($stage in @($shiftManifest.stages)) {
+        $stage.promptIds = @($stage.promptIds | Where-Object { $_ -ne '09' })
+        foreach ($propertyName in @('conditionalPromptIds', 'repeatablePromptIds')) {
+            if ($stage.PSObject.Properties.Name -contains $propertyName) {
+                $stage.$propertyName = @($stage.$propertyName | Where-Object { $_ -ne '09' })
+            }
+        }
+    }
+    $shiftManifest.catalogVersion = '2026-08-01.6'
+    $shiftManifest.promptCount = 75
+    $shiftManifest.releaseChannel = 'stable'
+    $shiftState.catalogVersion = [string]$shiftManifest.catalogVersion
+    $shiftedPromptState = $shiftState.prompts.'09'
+    $shiftedPromptState.evidence = 'fixture://stable-identity-preserved'
+    $shiftState.prompts.PSObject.Properties.Remove('08')
+    $shiftState.prompts.PSObject.Properties.Remove('09')
+    $shiftState.prompts | Add-Member -MemberType NoteProperty -Name '08' -Value $shiftedPromptState
+    $shiftGateEvidence.catalogVersion = [string]$shiftManifest.catalogVersion
+    Write-Json -Path $shiftManifestPath -Value $shiftManifest
+    Write-Json -Path $shiftStatePath -Value $shiftState
+    Write-Json -Path $shiftGateEvidencePath -Value $shiftGateEvidence
+    $oldPrompt08 = Get-ChildItem -LiteralPath (Join-Path $identityShiftProcess 'prompts') `
+        -Recurse -File -Filter '08-*.md'
+    $oldPrompt09 = Get-ChildItem -LiteralPath (Join-Path $identityShiftProcess 'prompts') `
+        -Recurse -File -Filter '09-*.md'
+    Remove-Item -LiteralPath $oldPrompt08.FullName -Force
+    Move-Item -LiteralPath $oldPrompt09.FullName `
+        -Destination (Join-Path $oldPrompt09.DirectoryName ($oldPrompt09.Name -replace '^09-', '08-'))
+
+    $shiftUpgrade = Invoke-Lifecycle @(
+        'upgrade', '-ProcessRoot', $identityShiftProcess,
+        '-ConfirmMigration', '-AcceptCandidateCatalog',
+        '-Objective', 'Preserve state while a stable prompt identity moves to another ID'
+    )
+    Assert-ExitCode $shiftUpgrade 0 'identity-shift migration'
+    if ($shiftUpgrade.Output -notmatch '08->09') {
+        throw "Identity-shift migration did not report the remap. Output: $($shiftUpgrade.Output)"
+    }
+    $shiftMigrated = Get-Content -Raw -Encoding UTF8 -LiteralPath $shiftStatePath | ConvertFrom-Json
+    $currentCatalogVersion = [string](
+        Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'PROCESS_MANIFEST.json') |
+            ConvertFrom-Json
+    ).catalogVersion
+    if ([string]$shiftMigrated.prompts.'09'.evidence -ne 'fixture://stable-identity-preserved' -or
+        $null -eq $shiftMigrated.prompts.PSObject.Properties['08'] -or
+        $shiftMigrated.catalogVersion -ne $currentCatalogVersion) {
+        throw 'Identity-shift migration did not preserve evidence under the new ID and add the inserted prompt.'
+    }
+    Assert-ExitCode (Invoke-Lifecycle @(
+        'validate', '-ProcessRoot', $identityShiftProcess
+    )) 0 'validate identity-shift migration'
+
+    $recoveryMarker = Join-Path $temporaryRoot `
+        'identity-shift-process-tool-update-backup-20260802-000000'
+    New-Item -ItemType Directory -Path $recoveryMarker | Out-Null
+    $localUpdater = Join-Path $root 'scripts/Update-AdvanceLocalProjects.ps1'
+    $propagationOutput = @(
+        & $powerShell.Source -NoProfile -File $localUpdater `
+            -ProjectsRoot $temporaryRoot -AcceptCandidateCatalog `
+            -Objective 'Validate propagation and safe skipping in disposable fixtures' 2>&1
+    ) -join [Environment]::NewLine
+    if ($LASTEXITCODE -ne 0 -or
+        $propagationOutput -notmatch 'Updated: legacy-process ->' -or
+        $propagationOutput -notmatch 'Skipped: identity-shift-process: recovery/concurrent-update marker exists' -or
+        $propagationOutput -match 'BoilerPlateAdvance ->') {
+        throw "Local lifecycle propagation did not update and skip the expected roots. Output: $propagationOutput"
+    }
     Write-Host 'PASS: controlled legacy migration preserves evidence and supports accepted incomplete advance.' -ForegroundColor Green
 }
 finally {

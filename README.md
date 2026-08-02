@@ -76,11 +76,25 @@ clone local. Reinicia o Codex e abre uma tarefa nova após a instalação. O
 manifesto está em `plugins/advance-app/.codex-plugin/plugin.json` e o
 marketplace em `.agents/plugins/marketplace.json`.
 
-Neste repositório, um pedido autorizado de `commit e sync` atualiza também a
-tool Advance. O cachebuster do plugin é gerado e incluído no próprio commit;
-depois do push, executa-se `codex plugin add advance-app@promptsadvance` e
-confirma-se a versão ativa com `codex plugin list`. A reinstalação não cria um
-segundo commit e uma task nova é necessária para carregar as skills atualizadas.
+Neste repositório, qualquer alteração ao processo termina com a atualização da
+tool Advance: depois das validações, gera-se o cachebuster oficial, validam-se
+plugin e skills, reinstala-se com
+`codex plugin add advance-app@promptsadvance` e confirma-se a versão ativa
+`installed, enabled` através de `codex plugin list`. Isto não cria autorização
+para commit ou push. Quando existir um pedido autorizado de `commit e sync`, o
+único cachebuster é gerado e incluído no próprio commit e a mesma versão é
+reinstalada depois do push; não existe segundo bump ou commit vazio. A ação de
+fecho não se considera uma nova alteração recursiva e uma task nova é necessária
+para carregar as skills atualizadas.
+
+Depois da reinstalação, o catálogo copiado para instâncias lifecycle locais
+conhecidas também é atualizado com
+`scripts/Update-AdvanceLocalProjects.ps1 -AcceptCandidateCatalog`. O script
+descobre apenas instâncias válidas diretamente sob `SoftwareProcesses`, preserva
+estado e evidências através do `upgrade` oficial e volta a validar cada uma.
+Lifecycles concluídos, ativos, inválidos ou com marcadores de recuperação são
+ignorados com um motivo claro; projetos sem lifecycle usam diretamente o plugin
+global e não precisam de ficheiros copiados.
 
 Para continuar ou adotar um projeto existente por caminho:
 

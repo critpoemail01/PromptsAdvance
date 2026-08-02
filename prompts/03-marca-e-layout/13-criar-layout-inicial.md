@@ -36,6 +36,9 @@ quarta superfície.
 - Existe `design/INITIAL_LAYOUT_DIRECTIONS.md` com três opções distintas para
   cada uma das três aplicações, a recomendação fundamentada e as escolhas
   explícitas do programador para `Client.Ssr`, `Client.Web` e `Client.Maui`.
+- Cada uma das nove opções apresentada ao programador contém pelo menos um link
+  Markdown clicável para um preview visual público e verificado da referência:
+  aplicação/demo, live preview do template ou galeria oficial da app nativa.
 - Em `novo do zero`, a camada visual anterior é removida antes da nova
   implementação e `design/INITIAL_LAYOUT_RESET.md` prova a ausência de
   reutilização residual.
@@ -207,8 +210,8 @@ comparáveis do mesmo género.
 
 Regista a pesquisa em `design/INITIAL_LAYOUT_RESEARCH.md` e atualiza o benchmark de `PRODUCT_QUALITY_BASELINE.md` com:
 
-| Referência | Tipo | URL oficial | Data | Produto/superfície | Padrão observado | Porque é relevante | Adaptação proposta | O que não copiar | Preço/licença/limite |
-|---|---|---|---|---|---|---|---|---|---|
+| Referência | Tipo | URL oficial | Preview visual clicável | Estado/data do preview | Produto/superfície | Padrão observado | Porque é relevante | Adaptação proposta | O que não copiar | Preço/licença/limite |
+|---|---|---|---|---|---|---|---|---|---|---|
 
 Regras da pesquisa:
 
@@ -218,6 +221,29 @@ Regras da pesquisa:
 - Não compres, inicies trials, cries contas, faças login, descarregues material pago ou instales dependências sem autorização nominal.
 - Não copies código, assets, ilustrações, texto, composição distintiva ou trade dress. Extrai princípios e adapta-os ao produto e à stack existente.
 - Se uma fonte não estiver acessível, regista a limitação; não inventes o que supostamente mostra.
+
+### Links de preview obrigatórios
+
+- Para uma aplicação online, liga diretamente a uma página pública, demo,
+  jornada observável ou galeria oficial que mostre a interface. A homepage só
+  conta quando contém efetivamente a experiência visual relevante.
+- Para um template, tema ou UI kit premium, usa o link do `live preview`/demo do
+  template exato. Mantém separado o link da página do produto onde se confirmam
+  preço, editor e licença; uma categoria de marketplace não é preview.
+- Para MAUI/nativo, usa a ficha oficial da App Store/Google Play com screenshots,
+  uma galeria oficial do produto ou um vídeo/demo oficial. Um link para a marca
+  sem ecrãs da aplicação não conta.
+- Cada uma das nove direções tem pelo menos um preview visual público acessível
+  sem compra. Se a aplicação exigir login, identifica `requer login` e junta uma
+  galeria, store listing, vídeo ou documentação visual pública para permitir a
+  decisão.
+- Abre e verifica cada destino na data da pesquisa: confirma que resolve, não
+  devolve erro, corresponde à aplicação/template exato e mostra conteúdo
+  visual. Remove parâmetros de afiliado/tracking e prefere HTTPS canónico do
+  fabricante, produto, loja oficial ou marketplace autorizado.
+- Se um preview estiver indisponível, não apresentes um link inventado nem uma
+  direção visualmente impossível de avaliar. Substitui a referência ou marca a
+  opção `não selecionável` até existir um preview válido; nunca a recomendes.
 
 ## Nove direções propostas e escolha obrigatória
 
@@ -233,37 +259,48 @@ Regras da pesquisa:
 4. Sustenta cada opção com aplicações premium/concorrentes, templates pagos ou
    design systems encontrados na pesquisa. Para cada direção regista:
    `ID/nome | tese visual e de interação | shell/navegação | primeira jornada |
-   comportamento responsivo/nativo | referências e URLs oficiais | princípios
-   adaptados | o que não copiar | adequação | ganho | custo/risco`.
+   comportamento responsivo/nativo | referências e URLs oficiais | links de
+   preview verificados | princípios adaptados | o que não copiar | adequação |
+   ganho | custo/risco`.
 5. Apresenta ao programador três tabelas curtas, uma para `Client.Ssr`, outra
    para `Client.Web` e outra para `Client.Maui`, cada uma com as suas três
-   opções. Inclui wireframe ou composição de baixa fidelidade quando isso
-   tornar a diferença compreensível sem implementar versões de produção.
-6. Recomenda exatamente uma opção por aplicação e explica cada recomendação
+   opções, neste formato mínimo:
+
+   | Opção | Direção | Síntese | Ver visual |
+   |---|---|---|---|
+
+   Preenche `Ver visual` em todas as linhas com links Markdown clicáveis e
+   rótulos orientados à ação, como `Abrir aplicação`, `Ver live preview`, `Ver
+   screenshots` ou `Ver vídeo`. Não mostres apenas a URL em texto, dentro de
+   backticks ou escondida apenas no artefacto.
+6. Inclui wireframe ou composição de baixa fidelidade quando isso tornar a
+   diferença compreensível sem implementar versões de produção. O wireframe não
+   substitui os links para as referências reais.
+7. Recomenda exatamente uma opção por aplicação e explica cada recomendação
    numa frase baseada na jornada, público, densidade, identidade,
    acessibilidade, stack e viabilidade. Avalia também se as três recomendações
    formam uma família coerente sem apagar diferenças Web/nativas.
-7. Depois de apresentar as nove propostas, pergunta exatamente:
+8. Depois de apresentar as nove propostas, pergunta exatamente:
 
    `Escolhe uma direção visual para cada aplicação: Client.Ssr — SSR-1, SSR-2
    ou SSR-3? Client.Web — WEB-1, WEB-2 ou WEB-3? Client.Maui — MAUI-1, MAUI-2
    ou MAUI-3? Podes também responder "usar as três recomendadas".`
 
-8. Regista em `design/INITIAL_LAYOUT_DIRECTIONS.md` as nove opções, fontes,
+9. Regista em `design/INITIAL_LAYOUT_DIRECTIONS.md` as nove opções, fontes,
    recomendação, resposta/fonte do programador, data e escolha final por
    aplicação. `usar as três recomendadas` conta como escolha explícita das três
    opções assinaladas; silêncio, `próximo`, uma escolha parcial ou a recomendação
    do próprio Codex não contam como autorização para implementar as restantes.
-9. Enquanto faltar uma das três escolhas, não apagues, alteres ou implementes
+10. Enquanto faltar uma das três escolhas, não apagues, alteres ou implementes
    layout, CSS, tokens, componentes, packages ou baselines visuais. Termina
    `bloqueado` com as escolhas recebidas e as que faltam. Se o programador
    limitar explicitamente o âmbito a menos aplicações, termina `parcial` para
    as restantes e não inventes uma escolha.
-10. Se a combinação selecionada for incoerente, insegura ou incompatível com a
+11. Se a combinação selecionada for incoerente, insegura ou incompatível com a
     identidade/acessibilidade aprovada, explica o conflito e propõe a correção
     mínima; não substituas silenciosamente a escolha. Uma compra, framework
     novo ou mudança material de marca mantém a autorização própria.
-11. Depois das três escolhas, conserva o mapa de navegação e as regras
+12. Depois das três escolhas, conserva o mapa de navegação e as regras
     responsivas em `design/INITIAL_LAYOUT_SPEC.md` e no brief da slice. Inclui a
     matriz `aplicação → direção escolhida → utilizador/contexto → arquitetura de
     informação → shell/navegação → primeira jornada → estados → comportamento

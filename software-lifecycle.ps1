@@ -412,6 +412,102 @@ function Get-PromptIdentityMap {
     return $identities
 }
 
+function Get-PromptIdentityMigrationMap {
+    param(
+        [Parameter(Mandatory)][hashtable]$SourceIdentities,
+        [Parameter(Mandatory)][hashtable]$TargetIdentities,
+        [Parameter(Mandatory)][string[]]$TargetPromptIds,
+        [switch]$ConfirmMigration
+    )
+
+    $migration = @{}
+    foreach ($targetPromptId in $TargetPromptIds) {
+        if (-not $TargetIdentities.ContainsKey($targetPromptId)) {
+            throw "upgrade requires an explicit migration because prompt $targetPromptId identity mapping changed."
+        }
+        $targetIdentity = [string]$TargetIdentities[$targetPromptId]
+        $sourceMatches = @(
+            $SourceIdentities.GetEnumerator() |
+                Where-Object { [string]$_.Value -eq $targetIdentity } |
+                ForEach-Object { [string]$_.Key }
+        )
+        if ($sourceMatches.Count -ne 1) {
+            throw "upgrade requires an explicit migration because prompt $targetPromptId identity mapping changed; stable identity '$targetIdentity' has $($sourceMatches.Count) matches in the source catalog."
+        }
+        $sourcePromptId = Normalize-PromptId $sourceMatches[0]
+        if ($sourcePromptId -ne $targetPromptId -and -not $ConfirmMigration) {
+            throw "upgrade requires -ConfirmMigration and an Objective because prompt identity '$targetIdentity' moved from $targetPromptId to $sourcePromptId."
+        }
+        $migration[$targetPromptId] = $sourcePromptId
+    }
+    $destinationIds = @($migration.Values | Sort-Object -Unique)
+    if ($destinationIds.Count -ne $migration.Count) {
+        throw 'upgrade refuses an ambiguous prompt identity migration with duplicate destination IDs.'
+    }
+    return $migration
+}
+
+function Convert-StatePromptIdentities {
+    param(
+        [Parameter(Mandatory)]$State,
+        [Parameter(Mandatory)][hashtable]$Migration
+    )
+
+    function Convert-PromptReference {
+        param([AllowNull()]$Value)
+        if ($null -eq $Value -or [string]::IsNullOrWhiteSpace([string]$Value)) {
+            return $Value
+        }
+        $normalized = Normalize-PromptId ([string]$Value)
+        if (-not $Migration.ContainsKey($normalized)) {
+            throw "Lifecycle state references prompt $normalized, which has no stable identity migration."
+        }
+        return [string]$Migration[$normalized]
+    }
+
+    $changes = [System.Collections.Generic.List[string]]::new()
+    $remappedPrompts = [pscustomobject][ordered]@{}
+    foreach ($property in @($State.prompts.PSObject.Properties)) {
+        $oldId = Normalize-PromptId ([string]$property.Name)
+        $newId = Convert-PromptReference $oldId
+        if ($null -ne $remappedPrompts.PSObject.Properties[$newId]) {
+            throw "Lifecycle state prompt migration collides at destination $newId."
+        }
+        $remappedPrompts | Add-Member -MemberType NoteProperty -Name $newId -Value $property.Value
+        if ($oldId -ne $newId) {
+            $changes.Add("$oldId->$newId")
+        }
+        foreach ($attempt in @($property.Value.attempts)) {
+            if ($null -ne $attempt.PSObject.Properties['promptId']) {
+                $attempt.promptId = Convert-PromptReference $attempt.promptId
+            }
+        }
+    }
+    $State.prompts = $remappedPrompts
+
+    foreach ($propertyName in @('currentPrompt', 'lastPrompt')) {
+        if ($null -ne $State.PSObject.Properties[$propertyName] -and
+            -not [string]::IsNullOrWhiteSpace([string]$State.$propertyName)) {
+            $State.$propertyName = Convert-PromptReference $State.$propertyName
+        }
+    }
+    if ($null -ne $State.PSObject.Properties['selectedOptionalPromptIds']) {
+        $State.selectedOptionalPromptIds = @(
+            @($State.selectedOptionalPromptIds) |
+                ForEach-Object { Convert-PromptReference $_ }
+        )
+    }
+    foreach ($historyItem in @($State.history)) {
+        foreach ($propertyName in @('promptId', 'nextPrompt')) {
+            if ($null -ne $historyItem.PSObject.Properties[$propertyName] -and
+                -not [string]::IsNullOrWhiteSpace([string]$historyItem.$propertyName)) {
+                $historyItem.$propertyName = Convert-PromptReference $historyItem.$propertyName
+            }
+        }
+    }
+    return @($changes)
+}
+
 function Get-PromptState {
     param(
         [Parameter(Mandatory)]$State,
@@ -483,7 +579,7 @@ function Merge-CatalogPromptsIntoState {
         $metadata = Get-CatalogPromptMetadata -Root $SourceRoot -Manifest $SourceManifest -Id $id
         $existing = $State.prompts.PSObject.Properties[$id]
         if ($null -eq $existing) {
-            $State.prompts | Add-Member -NotePropertyName $id -NotePropertyValue ([pscustomobject][ordered]@{
+            $State.prompts | Add-Member -MemberType NoteProperty -Name $id -Value ([pscustomobject][ordered]@{
                 title = $metadata.title
                 path = $metadata.path
                 stage = $metadata.stage
@@ -2673,20 +2769,17 @@ if ($Command -eq 'upgrade') {
     }
     $sourcePromptIds = @($sourceManifest.stages | ForEach-Object { @($_.promptIds) } | Sort-Object -Unique)
     $targetPromptIds = @($targetState.prompts.PSObject.Properties.Name | Sort-Object -Unique)
-    $removedPromptIds = @($targetPromptIds | Where-Object { $_ -notin $sourcePromptIds })
-    if ($removedPromptIds.Count -gt 0) {
-        throw "upgrade refuses to remove prompt state or evidence: $($removedPromptIds -join ', ')."
-    }
     $sourcePromptIdentities = Get-PromptIdentityMap -Root $catalogRoot
     $targetPromptIdentities = Get-PromptIdentityMap -Root $ProcessRoot
-    foreach ($promptId in $targetPromptIds) {
-        if (-not $sourcePromptIdentities.ContainsKey($promptId) -or
-            -not $targetPromptIdentities.ContainsKey($promptId) -or
-            [string]$sourcePromptIdentities[$promptId] -ne [string]$targetPromptIdentities[$promptId]) {
-            throw "upgrade requires an explicit migration because prompt $promptId identity mapping changed."
-        }
-    }
-    $addedPromptIds = @($sourcePromptIds | Where-Object { $_ -notin $targetPromptIds })
+    $promptIdentityMigration = Get-PromptIdentityMigrationMap `
+        -SourceIdentities $sourcePromptIdentities `
+        -TargetIdentities $targetPromptIdentities `
+        -TargetPromptIds $targetPromptIds `
+        -ConfirmMigration:$ConfirmMigration
+    $identityRemaps = @(Convert-StatePromptIdentities `
+        -State $targetState -Migration $promptIdentityMigration)
+    $migratedTargetPromptIds = @($targetState.prompts.PSObject.Properties.Name | Sort-Object -Unique)
+    $addedPromptIds = @($sourcePromptIds | Where-Object { $_ -notin $migratedTargetPromptIds })
     if (($addedPromptIds.Count -gt 0 -or
         [int]$targetManifest.promptCount -ne [int]$sourceManifest.promptCount) -and
         -not $ConfirmMigration) {
@@ -2783,7 +2876,7 @@ if ($Command -eq 'upgrade') {
             "catalog-migration:$oldCatalogVersion->$($sourceManifest.catalogVersion)"
         }) `
         -Evidence $(if ($ConfirmMigration) {
-            "controlled migration; added prompts=$($mergedPromptIds -join ','); removed stale prompt paths=$($removedStalePromptPaths -join ','); programmer-controlled=$convertedWorkflow; objective=$Objective; product content, results, gates, attempts and evidence preserved"
+            "controlled migration; identity remaps=$($identityRemaps -join ','); added prompts=$($mergedPromptIds -join ','); removed stale prompt paths=$($removedStalePromptPaths -join ','); programmer-controlled=$convertedWorkflow; objective=$Objective; product content, results, gates, attempts and evidence preserved"
         } else {
             'canonical prompt catalog; product content and lifecycle results preserved'
         })
@@ -2803,6 +2896,7 @@ if ($Command -eq 'upgrade') {
         "PASS: lifecycle migrated from $oldCatalogVersion to $($sourceManifest.catalogVersion)."
     }) -ForegroundColor Green
     Write-Host ' - Product content, prompt results, gates and attempts: preserved'
+    Write-Host " - Prompt identity remaps: $(if ($identityRemaps.Count -eq 0) { 'none' } else { $identityRemaps -join ', ' })"
     Write-Host " - Added prompt states: $(if ($mergedPromptIds.Count -eq 0) { 'none' } else { $mergedPromptIds -join ', ' })"
     Write-Host " - Removed stale prompt paths: $(if ($removedStalePromptPaths.Count -eq 0) { 'none' } else { $removedStalePromptPaths -join ', ' })"
     Write-Host " - Programmer-controlled waiting state: $convertedWorkflow"

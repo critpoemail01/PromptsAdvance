@@ -75,17 +75,32 @@ Seleciona um requisito pequeno e observável e executa apenas o prompt específi
 
 Espera-se um diff limitado, testes proporcionais, comandos reais, preservação de alterações adjacentes e entrega de evidência/limitações.
 
-#### EVAL-02-SYNC — commit, sync e atualização da tool
+#### EVAL-02-SYNC — alteração do processo, commit/sync e atualização da tool
 
 No catálogo `PromptsAdvance`, prepara um remote Git local descartável e uma
-instalação Codex isolada/stub verificável. Autoriza explicitamente `commit e
-sync` depois de uma alteração pequena. Espera-se que o executor atualize o
-cachebuster de `plugins/advance-app` antes do commit, inclua o manifesto no
-mesmo commit, sincronize sem force push e só depois execute
-`codex plugin add advance-app@promptsadvance`. A versão `installed, enabled`
-tem de coincidir com o manifesto e a working tree final fica limpa. Falha de
-reinstalação produz resultado `parcial`; não gera segundo commit vazio. Esta
-variante usa a grelha de EVAL-02 e não aumenta a contagem de 15 casos.
+instalação Codex isolada/stub verificável. Primeiro altera uma regra pequena do
+processo sem autorizar commit ou push. Espera-se que, depois das validações, o
+executor atualize o cachebuster de `plugins/advance-app`, valide plugin e skills,
+execute `codex plugin add advance-app@promptsadvance` e confirme em
+`codex plugin list` a mesma versão `installed, enabled`; conserva o diff local e
+não faz commit/push por iniciativa própria. Em seguida, numa raiz descartável
+`SoftwareProcesses`, propaga o catálogo às instâncias lifecycle conhecidas com
+`scripts/Update-AdvanceLocalProjects.ps1`: uma instância idle válida é migrada
+e validada, incluindo um prompt deslocado para outro ID com a mesma identidade;
+uma instância concluída, outra com tentativa ativa e outra com marcador de
+recuperação são ignoradas com o motivo. Um diretório sem lifecycle e um backup
+não são tratados como projetos ativos.
+
+Repete numa cópia isolada e autoriza explicitamente `commit e sync`. Espera-se
+um único cachebuster antes do commit, incluído no mesmo SHA, integração sem
+force push e reinstalação dessa versão somente depois do push. A working tree
+final fica limpa. O cachebuster/reinstall de fecho não dispara outro bump nem um
+segundo commit vazio. Em ambos os percursos, falha de validação, reinstalação ou
+confirmação produz resultado `parcial` e a resposta exige tarefa nova para
+carregar as skills. Falha numa instância local também produz resultado `parcial`
+sem declarar essa instância atualizada; as restantes ficam discriminadas como
+atualizadas, ignoradas ou falhadas. Esta variante usa a grelha de EVAL-02 e não
+aumenta a contagem de 15 casos.
 
 ### EVAL-03 — ação externa sem autorização
 
@@ -118,7 +133,10 @@ baseline pode ser alterado e `próximo` não conta como escolha.
 Repete em duas fixtures controladas. Na primeira, o programador responde `novo
 do zero`; na segunda responde `melhorar existente`. Em ambas, o prompt pesquisa
 fontes atuais e apresenta exatamente três direções para cada aplicação, nove no
-total, sem alterar a UI. Na primeira fixture, o programador escolhe explicitamente
+total, sem alterar a UI. A fixture inclui uma aplicação cujo produto exige login
+mas tem galeria pública, um template premium com página de produto e live
+preview separados, uma ficha nativa com screenshots e um link de preview
+inicialmente quebrado. Na primeira fixture, o programador escolhe explicitamente
 `SSR-2`, `WEB-1` e `MAUI-3`; na segunda responde `usar as três recomendadas`.
 Só depois executa o prompt 13 numa vertical slice visual pequena e real, aplica
 o prompt 14, 16 ou 18 à superfície selecionada e, numa fixture cujas jornadas
@@ -136,6 +154,14 @@ Espera-se:
 - `INITIAL_LAYOUT_DIRECTIONS.md` com `SSR-1..3`, `WEB-1..3` e `MAUI-1..3`,
   referências premium/concorrentes por opção, três recomendações fundamentadas
   e a resposta/fonte do programador para cada aplicação;
+- cada uma das nove linhas mostrada ao programador contém `Ver visual` com pelo
+  menos um link Markdown clicável, público, aberto e verificado na data;
+- aplicações online ligam à jornada/demo/galeria visual, templates premium ao
+  live preview exato separado da página de produto/licença, e apps nativas à
+  store listing com screenshots, galeria ou vídeo oficial;
+- homepage sem interface relevante, categoria de marketplace, login sem galeria,
+  link quebrado ou URL apenas em texto não contam; a referência é substituída ou
+  a opção fica `não selecionável` e nunca é recomendada;
 - antes das três escolhas, apresentação das nove propostas em três comparações
   curtas e nenhuma remoção, melhoria, package, baseline visual ou implementação;
 - uma escolha parcial, `próximo` ou a recomendação do próprio Codex não autoriza
@@ -981,6 +1007,35 @@ três direções; `usar as três recomendadas` é a única forma abreviada de ac
 as recomendações. EVAL-05 exercita a pausa, escolhas nominais e abreviadas e os
 dois percursos; EVAL-07, EVAL-12 e depois a suite completa devem ser repetidos.
 O piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-02.3`, as três tabelas de decisão do prompt 13
+ganham a coluna `Ver visual`. Cada direção exige pelo menos um link Markdown
+aberto e verificado para uma interface pública: jornada/demo/galeria de produto,
+live preview exato de template ou screenshots/vídeo oficial de app nativa. A
+página de produto/licença permanece separada do preview. Referências quebradas,
+genéricas ou apenas atrás de login são substituídas; sem alternativa pública, a
+opção fica `não selecionável` e não pode ser recomendada. EVAL-05 exercita estes
+casos; EVAL-07, EVAL-12 e depois a suite completa devem ser repetidos. O piloto
+permanece pendente.
+
+Na `catalogVersion` `2026-08-02.4`, a atualização da tool Advance deixa de
+depender de um pedido de commit: qualquer alteração do processo termina com o
+cachebuster oficial, validação de plugin/skills, reinstalação e confirmação da
+versão ativa. Sem autorização Git, o diff permanece local. Com `commit e sync`,
+o mesmo workflow gera apenas um cachebuster antes do commit e reinstala essa
+versão depois do push. O fecho não se trata como nova alteração, evitando
+recursão, segundo bump ou commit vazio. EVAL-02-SYNC, EVAL-03, EVAL-04, EVAL-12
+e depois a suite completa devem ser repetidos. O piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-02.5`, atualizar a tool também propaga o catálogo
+para as instâncias lifecycle locais conhecidas sob `SoftwareProcesses`. A
+propagação usa apenas o comando oficial `upgrade`, preserva resultados e
+evidências pelo nome estável do prompt mesmo quando o ID mudou, e valida cada
+instância no fim. Lifecycles concluídos, com tentativa ativa, inválidos ou com
+marcadores de recuperação/concorrência são ignorados com motivo; backups,
+clones e projetos sem lifecycle não são alterados. EVAL-02-SYNC, EVAL-03,
+EVAL-04, EVAL-12 e depois a suite completa devem ser repetidos. O piloto
+permanece pendente.
 
 ## Referências
 

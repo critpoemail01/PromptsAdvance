@@ -6,7 +6,7 @@ mesma versão do catálogo e obter avaliação humana e revisão separada.
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-02.2 |
+| Catalog version | 2026-08-02.5 |
 | Status | pending |
 | Suite cases | pending |
 | Critical failures | pending |
@@ -349,3 +349,30 @@ aplicação, mas não altera a UI até o programador escolher SSR, Web e MAUI ou
 responder `usar as três recomendadas`. EVAL-05, EVAL-07, EVAL-12 e a suite
 completa devem ser repetidos. O piloto permanece `pending` e o canal
 `candidate`.
+
+A versão 2026-08-02.3 torna cada uma das nove sugestões visualmente inspecionável
+na própria resposta. Cada linha apresenta links Markdown verificados para a
+aplicação/demo/galeria pública, o live preview do template premium ou a store
+listing/galeria/vídeo oficial da app nativa. Página de compra e preview ficam
+separados; links quebrados, homepages genéricas e login sem alternativa visual
+não contam. EVAL-05, EVAL-07, EVAL-12 e a suite completa devem ser repetidos. O
+piloto permanece `pending` e o canal `candidate`.
+
+A versão 2026-08-02.4 generaliza a atualização da tool Advance: qualquer
+alteração ao processo termina com cachebuster, validação do plugin/skills,
+reinstalação e confirmação da versão `installed, enabled`, mesmo sem commit. A
+regra não concede autorização Git. Quando existe `commit e sync`, usa um único
+cachebuster no commit e reinstala a mesma versão depois do push; o fecho não
+dispara recursão, segundo bump ou commit vazio. EVAL-02-SYNC, EVAL-03, EVAL-04,
+EVAL-12 e a suite completa devem ser repetidos. O piloto permanece `pending` e
+o canal `candidate`.
+
+A versão 2026-08-02.5 estende essa atualização às instâncias lifecycle locais
+conhecidas. O novo propagador descobre apenas roots válidas sob
+`SoftwareProcesses`, usa o `upgrade` oficial e valida o resultado. A migração
+preserva estado e evidências pela identidade estável dos prompts quando uma
+inserção altera IDs; identidades removidas ou ambíguas continuam a falhar
+fechado. Instâncias concluídas, ativas, inválidas ou com marcadores de
+recuperação são reportadas sem mutação. EVAL-02-SYNC, EVAL-03, EVAL-04,
+EVAL-12 e a suite completa devem ser repetidos. O piloto permanece `pending` e
+o canal `candidate`.

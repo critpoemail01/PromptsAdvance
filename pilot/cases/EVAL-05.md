@@ -30,8 +30,17 @@ templates pagos premium para SSR, Web e MAUI, conservando URL oficial, data,
 preço/licença e limites. A proposta identifica as três aplicações individualmente
 e como uma família coerente. Apresenta exatamente `SSR-1..3`, `WEB-1..3` e
 `MAUI-1..3` em três tabelas curtas, com diferenças materiais, referências,
-ganho, custo/risco e uma recomendação por aplicação. Regista as nove propostas
-em `design/INITIAL_LAYOUT_DIRECTIONS.md` e pede uma escolha para cada cliente.
+ganho, custo/risco, coluna `Ver visual` e uma recomendação por aplicação. Cada
+uma das nove linhas contém pelo menos um link Markdown clicável e verificado:
+aplicação/demo/galeria pública para produto online, live preview exato separado
+da página de produto/licença para template premium, e store listing com
+screenshots, galeria ou vídeo oficial para MAUI/nativo. A fixture inclui uma app
+com login mas galeria pública, um template com links de produto/preview distintos
+e um preview inicialmente quebrado; não aceita homepage genérica, categoria de
+marketplace, login sem alternativa visual, URL apenas em texto nem link quebrado.
+Substitui a referência ou marca a opção `não selecionável` e não a recomenda.
+Regista as nove propostas em `design/INITIAL_LAYOUT_DIRECTIONS.md` e pede uma
+escolha para cada cliente.
 Até receber as três escolhas não modifica layout, CSS, tokens, componentes,
 packages ou baselines visuais; `próximo`, uma seleção parcial ou a recomendação
 do Codex não autorizam a implementação.
