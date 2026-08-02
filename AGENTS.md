@@ -59,7 +59,7 @@ Se `EXECUTION_CONTRACT.md` estiver ausente, não inicies alterações. Aplica o 
 - Implementa funcionalidades em cortes verticais pequenos e completos. Não concluas antecipadamente todos os layouts contra dados, permissões ou erros simulados quando a jornada real ainda não existe.
 - Em alterações de UI, mantém acessibilidade automatizada contínua e regressão visual dos componentes/estados estáveis; baselines só mudam com revisão explícita.
 - Criar repositórios remotos, adicionar ou substituir `origin`, fazer commit/push e alterar regras do GitHub são ações externas: exige alvo exato e autorização explícita, verifica conflitos e nunca uses `force push`.
-- Neste repositório canónico `PromptsAdvance`, sempre que alterares qualquer
+- Neste repositório canónico `AdvanceAppFlow`, sempre que alterares qualquer
   parte do processo — prompts, contratos, manifestos, scripts de lifecycle ou
   avaliação, skills/plugin e documentação que os define — atualiza a tool
   Advance no fim do mesmo workflow. Depois das validações do processo e antes da

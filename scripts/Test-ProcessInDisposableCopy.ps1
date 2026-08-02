@@ -36,7 +36,7 @@ if (-not (Test-Path -LiteralPath $boilerplateSource -PathType Container)) {
 
 $evaluationRoot = Join-Path ([System.IO.Path]::GetTempPath()) `
     ('prompts-advance-evaluation-' + [Guid]::NewGuid().ToString('N'))
-$catalogCopy = Join-Path $evaluationRoot 'PromptsAdvance'
+$catalogCopy = Join-Path $evaluationRoot 'AdvanceAppFlow'
 $boilerplateLink = Join-Path $evaluationRoot 'BoilerPlateAdvance'
 $powerShellExe = Join-Path $PSHOME 'powershell.exe'
 if (-not (Test-Path -LiteralPath $powerShellExe -PathType Leaf)) {

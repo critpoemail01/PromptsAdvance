@@ -1,13 +1,13 @@
 {
   "name": "advance-app",
-  "version": "0.1.0+codex.20260802081610",
-  "description": "Start, adopt, and continue Advance applications one prompt at a time under programmer control.",
+  "version": "0.1.0+codex.20260802082938",
+  "description": "Use AdvanceAppFlow to start, adopt, and continue Advance applications one prompt at a time under programmer control.",
   "author": {
-    "name": "PromptsAdvance Maintainers",
+    "name": "AdvanceAppFlow Maintainers",
     "url": "https://github.com/critpoemail01"
   },
-  "homepage": "https://github.com/critpoemail01/PromptsAdvance",
-  "repository": "https://github.com/critpoemail01/PromptsAdvance",
+  "homepage": "https://github.com/critpoemail01/AdvanceAppFlow",
+  "repository": "https://github.com/critpoemail01/AdvanceAppFlow",
   "keywords": [
     "advance",
     "application-lifecycle",
@@ -17,15 +17,15 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Advance App",
+    "displayName": "AdvanceAppFlow",
     "shortDescription": "Develop Advance apps one prompt at a time.",
-    "longDescription": "Advance App creates or adopts an application, executes one prompt, reports result and remaining work, and waits for the programmer before advancing or rerunning.",
-    "developerName": "PromptsAdvance Maintainers",
+    "longDescription": "AdvanceAppFlow creates or adopts an application, executes one prompt, reports result and remaining work, and waits for the programmer before advancing or rerunning.",
+    "developerName": "AdvanceAppFlow Maintainers",
     "category": "Productivity",
     "capabilities": [
       "Skills"
     ],
-    "websiteURL": "https://github.com/critpoemail01/PromptsAdvance",
+    "websiteURL": "https://github.com/critpoemail01/AdvanceAppFlow",
     "defaultPrompt": [
       "Use $advance-app-start to create a new Advance application.",
       "Use $advance-app-continue to continue an Advance project.",

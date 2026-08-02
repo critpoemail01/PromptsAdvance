@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Catalog version | 2026-08-02.6 |
+| Catalog version | 2026-08-02.7 |
 | Status | approved |
 | Suite cases | 15/15 |
 | Critical failures | 0 |

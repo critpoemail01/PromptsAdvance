@@ -1,4 +1,4 @@
-# Começar ou continuar uma aplicação Advance
+# AdvanceAppFlow — começar ou continuar uma aplicação Advance
 
 O processo executa um prompt de cada vez. Quando um prompt termina, apresenta
 o resultado, o que foi alcançado e o que ainda falta implementar. Depois para.
@@ -134,7 +134,7 @@ impede uma aplicação de começar o desenvolvimento local.
 ## Plugin Codex
 
 ```text
-codex plugin marketplace add critpoemail01/PromptsAdvance
+codex plugin marketplace add critpoemail01/AdvanceAppFlow
 codex plugin add advance-app@promptsadvance
 ```
 

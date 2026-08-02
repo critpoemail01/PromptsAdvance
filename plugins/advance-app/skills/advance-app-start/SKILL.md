@@ -6,7 +6,7 @@ description: Create a new greenfield Advance initiative from any Codex project, 
 # Advance App Start
 
 Use this plugin skill as the global entry point to the canonical
-`PromptsAdvance` catalog. Do not reproduce or replace the catalog workflow.
+`AdvanceAppFlow` catalog. Do not reproduce or replace the catalog workflow.
 
 ## Resolve and load the catalog
 
@@ -18,7 +18,7 @@ Use this plugin skill as the global entry point to the canonical
 pwsh -NoProfile -File <absolute-plugin-root>/scripts/Resolve-AdvanceCatalog.ps1
 ```
 
-Pass `-CatalogPath` when the user supplied an exact `PromptsAdvance` clone.
+Pass `-CatalogPath` when the user supplied an exact `AdvanceAppFlow` clone.
 The resolver checks that the catalog contains `PROCESS_MANIFEST.json`,
 `software-lifecycle.ps1`, and both canonical Advance skills. It may use the
 configured `PROMPTS_ADVANCE_ROOT`, the installed `promptsadvance` marketplace

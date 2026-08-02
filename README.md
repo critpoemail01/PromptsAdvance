@@ -1,6 +1,7 @@
-# Processo profissional de desenvolvimento com Codex
+# AdvanceAppFlow
 
-Catálogo de prompts para criar, adotar, publicar e operar uma aplicação
+Processo profissional de desenvolvimento com Codex e catálogo de prompts para
+criar, adotar, publicar e operar uma aplicação
 Advance. O fluxo padrão é controlado pelo programador: executa um prompt,
 apresenta o resultado e tudo o que falta implementar, e para. Só prepara outro
 prompt depois de `próximo`, `repetir`, `corrigir` ou `ignorar e avançar`.
@@ -67,9 +68,14 @@ Para que as skills apareçam em todos os projetos, instala o catálogo como um
 plugin Codex, no mesmo modelo de um marketplace Git:
 
 ```text
-codex plugin marketplace add critpoemail01/PromptsAdvance
+codex plugin marketplace add critpoemail01/AdvanceAppFlow
 codex plugin add advance-app@promptsadvance
 ```
+
+O projeto e a pasta chamam-se `AdvanceAppFlow`. Os identificadores técnicos
+`promptsadvance`, `advance-app`, `$advance-app-start` e
+`$advance-app-continue` permanecem estáveis para não quebrar instalações e
+automações existentes.
 
 Também é possível substituir o primeiro argumento pelo caminho absoluto de um
 clone local. Reinicia o Codex e abre uma tarefa nova após a instalação. O

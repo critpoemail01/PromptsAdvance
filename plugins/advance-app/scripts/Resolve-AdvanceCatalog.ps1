@@ -36,7 +36,7 @@ if (-not [string]::IsNullOrWhiteSpace($CatalogPath)) {
         throw "CatalogPath is invalid: $CatalogPath"
     }
     if (-not (Test-AdvanceCatalog -Candidate $explicitCatalogPath)) {
-        throw "CatalogPath is not a valid PromptsAdvance catalog: $explicitCatalogPath"
+        throw "CatalogPath is not a valid AdvanceAppFlow catalog: $explicitCatalogPath"
     }
     Write-Output $explicitCatalogPath
     exit 0
@@ -64,10 +64,13 @@ $userProfilePath = [Environment]::GetFolderPath(
     [Environment+SpecialFolder]::UserProfile)
 if (-not [string]::IsNullOrWhiteSpace($userProfilePath)) {
     Add-Candidate -Candidate (Join-Path $userProfilePath '.codex/.tmp/marketplaces/promptsadvance')
+    Add-Candidate -Candidate (Join-Path $userProfilePath 'Documents/AdvanceAppFlow')
+    Add-Candidate -Candidate (Join-Path $userProfilePath 'AdvanceAppFlow')
     Add-Candidate -Candidate (Join-Path $userProfilePath 'Documents/PromptsAdvance')
     Add-Candidate -Candidate (Join-Path $userProfilePath 'PromptsAdvance')
 }
 if ($IsWindows) {
+    Add-Candidate -Candidate 'C:\Work\AdvanceAppFlow'
     Add-Candidate -Candidate 'C:\Work\PromptsAdvance'
 }
 
@@ -90,6 +93,6 @@ foreach ($candidate in $candidatePaths) {
 }
 
 throw @'
-PromptsAdvance catalog not found. Pass -CatalogPath with the exact clone path or
+AdvanceAppFlow catalog not found. Pass -CatalogPath with the exact clone path or
 set PROMPTS_ADVANCE_ROOT. No files were changed.
 '@

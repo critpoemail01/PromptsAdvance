@@ -77,7 +77,7 @@ Espera-se um diff limitado, testes proporcionais, comandos reais, preservação 
 
 #### EVAL-02-SYNC — alteração do processo, commit/sync e atualização da tool
 
-No catálogo `PromptsAdvance`, prepara um remote Git local descartável e uma
+No catálogo `AdvanceAppFlow`, prepara um remote Git local descartável e uma
 instalação Codex isolada/stub verificável. Primeiro altera uma regra pequena do
 processo sem autorizar commit ou push. Espera-se que, depois das validações, o
 executor atualize o cachebuster de `plugins/advance-app`, valide plugin e skills,
@@ -1048,6 +1048,14 @@ comparáveis podem ser apresentadas apenas em `Ver rival (opcional)` para
 observar padrões; não substituem a base premium nem justificam a recomendação.
 EVAL-05, EVAL-07, EVAL-12 e depois a suite completa devem ser repetidos. O
 piloto permanece pendente.
+
+Na `catalogVersion` `2026-08-02.7`, a identidade pública do catálogo, pasta e
+repositório passa de `PromptsAdvance` para `AdvanceAppFlow`. Documentação,
+manifesto, marketplace visível, plugin, resolver e URLs oficiais usam o novo
+nome. Os IDs técnicos `promptsadvance`, `advance-app` e das duas skills são
+preservados para compatibilidade, e o resolver mantém os caminhos antigos
+apenas como fallback de migração. EVAL-02-SYNC, EVAL-03, EVAL-04, EVAL-12 e a
+suite completa devem ser repetidos. O piloto permanece pendente.
 
 ## Referências
 

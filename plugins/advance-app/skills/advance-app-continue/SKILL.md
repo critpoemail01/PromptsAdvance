@@ -6,7 +6,7 @@ description: Continue, adopt, validate, recover, request, rerun, run, or stop an
 # Advance App Continue
 
 Use this plugin skill as the global entry point to the canonical
-`PromptsAdvance` workflow. Do not initialize a new greenfield lifecycle from
+`AdvanceAppFlow` workflow. Do not initialize a new greenfield lifecycle from
 this skill; route that request to `$advance-app-start`.
 
 ## Resolve and load the catalog
@@ -20,7 +20,7 @@ this skill; route that request to `$advance-app-start`.
 pwsh -NoProfile -File <absolute-plugin-root>/scripts/Resolve-AdvanceCatalog.ps1
 ```
 
-Pass `-CatalogPath` when the user supplied an exact `PromptsAdvance` clone.
+Pass `-CatalogPath` when the user supplied an exact `AdvanceAppFlow` clone.
 The resolver checks explicit configuration, the installed `promptsadvance`
 marketplace checkout, bounded conventional clone paths, and ancestors of the
 current working directory. Do not search the entire filesystem.

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-08-02.6",
+  "catalogVersion": "2026-08-02.7",
   "releaseChannel": "candidate",
-  "name": "Professional Advance .NET Software Lifecycle",
+  "name": "AdvanceAppFlow — Professional Advance .NET Software Lifecycle",
   "promptCount": 76,
   "executionPolicy": {
     "workflowMode": "programmer_controlled",

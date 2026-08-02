@@ -1,7 +1,7 @@
 {
   "name": "promptsadvance",
   "interface": {
-    "displayName": "PromptsAdvance"
+    "displayName": "AdvanceAppFlow"
   },
   "plugins": [
     {
